@@ -75,4 +75,43 @@ public class MenuControllerTests
         Assert.Equal(AppScreen.MainMenu, screen);
         Assert.True(returned);
     }
+
+    [Fact]
+    public void Settings_RightOnScale_Cycles1To4()
+    {
+        var menu = new MenuController();
+        var settings = new GameSettings { WindowScale = 2 };
+        var applied = 0;
+        void Apply() => applied++;
+
+        menu.Update(AppScreen.Settings, settings, Apply, () => { }, () => { }, new KeyboardState());
+        menu.Update(AppScreen.Settings, settings, Apply, () => { }, () => { }, new KeyboardState(Keys.Down));
+        menu.Update(AppScreen.Settings, settings, Apply, () => { }, () => { }, new KeyboardState());
+        menu.Update(AppScreen.Settings, settings, Apply, () => { }, () => { }, new KeyboardState(Keys.Right));
+
+        Assert.Equal(3, settings.WindowScale);
+        Assert.True(applied >= 1);
+
+        menu.Update(AppScreen.Settings, settings, Apply, () => { }, () => { }, new KeyboardState());
+        menu.Update(AppScreen.Settings, settings, Apply, () => { }, () => { }, new KeyboardState(Keys.Right));
+        menu.Update(AppScreen.Settings, settings, Apply, () => { }, () => { }, new KeyboardState());
+        menu.Update(AppScreen.Settings, settings, Apply, () => { }, () => { }, new KeyboardState(Keys.Right));
+        Assert.Equal(1, settings.WindowScale);
+    }
+
+    [Fact]
+    public void Settings_Scale_IgnoresInputWhenFullscreen()
+    {
+        var menu = new MenuController();
+        var settings = new GameSettings { Fullscreen = true, WindowScale = 2 };
+        var applied = 0;
+
+        menu.Update(AppScreen.Settings, settings, () => applied++, () => { }, () => { }, new KeyboardState());
+        menu.Update(AppScreen.Settings, settings, () => applied++, () => { }, () => { }, new KeyboardState(Keys.Down));
+        menu.Update(AppScreen.Settings, settings, () => applied++, () => { }, () => { }, new KeyboardState());
+        menu.Update(AppScreen.Settings, settings, () => applied++, () => { }, () => { }, new KeyboardState(Keys.Right));
+
+        Assert.Equal(2, settings.WindowScale);
+        Assert.Equal(0, applied);
+    }
 }

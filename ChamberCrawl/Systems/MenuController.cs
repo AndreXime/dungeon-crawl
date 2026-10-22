@@ -12,7 +12,7 @@ public sealed class MenuController
     private int _pauseIndex;
 
     private static readonly string[] MainItems = ["COMECAR", "CONFIGURACOES", "SAIR"];
-    private static readonly string[] SettingsItems = ["TELA CHEIA", "VOLTAR"];
+    private static readonly string[] SettingsItems = ["TELA CHEIA", "ESCALA", "VOLTAR"];
     private static readonly string[] PauseItems = ["CONTINUAR", "MENU"];
 
     public int MainIndex => _mainIndex;
@@ -149,7 +149,22 @@ public sealed class MenuController
             applyDisplay();
         }
 
-        if (_settingsIndex == 1 && (Pressed(kb, Keys.Enter) || Pressed(kb, Keys.Space)))
+        if (_settingsIndex == 1 &&
+            !settings.Fullscreen &&
+            (Pressed(kb, Keys.Left) || Pressed(kb, Keys.Right) ||
+             Pressed(kb, Keys.Enter) || Pressed(kb, Keys.Space) ||
+             Pressed(kb, Keys.A) || Pressed(kb, Keys.D)))
+        {
+            var delta = Pressed(kb, Keys.Left) || Pressed(kb, Keys.A) ? -1 : 1;
+            var span = GameSettings.MaxWindowScale - GameSettings.MinWindowScale + 1;
+            var next = settings.ClampedWindowScale - GameSettings.MinWindowScale + delta;
+            next = ((next % span) + span) % span;
+            settings.WindowScale = next + GameSettings.MinWindowScale;
+            settings.Save();
+            applyDisplay();
+        }
+
+        if (_settingsIndex == 2 && (Pressed(kb, Keys.Enter) || Pressed(kb, Keys.Space)))
         {
             _prev = kb;
             return AppScreen.MainMenu;

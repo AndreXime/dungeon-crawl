@@ -28,8 +28,8 @@ public class Game1 : Game
     {
         _graphics = new GraphicsDeviceManager(this);
         IsMouseVisible = true;
-        _graphics.PreferredBackBufferWidth = VirtualWidth;
-        _graphics.PreferredBackBufferHeight = VirtualHeight;
+        _graphics.PreferredBackBufferWidth = VirtualWidth * GameSettings.DefaultWindowScale;
+        _graphics.PreferredBackBufferHeight = VirtualHeight * GameSettings.DefaultWindowScale;
         _graphics.HardwareModeSwitch = false;
         Window.AllowUserResizing = false;
     }
@@ -138,8 +138,9 @@ public class Game1 : Game
         }
         else
         {
-            _graphics.PreferredBackBufferWidth = VirtualWidth;
-            _graphics.PreferredBackBufferHeight = VirtualHeight;
+            var scale = _settings.ClampedWindowScale;
+            _graphics.PreferredBackBufferWidth = VirtualWidth * scale;
+            _graphics.PreferredBackBufferHeight = VirtualHeight * scale;
             _graphics.IsFullScreen = false;
         }
 

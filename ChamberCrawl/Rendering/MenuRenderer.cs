@@ -52,7 +52,12 @@ public static class MenuRenderer
             menu.SettingsIndex,
             screenW,
             startY: 140,
-            i => i == 0 ? (settings.Fullscreen ? "SIM" : "NAO") : null);
+            i => i switch
+            {
+                0 => settings.Fullscreen ? "SIM" : "NAO",
+                1 => settings.Fullscreen ? "-" : $"{settings.ClampedWindowScale}X",
+                _ => null,
+            });
     }
 
     public static void DrawPause(

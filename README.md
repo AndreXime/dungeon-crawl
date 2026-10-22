@@ -37,14 +37,14 @@ dotnet build
 
 ## Menu
 
-No menu inicial: **Começar**, **Configurações** (tela cheia Sim/Não) e **Sair**.
-Preferência de tela cheia fica em `settings.json` ao lado do executável.
+No menu inicial: **Começar**, **Configurações** (tela cheia e escala 1x–4x) e **Sair**.
+Preferências ficam em `settings.json` ao lado do executável.
 
 | Tecla (menu) | Ação |
 |--------------|------|
 | W / S ou ↑ / ↓ | Navegar |
 | Enter / Espaço | Confirmar |
-| ← / → | Alternar tela cheia |
+| ← / → | Alternar tela cheia ou ciclo de escala |
 | Esc | Voltar (configurações). No menu principal não fecha o jogo |
 
 ## Controles (durante a run)
