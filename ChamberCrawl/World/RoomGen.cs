@@ -14,7 +14,7 @@ public static class RoomGen
 
     private static readonly EnemyKind[] EnemyPool =
     {
-        EnemyKind.Chaser, EnemyKind.Wander, EnemyKind.Shooter,
+        EnemyKind.Pspam, EnemyKind.Trojan,
     };
 
     private static (int Tx, int Ty) DoorCoords(Dir dir)
@@ -117,7 +117,7 @@ public static class RoomGen
                 break;
             }
             case RoomType.Boss:
-                spawns.Add(new EnemySpawn { Enemy = EnemyKind.Boss, Tx = centerX, Ty = centerY });
+                spawns.Add(new EnemySpawn { Enemy = EnemyKind.AdwareKing, Tx = centerX, Ty = centerY });
                 break;
         }
 

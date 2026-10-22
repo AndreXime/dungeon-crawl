@@ -64,12 +64,12 @@ public class CollisionTests
         var alive = new List<Entity>
         {
             new PlayerEntity { Id = "p1", Hp = 6 },
-            new EnemyEntity { Id = "e1", Enemy = EnemyKind.Chaser, Hp = 2 },
+            new EnemyEntity { Id = "e1", Enemy = EnemyKind.Trojan, Hp = 2 },
         };
         var cleared = new List<Entity>
         {
             new PlayerEntity { Id = "p1", Hp = 6 },
-            new EnemyEntity { Id = "e1", Enemy = EnemyKind.Chaser, Hp = 0 },
+            new EnemyEntity { Id = "e1", Enemy = EnemyKind.Trojan, Hp = 0 },
         };
         Assert.False(Doors.IsRoomCleared(alive));
         Assert.True(Doors.IsRoomCleared(cleared));

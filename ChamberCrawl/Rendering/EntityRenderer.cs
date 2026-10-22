@@ -28,7 +28,7 @@ public static class EntityRenderer
         entity switch
         {
             ProjectileEntity => MathF.Max(entity.Radius * 2.5f, 12f),
-            EnemyEntity { Enemy: EnemyKind.Boss } => MathF.Max(entity.Radius * 3.2f, 40f),
+            EnemyEntity { Enemy: EnemyKind.AdwareKing } => MathF.Max(entity.Radius * 3.2f, 40f),
             PlayerEntity => MathF.Max(entity.Radius * 2.8f, 28f),
             EnemyEntity => MathF.Max(entity.Radius * 2.8f, 26f),
             PickupEntity { Pickup: PickupKind.Portal } => 36f,

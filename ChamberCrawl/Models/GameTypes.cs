@@ -5,7 +5,7 @@ namespace ChamberCrawl.Models;
 public enum Dir { N, S, E, W }
 public enum RoomType { Normal, Item, Shop, Boss, Start }
 public enum RunStatus { Playing, Dead, Won }
-public enum EnemyKind { Chaser, Shooter, Wander, Boss }
+public enum EnemyKind { Pspam, Trojan, AdwareKing }
 public enum EntityKind { Player, Enemy, Projectile, Pickup, Door }
 public enum PickupKind { Coin, Item, Portal }
 
@@ -100,6 +100,8 @@ public sealed class EnemyEntity : Entity
     public float Hp { get; set; }
     public float Cooldown { get; set; }
     public float Phase { get; set; }
+    public bool CanSplit { get; set; }
+    public float IframeUntil { get; set; }
     public EnemyEntity() { Kind = EntityKind.Enemy; }
 }
 
@@ -108,6 +110,7 @@ public sealed class ProjectileEntity : Entity
     public bool FromPlayer { get; set; }
     public float Damage { get; set; }
     public float Life { get; set; }
+    public int BitGlyph { get; set; }
     public ProjectileEntity() { Kind = EntityKind.Projectile; }
 }
 

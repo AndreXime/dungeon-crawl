@@ -48,7 +48,7 @@ public class RunFactoryTests
     {
         var run = RunFactory.Create(7);
         RunFactory.EnterRoom(run, run.Floor.BossRoomId, null);
-        var boss = run.Entities.OfType<EnemyEntity>().Single(e => e.Enemy == EnemyKind.Boss);
+        var boss = run.Entities.OfType<EnemyEntity>().Single(e => e.Enemy == EnemyKind.AdwareKing);
         Assert.Equal(0, boss.Phase);
 
         run.Floor.Rooms[run.Floor.BossRoomId].Cleared = true;

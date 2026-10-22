@@ -47,7 +47,7 @@ public class RoomGenTests
         Assert.All(shopItems, s => Assert.True(s.Price > 0));
 
         var boss = RoomGen.Generate(Node(RoomType.Boss), new[] { Dir.N });
-        var bosses = boss.Spawns.OfType<EnemySpawn>().Where(s => s.Enemy == EnemyKind.Boss).ToList();
+        var bosses = boss.Spawns.OfType<EnemySpawn>().Where(s => s.Enemy == EnemyKind.AdwareKing).ToList();
         Assert.Single(bosses);
         Assert.Equal(GameConstants.RoomW / 2, bosses[0].Tx);
         Assert.Equal(GameConstants.RoomH / 2, bosses[0].Ty);
