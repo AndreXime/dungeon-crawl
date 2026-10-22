@@ -35,11 +35,23 @@ dotnet test
 dotnet build
 ```
 
-## Controles
+## Menu
+
+No menu inicial: **Começar**, **Configurações** (tela cheia Sim/Não) e **Sair**.
+Preferência de tela cheia fica em `settings.json` ao lado do executável.
+
+| Tecla (menu) | Ação |
+|--------------|------|
+| W / S ou ↑ / ↓ | Navegar |
+| Enter / Espaço | Confirmar |
+| ← / → | Alternar tela cheia |
+| Esc | Voltar / sair do jogo no menu |
+
+## Controles (durante a run)
 
 | Tecla | Ação |
 |-------|------|
 | WASD | Mover |
 | Setas | Atirar |
-| R | Reiniciar a run |
-| Esc | Sair |
+| R | Reiniciar a run (após morrer ou vencer) |
+| Esc | Voltar ao menu |
