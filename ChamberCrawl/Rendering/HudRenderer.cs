@@ -1,5 +1,6 @@
 using System.Globalization;
 using ChamberCrawl.Models;
+using ChamberCrawl.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -43,6 +44,25 @@ public static class HudRenderer
         DrawNumber(spriteBatch, atlas, state.Floor.Depth, x + 16, y + 1, Color.LightSkyBlue);
 
         DrawMinimap(spriteBatch, state, atlas);
+        DrawItemPrompt(spriteBatch, state, atlas);
+    }
+
+    private static void DrawItemPrompt(SpriteBatch spriteBatch, RunState state, TextureAtlas atlas)
+    {
+        if (!ItemPrompt.TryResolve(state.Entities, out var name, out var detail))
+            return;
+
+        var x = HudPad;
+        var y = HudPad + HeartSize + 6;
+        GlyphFont.Draw(spriteBatch, atlas.Pixel, name, x, y, Color.White, scale: 1);
+        GlyphFont.Draw(
+            spriteBatch,
+            atlas.Pixel,
+            detail,
+            x,
+            y + GlyphFont.GlyphH + 4,
+            new Color(200, 210, 230),
+            scale: 1);
     }
 
     private static void DrawHearts(
