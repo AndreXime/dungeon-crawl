@@ -1,10 +1,10 @@
-# Chamber Crawl
+# Diskette
 
-Roguelike top-down em C# com MonoGame (DesktopGL).
+Roguelike top-down em C# com MonoGame (DesktopGL). Você controla **Diskette**, um disquete 3,5" que dispara Bits pelos setores corrompidos do PC.
 
 ## Objetivo do MVP
 
-Sobreviva em salas geradas proceduralmente, derrote inimigos, colete moedas, compre itens na loja e avance de andar pelo portal até completar a run.
+Sobreviva em salas geradas proceduralmente na **Partition C**, derrote inimigos (Pspam, Trojan), colete moedas, compre itens na loja e vença o **Adware King** para completar a run.
 
 ## Requisitos
 

@@ -14,7 +14,7 @@ public static class EntityRenderer
             if (!TrySprite(entity, state, atlas, out var texture, out var tint, out var opacity))
                 continue;
 
-            var size = SpriteDrawSize(entity);
+            var size = SpriteDrawSize(entity, state);
             var dest = new Rectangle(
                 (int)MathF.Round(entity.X - size / 2f),
                 (int)MathF.Round(entity.Y - size / 2f),
@@ -24,11 +24,19 @@ public static class EntityRenderer
         }
     }
 
-    private static float SpriteDrawSize(Entity entity) =>
-        entity switch
+    private static float SpriteDrawSize(Entity entity, RunState state)
+    {
+        if (entity is EnemyEntity { Enemy: EnemyKind.AdwareKing } adware)
+        {
+            var size = MathF.Max(adware.Radius * 3.2f, 40f);
+            if (adware.IframeUntil > state.TimeMs)
+                size *= 0.45f;
+            return size;
+        }
+
+        return entity switch
         {
             ProjectileEntity => MathF.Max(entity.Radius * 2.5f, 12f),
-            EnemyEntity { Enemy: EnemyKind.AdwareKing } => MathF.Max(entity.Radius * 3.2f, 40f),
             PlayerEntity => MathF.Max(entity.Radius * 2.8f, 28f),
             EnemyEntity => MathF.Max(entity.Radius * 2.8f, 26f),
             PickupEntity { Pickup: PickupKind.Portal } => 36f,
@@ -36,6 +44,7 @@ public static class EntityRenderer
             DoorEntity => 30f,
             _ => MathF.Max(entity.Radius * 2f, 16f),
         };
+    }
 
     private static bool TrySprite(
         Entity entity,
@@ -58,7 +67,11 @@ public static class EntityRenderer
                     opacity = 0.35f;
                 return true;
             case EnemyEntity enemy:
-                texture = atlas.Get(Enemies.Defs[enemy.Enemy].Texture);
+                texture = enemy.Enemy switch
+                {
+                    EnemyKind.Trojan => atlas.Get(enemy.Phase == 0 ? "enemy-trojan" : "enemy-trojan-active"),
+                    _ => atlas.Get(Enemies.Defs[enemy.Enemy].Texture),
+                };
                 return true;
             case ProjectileEntity proj:
                 if (proj.FromPlayer)

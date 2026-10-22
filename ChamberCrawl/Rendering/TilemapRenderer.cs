@@ -1,3 +1,4 @@
+using ChamberCrawl.Data;
 using ChamberCrawl.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,13 +14,7 @@ public static class TilemapRenderer
         {
             for (var tx = 0; tx < GameConstants.RoomW; tx++)
             {
-                var name = tiles[ty, tx] switch
-                {
-                    GameConstants.TileWall => "wall",
-                    GameConstants.TileDoor => "door-tile",
-                    GameConstants.TileObstacle => "obstacle",
-                    _ => "floor",
-                };
+                var name = FloorThemes.TextureForTile(tiles[ty, tx]);
                 var dest = new Rectangle(
                     tx * GameConstants.Cell,
                     ty * GameConstants.Cell,
