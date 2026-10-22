@@ -7,6 +7,8 @@ export interface EnemyDef {
   radius: number;
   fireCooldownMs: number;
   projectileSpeed: number;
+  preferredDist?: number;
+  chargeSpeed?: number;
   svg: string;
 }
 
@@ -27,6 +29,7 @@ export const ENEMIES: Record<EnemyKind, EnemyDef> = {
     radius: 10,
     fireCooldownMs: 1500,
     projectileSpeed: 140,
+    preferredDist: 140,
     svg: "enemy-shooter.svg",
   },
   wander: {
@@ -45,6 +48,7 @@ export const ENEMIES: Record<EnemyKind, EnemyDef> = {
     radius: 22,
     fireCooldownMs: 1200,
     projectileSpeed: 160,
+    chargeSpeed: 110,
     svg: "enemy-boss.svg",
   },
 };
