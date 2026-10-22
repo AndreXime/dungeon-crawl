@@ -1,4 +1,5 @@
 using System.Linq;
+using ChamberCrawl.Data;
 using ChamberCrawl.Models;
 using ChamberCrawl.Systems;
 
@@ -20,6 +21,51 @@ public class AiTests
             Id = "player", X = 300, Y = 160, Radius = GameConstants.PlayerRadius, Hp = 6,
         });
         return run;
+    }
+
+    private static EnemyEntity AddEnemy(RunState run, EnemyKind kind, float x, float y, float radius = 9)
+    {
+        var enemy = new EnemyEntity
+        {
+            Id = $"e{run.Entities.Count}",
+            Enemy = kind,
+            X = x,
+            Y = y,
+            Radius = radius,
+            Hp = Enemies.Defs[kind].Hp,
+        };
+        run.Entities.Add(enemy);
+        return enemy;
+    }
+
+    [Fact]
+    public void Update_Pspam_SplitsIntoTwoChildrenAfter4Seconds()
+    {
+        var run = OpenRoomRun();
+        var parent = AddEnemy(run, EnemyKind.Pspam, 200, 160);
+        parent.CanSplit = true;
+        parent.Cooldown = 4000f;
+        parent.Hp = 2;
+
+        Ai.Update(run, 4.1f);
+
+        Assert.DoesNotContain(run.Entities, e => e.Id == parent.Id);
+        var kids = run.Entities.OfType<EnemyEntity>().Where(e => e.Enemy == EnemyKind.Pspam).ToList();
+        Assert.Equal(2, kids.Count);
+        Assert.All(kids, k => Assert.False(k.CanSplit));
+        Assert.All(kids, k => Assert.Equal(1, k.Hp));
+    }
+
+    [Fact]
+    public void Update_PspamChild_DoesNotSplit()
+    {
+        var run = OpenRoomRun();
+        var child = AddEnemy(run, EnemyKind.Pspam, 200, 160);
+        child.CanSplit = false;
+        child.Cooldown = 4000f;
+        Ai.Update(run, 5f);
+        Assert.Contains(run.Entities, e => e.Id == child.Id);
+        Assert.Single(run.Entities.OfType<EnemyEntity>());
     }
 
     [Fact]

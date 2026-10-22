@@ -99,8 +99,9 @@ public static class RunFactory
                         X = ex, Y = ey,
                         Radius = def.Radius,
                         Hp = def.Hp,
-                        Cooldown = def.FireCooldownMs,
+                        Cooldown = enemy.Enemy == EnemyKind.Pspam ? Ai.PspamSplitMs : def.FireCooldownMs,
                         Phase = 0,
+                        CanSplit = enemy.Enemy == EnemyKind.Pspam,
                     });
                     break;
                 case ItemSpawn item when !node.ClaimedSpawns.Contains(index):
