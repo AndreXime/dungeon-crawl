@@ -99,7 +99,12 @@ public static class RunFactory
                         X = ex, Y = ey,
                         Radius = def.Radius,
                         Hp = def.Hp,
-                        Cooldown = enemy.Enemy == EnemyKind.Pspam ? Ai.PspamSplitMs : def.FireCooldownMs,
+                        Cooldown = enemy.Enemy switch
+                        {
+                            EnemyKind.Pspam => Ai.PspamSplitMs,
+                            EnemyKind.AdwareKing => Ai.AdwareIdleMs,
+                            _ => def.FireCooldownMs,
+                        },
                         Phase = 0,
                         CanSplit = enemy.Enemy == EnemyKind.Pspam,
                     });
