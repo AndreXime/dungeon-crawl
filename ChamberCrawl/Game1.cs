@@ -1,6 +1,4 @@
-﻿#nullable enable
-using System;
-using ChamberCrawl.Models;
+﻿using ChamberCrawl.Models;
 using ChamberCrawl.Rendering;
 using ChamberCrawl.Systems;
 using Microsoft.Xna.Framework;
@@ -21,7 +19,6 @@ public class Game1 : Game
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
-        Content.RootDirectory = "Content";
         IsMouseVisible = true;
         _graphics.PreferredBackBufferWidth = GameConstants.RoomW * GameConstants.Cell;
         _graphics.PreferredBackBufferHeight = GameConstants.RoomH * GameConstants.Cell + HudMargin;
