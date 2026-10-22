@@ -61,6 +61,28 @@ public class RoomGenTests
     }
 
     [Fact]
+    public void Generate_Normal_EnemiesStayAwayFromDoorEntries()
+    {
+        var neighbors = new[] { Dir.N, Dir.E, Dir.S };
+        var entries = neighbors.Select(RoomGen.EntryTileForDoor).ToList();
+
+        for (var seed = 0; seed < 60; seed++)
+        {
+            var room = RoomGen.Generate(Node(RoomType.Normal, seed), neighbors);
+            foreach (var enemy in room.Spawns.OfType<EnemySpawn>())
+            {
+                foreach (var (ex, ey) in entries)
+                {
+                    var dist = Math.Abs(enemy.Tx - ex) + Math.Abs(enemy.Ty - ey);
+                    Assert.True(
+                        dist >= RoomGen.MinEnemySpawnDistFromEntry,
+                        $"seed {seed}: {enemy.Enemy} at ({enemy.Tx},{enemy.Ty}) dist {dist} from entry ({ex},{ey})");
+                }
+            }
+        }
+    }
+
+    [Fact]
     public void Generate_CreatesWallBorderAndDoorsOnNeighbors()
     {
         var room = RoomGen.Generate(Node(), new[] { Dir.N, Dir.E });

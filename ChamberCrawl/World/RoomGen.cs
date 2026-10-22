@@ -7,6 +7,9 @@ namespace ChamberCrawl.World;
 
 public static class RoomGen
 {
+    /// <summary>Distância Manhattan mínima entre inimigo e cada tile de entrada (porta).</summary>
+    public const int MinEnemySpawnDistFromEntry = 4;
+
     private static readonly string[] ItemIds =
     {
         "damage_up", "speed_up", "hp_up", "fire_rate", "triple", "greedy",
@@ -77,23 +80,35 @@ public static class RoomGen
                 }
 
                 var enemyCount = 3 + rng.Next(3);
+                var entries = EntryTiles(neighbors);
                 var occupied = new HashSet<(int, int)> { (centerX, centerY) };
+                foreach (var entry in entries)
+                    occupied.Add(entry);
 
                 for (var i = 0; i < enemyCount; i++)
                 {
                     var enemy = EnemyPool[rng.Next(EnemyPool.Length)];
                     var placed = false;
-                    for (var attempt = 0; attempt < 20 && !placed; attempt++)
+                    for (var attempt = 0; attempt < 40 && !placed; attempt++)
                     {
                         var (tx, ty) = enemy == EnemyKind.Trojan
                             ? PickTrojanTile(rng, w, h)
                             : (2 + rng.Next(w - 4), 2 + rng.Next(h - 4));
-                        if (tiles[ty, tx] != GameConstants.TileFloor || !occupied.Add((tx, ty))) continue;
+                        if (tiles[ty, tx] != GameConstants.TileFloor) continue;
+                        if (!FarFromEntries(tx, ty, entries, MinEnemySpawnDistFromEntry)) continue;
+                        if (!occupied.Add((tx, ty))) continue;
                         spawns.Add(new EnemySpawn { Enemy = enemy, Tx = tx, Ty = ty });
                         placed = true;
                     }
                     if (!placed)
-                        spawns.Add(new EnemySpawn { Enemy = enemy, Tx = 2 + i, Ty = 2 });
+                    {
+                        var fallback = FindSafeEnemyTile(tiles, occupied, entries, w, h);
+                        if (fallback is { } tile)
+                        {
+                            occupied.Add(tile);
+                            spawns.Add(new EnemySpawn { Enemy = enemy, Tx = tile.Tx, Ty = tile.Ty });
+                        }
+                    }
                 }
                 break;
             }
@@ -144,5 +159,70 @@ public static class RoomGen
             _ => (w - 5, h - 5),
         };
         return (baseX + rng.Next(3), baseY + rng.Next(3));
+    }
+
+    /// <summary>Tile onde o jogador aparece ao entrar por aquela porta da sala.</summary>
+    public static (int Tx, int Ty) EntryTileForDoor(Dir doorDir)
+    {
+        var midX = GameConstants.RoomW / 2;
+        var midY = GameConstants.RoomH / 2;
+        return doorDir switch
+        {
+            Dir.N => (midX, 1),
+            Dir.S => (midX, GameConstants.RoomH - 2),
+            Dir.W => (1, midY),
+            _ => (GameConstants.RoomW - 2, midY),
+        };
+    }
+
+    private static List<(int Tx, int Ty)> EntryTiles(IReadOnlyList<Dir> neighbors)
+    {
+        var entries = new List<(int Tx, int Ty)>(neighbors.Count);
+        foreach (var dir in neighbors)
+            entries.Add(EntryTileForDoor(dir));
+        return entries;
+    }
+
+    private static bool FarFromEntries(
+        int tx,
+        int ty,
+        IReadOnlyList<(int Tx, int Ty)> entries,
+        int minDist)
+    {
+        foreach (var (ex, ey) in entries)
+        {
+            if (Math.Abs(tx - ex) + Math.Abs(ty - ey) < minDist)
+                return false;
+        }
+        return true;
+    }
+
+    private static (int Tx, int Ty)? FindSafeEnemyTile(
+        int[,] tiles,
+        HashSet<(int, int)> occupied,
+        IReadOnlyList<(int Tx, int Ty)> entries,
+        int w,
+        int h)
+    {
+        (int Tx, int Ty)? best = null;
+        var bestScore = -1;
+        for (var ty = 2; ty < h - 2; ty++)
+        {
+            for (var tx = 2; tx < w - 2; tx++)
+            {
+                if (tiles[ty, tx] != GameConstants.TileFloor) continue;
+                if (occupied.Contains((tx, ty))) continue;
+                var minEntry = int.MaxValue;
+                foreach (var (ex, ey) in entries)
+                    minEntry = Math.Min(minEntry, Math.Abs(tx - ex) + Math.Abs(ty - ey));
+                if (minEntry < MinEnemySpawnDistFromEntry) continue;
+                if (minEntry > bestScore)
+                {
+                    bestScore = minEntry;
+                    best = (tx, ty);
+                }
+            }
+        }
+        return best;
     }
 }
