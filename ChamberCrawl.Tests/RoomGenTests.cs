@@ -41,6 +41,26 @@ public class RoomGenTests
     }
 
     [Fact]
+    public void Generate_Normal_TrojansSpawnAwayFromCenter()
+    {
+        var centerX = GameConstants.RoomW / 2;
+        var centerY = GameConstants.RoomH / 2;
+        var trojans = new List<EnemySpawn>();
+        for (var seed = 0; seed < 80; seed++)
+        {
+            var room = RoomGen.Generate(Node(RoomType.Normal, seed), new[] { Dir.N, Dir.E });
+            trojans.AddRange(room.Spawns.OfType<EnemySpawn>().Where(s => s.Enemy == EnemyKind.Trojan));
+        }
+
+        Assert.NotEmpty(trojans);
+        Assert.All(trojans, t =>
+        {
+            var dist = Math.Abs(t.Tx - centerX) + Math.Abs(t.Ty - centerY);
+            Assert.True(dist >= 4, $"Trojan at ({t.Tx},{t.Ty}) too close to center ({centerX},{centerY})");
+        });
+    }
+
+    [Fact]
     public void Generate_CreatesWallBorderAndDoorsOnNeighbors()
     {
         var room = RoomGen.Generate(Node(), new[] { Dir.N, Dir.E });

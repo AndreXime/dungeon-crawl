@@ -10,6 +10,7 @@ public static class Ai
 {
     public const float PspamSplitMs = 4000f;
     public const float TrojanWakeRadius = 80f;
+    public const float TrojanChargeMs = 400f;
     public const float WanderMinMs = 500f;
     public const float WanderMaxMs = 1500f;
     public const float AdwareIdleMs = 800f;
@@ -22,7 +23,7 @@ public static class Ai
     private const float PspamNoSplitCooldownMs = 999_999f;
     private const int AdwareSpamSpawnCount = 3;
 
-    /// <summary>Dano de contato fica em Combat.Update. AI por kind nas tasks 4–6.</summary>
+    /// <summary>Dano de contato fica em Combat.Update. Movimenta inimigos por kind (Pspam, Trojan, AdwareKing).</summary>
     public static void Update(RunState state, float dt, Func<float>? rng = null)
     {
         if (state.Status != RunStatus.Playing) return;
@@ -125,7 +126,7 @@ public static class Ai
                 Enemy = EnemyKind.Pspam,
                 X = (tx + 0.5f) * GameConstants.Cell,
                 Y = (ty + 0.5f) * GameConstants.Cell,
-                Radius = def.Radius,
+                Radius = def.Radius * 0.7f,
                 Hp = 1,
                 CanSplit = false,
                 Cooldown = PspamNoSplitCooldownMs,
@@ -261,19 +262,35 @@ public static class Ai
         var dy = player.Y - enemy.Y;
         var dist = MathF.Sqrt(dx * dx + dy * dy);
 
+        // Phase 0 idle, 1 charging, 2+ chasing.
         if (enemy.Phase == 0)
         {
             if (dist > 0 && dist <= TrojanWakeRadius)
             {
                 enemy.Phase = 1;
-                var dirX = dx / dist;
-                var dirY = dy / dist;
+                enemy.Cooldown = TrojanChargeMs;
                 var charge = def.ChargeSpeed ?? def.Speed;
-                enemy.Vx = dirX * charge;
-                enemy.Vy = dirY * charge;
+                enemy.Vx = dx / dist * charge;
+                enemy.Vy = dy / dist * charge;
                 MoveWithTiles(state, enemy, enemy.Vx * dt, enemy.Vy * dt);
             }
 
+            return;
+        }
+
+        if (enemy.Phase == 1)
+        {
+            enemy.Cooldown -= dt * 1000f;
+            if (dist > 0)
+            {
+                var charge = def.ChargeSpeed ?? def.Speed;
+                enemy.Vx = dx / dist * charge;
+                enemy.Vy = dy / dist * charge;
+                MoveWithTiles(state, enemy, enemy.Vx * dt, enemy.Vy * dt);
+            }
+
+            if (enemy.Cooldown <= 0)
+                enemy.Phase = 2;
             return;
         }
 

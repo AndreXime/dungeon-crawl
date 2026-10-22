@@ -92,6 +92,36 @@ public class AiTests
         Ai.Update(run, Dt);
         Assert.Equal(1, enemy.Phase);
         Assert.True(enemy.X > 200);
+        Assert.True(enemy.Cooldown > 0);
+    }
+
+    [Fact]
+    public void Update_Trojan_ChargeLastsMultipleFramesAtChargeSpeed()
+    {
+        var run = OpenRoomRun();
+        var enemy = AddEnemy(run, EnemyKind.Trojan, 200, 160);
+        enemy.Phase = 0;
+        run.Entities.OfType<PlayerEntity>().Single().X = 280;
+        var chaseSpeed = Enemies.Defs[EnemyKind.Trojan].Speed;
+        var chargeSpeed = Enemies.Defs[EnemyKind.Trojan].ChargeSpeed!.Value;
+
+        Ai.Update(run, Dt);
+        Assert.Equal(1, enemy.Phase);
+        var xWake = enemy.X;
+
+        Ai.Update(run, Dt);
+        Assert.Equal(1, enemy.Phase);
+        var step = enemy.X - xWake;
+        Assert.True(step > chaseSpeed * Dt);
+        Assert.InRange(step, chargeSpeed * Dt * 0.85f, chargeSpeed * Dt * 1.15f);
+
+        Ai.Update(run, Ai.TrojanChargeMs / 1000f);
+        Assert.Equal(2, enemy.Phase);
+
+        var xChaseStart = enemy.X;
+        Ai.Update(run, Dt);
+        Assert.Equal(2, enemy.Phase);
+        Assert.InRange(enemy.X - xChaseStart, chaseSpeed * Dt * 0.85f, chaseSpeed * Dt * 1.15f);
     }
 
     [Fact]
@@ -141,9 +171,14 @@ public class AiTests
         boss.Cooldown = 0;
         Ai.Update(run, Dt);
         Assert.Equal(3, run.Entities.OfType<EnemyEntity>().Count(e => e.Enemy == EnemyKind.Pspam));
+        var expectedRadius = Enemies.Defs[EnemyKind.Pspam].Radius * 0.7f;
         Assert.All(
             run.Entities.OfType<EnemyEntity>().Where(e => e.Enemy == EnemyKind.Pspam),
-            p => Assert.False(p.CanSplit));
+            p =>
+            {
+                Assert.False(p.CanSplit);
+                Assert.Equal(expectedRadius, p.Radius);
+            });
     }
 
     [Fact]

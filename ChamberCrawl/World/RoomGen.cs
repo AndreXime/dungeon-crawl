@@ -85,8 +85,9 @@ public static class RoomGen
                     var placed = false;
                     for (var attempt = 0; attempt < 20 && !placed; attempt++)
                     {
-                        var tx = 2 + rng.Next(w - 4);
-                        var ty = 2 + rng.Next(h - 4);
+                        var (tx, ty) = enemy == EnemyKind.Trojan
+                            ? PickTrojanTile(rng, w, h)
+                            : (2 + rng.Next(w - 4), 2 + rng.Next(h - 4));
                         if (tiles[ty, tx] != GameConstants.TileFloor || !occupied.Add((tx, ty))) continue;
                         spawns.Add(new EnemySpawn { Enemy = enemy, Tx = tx, Ty = ty });
                         placed = true;
@@ -129,5 +130,19 @@ public static class RoomGen
         }
 
         return new RoomData { Tiles = tiles, Spawns = spawns };
+    }
+
+    /// <summary>Prefere cantos / longe do centro da sala para Trojan.</summary>
+    private static (int Tx, int Ty) PickTrojanTile(Random rng, int w, int h)
+    {
+        var corner = rng.Next(4);
+        var (baseX, baseY) = corner switch
+        {
+            0 => (2, 2),
+            1 => (w - 5, 2),
+            2 => (2, h - 5),
+            _ => (w - 5, h - 5),
+        };
+        return (baseX + rng.Next(3), baseY + rng.Next(3));
     }
 }
