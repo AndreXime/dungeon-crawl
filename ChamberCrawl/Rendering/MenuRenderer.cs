@@ -55,7 +55,7 @@ public static class MenuRenderer
             i => i switch
             {
                 0 => settings.Fullscreen ? "SIM" : "NAO",
-                1 => settings.Fullscreen ? "-" : $"{settings.ClampedWindowScale}X",
+                1 => settings.Fullscreen ? "AJUSTE" : $"{settings.ClampedWindowScale}X",
                 _ => null,
             });
     }

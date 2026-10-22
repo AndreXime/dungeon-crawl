@@ -39,12 +39,13 @@ dotnet build
 
 No menu inicial: **Começar**, **Configurações** (tela cheia e escala 1x–4x) e **Sair**.
 Preferências ficam em `settings.json` ao lado do executável.
+Em tela cheia a escala fica em **AJUSTE**: preenche o monitor o máximo possível sem cortar o jogo.
 
 | Tecla (menu) | Ação |
 |--------------|------|
 | W / S ou ↑ / ↓ | Navegar |
 | Enter / Espaço | Confirmar |
-| ← / → | Alternar tela cheia ou ciclo de escala |
+| ← / → | Alternar tela cheia ou ciclo de escala (só no modo janela) |
 | Esc | Voltar (configurações). No menu principal não fecha o jogo |
 
 ## Controles (durante a run)

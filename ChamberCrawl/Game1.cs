@@ -200,18 +200,41 @@ public class Game1 : Game
         GraphicsDevice.SetRenderTarget(null);
         GraphicsDevice.Clear(Color.Black);
 
-        var backW = GraphicsDevice.Viewport.Width;
-        var backH = GraphicsDevice.Viewport.Height;
-        var scale = Math.Max(1, Math.Min(backW / VirtualWidth, backH / VirtualHeight));
-        var destW = VirtualWidth * scale;
-        var destH = VirtualHeight * scale;
-        var destX = (backW - destW) / 2;
-        var destY = (backH - destH) / 2;
+        var dest = FitSceneDestination(
+            GraphicsDevice.Viewport.Width,
+            GraphicsDevice.Viewport.Height,
+            VirtualWidth,
+            VirtualHeight,
+            integerScale: !_settings.Fullscreen);
 
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-        _spriteBatch.Draw(_scene, new Rectangle(destX, destY, destW, destH), Color.White);
+        _spriteBatch.Draw(_scene, dest, Color.White);
         _spriteBatch.End();
 
         base.Draw(gameTime);
+    }
+
+    /// <summary>
+    /// Janela: escala inteira (1x-4x). Tela cheia: maior escala contínua sem cortar o conteúdo.
+    /// </summary>
+    public static Rectangle FitSceneDestination(
+        int backW,
+        int backH,
+        int virtualW,
+        int virtualH,
+        bool integerScale)
+    {
+        if (virtualW <= 0 || virtualH <= 0 || backW <= 0 || backH <= 0)
+            return Rectangle.Empty;
+
+        float scale;
+        if (integerScale)
+            scale = Math.Max(1, Math.Min(backW / virtualW, backH / virtualH));
+        else
+            scale = Math.Min((float)backW / virtualW, (float)backH / virtualH);
+
+        var destW = Math.Min(backW, (int)MathF.Round(virtualW * scale));
+        var destH = Math.Min(backH, (int)MathF.Round(virtualH * scale));
+        return new Rectangle((backW - destW) / 2, (backH - destH) / 2, destW, destH);
     }
 }
