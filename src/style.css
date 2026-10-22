@@ -31,9 +31,11 @@ body {
 
 #game-root {
   isolation: isolate;
+  display: inline-block;
 }
 
 #tilemap {
+  position: relative;
   z-index: 0;
 }
 
