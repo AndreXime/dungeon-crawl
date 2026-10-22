@@ -45,7 +45,7 @@ Preferência de tela cheia fica em `settings.json` ao lado do executável.
 | W / S ou ↑ / ↓ | Navegar |
 | Enter / Espaço | Confirmar |
 | ← / → | Alternar tela cheia |
-| Esc | Voltar / sair do jogo no menu |
+| Esc | Voltar (configurações). No menu principal não fecha o jogo |
 
 ## Controles (durante a run)
 
@@ -54,4 +54,4 @@ Preferência de tela cheia fica em `settings.json` ao lado do executável.
 | WASD | Mover |
 | Setas | Atirar |
 | R | Reiniciar a run (após morrer ou vencer) |
-| Esc | Voltar ao menu |
+| Esc | Pause (Continuar / Menu). Esc de novo continua |

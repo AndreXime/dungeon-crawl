@@ -5,4 +5,5 @@ public enum AppScreen
     MainMenu,
     Settings,
     Playing,
+    Paused,
 }

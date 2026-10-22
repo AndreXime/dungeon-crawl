@@ -55,6 +55,29 @@ public static class MenuRenderer
             i => i == 0 ? (settings.Fullscreen ? "SIM" : "NAO") : null);
     }
 
+    public static void DrawPause(
+        SpriteBatch spriteBatch,
+        TextureAtlas atlas,
+        MenuController menu,
+        int screenW,
+        int screenH)
+    {
+        spriteBatch.Draw(atlas.Pixel, new Rectangle(0, 0, screenW, screenH), new Color(0, 0, 0, 160));
+
+        var title = "PAUSE";
+        var titleX = (screenW - GlyphFont.MeasureWidth(title)) / 2;
+        GlyphFont.Draw(spriteBatch, atlas.Pixel, title, titleX, 100, new Color(255, 220, 120));
+
+        DrawItemList(
+            spriteBatch,
+            atlas,
+            menu.PauseLabels,
+            menu.PauseIndex,
+            screenW,
+            startY: 160,
+            _ => null);
+    }
+
     private static void DrawBackdrop(SpriteBatch spriteBatch, TextureAtlas atlas, int w, int h)
     {
         spriteBatch.Draw(atlas.Pixel, new Rectangle(0, 0, w, h), new Color(12, 14, 22));

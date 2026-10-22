@@ -70,11 +70,16 @@ public class Game1 : Game
                     _settings,
                     ApplyDisplaySettings,
                     StartRun,
-                    Exit);
+                    Exit,
+                    kb);
                 break;
 
             case AppScreen.Playing:
                 UpdatePlaying(kb, dt);
+                break;
+
+            case AppScreen.Paused:
+                _screen = _menu.UpdatePause(_screen, () => { }, ReturnToMenu, kb);
                 break;
         }
 
@@ -86,7 +91,9 @@ public class Game1 : Game
     {
         if (Pressed(kb, Keys.Escape))
         {
-            ReturnToMenu();
+            _menu.ResetPauseSelection();
+            _menu.SyncInput(kb);
+            _screen = AppScreen.Paused;
             return;
         }
 
@@ -179,6 +186,10 @@ public class Game1 : Game
                 break;
             case AppScreen.Playing:
                 GameRenderer.Draw(_spriteBatch, _state, _atlas);
+                break;
+            case AppScreen.Paused:
+                GameRenderer.Draw(_spriteBatch, _state, _atlas);
+                MenuRenderer.DrawPause(_spriteBatch, _atlas, _menu, VirtualWidth, VirtualHeight);
                 break;
         }
 
