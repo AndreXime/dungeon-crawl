@@ -75,12 +75,13 @@ public static class Combat
                 Id = NextProjectileId("player"),
                 FromPlayer = true,
                 X = player.X,
-                Y = player.Y,
+                Y = player.Y - player.Radius * 0.75f,
                 Vx = MathF.Cos(angle) * PlayerProjectileSpeed,
                 Vy = MathF.Sin(angle) * PlayerProjectileSpeed,
                 Radius = GameConstants.ProjectileRadius,
                 Damage = stats.Damage,
                 Life = stats.Range / PlayerProjectileSpeed,
+                BitGlyph = projectileCounter & 1,
             });
         }
         state.ShootCooldown = 1f / stats.FireRate;

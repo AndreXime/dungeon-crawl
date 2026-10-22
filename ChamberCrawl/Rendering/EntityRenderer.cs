@@ -61,8 +61,13 @@ public static class EntityRenderer
                 texture = atlas.Get(Enemies.Defs[enemy.Enemy].Texture);
                 return true;
             case ProjectileEntity proj:
-                texture = atlas.Get("projectile");
-                if (!proj.FromPlayer) tint = new Color(180, 120, 255);
+                if (proj.FromPlayer)
+                    texture = atlas.Get(proj.BitGlyph == 0 ? "bit-0" : "bit-1");
+                else
+                {
+                    texture = atlas.Get("projectile");
+                    tint = new Color(180, 120, 255);
+                }
                 return true;
             case PickupEntity pickup:
                 texture = pickup.Pickup switch
