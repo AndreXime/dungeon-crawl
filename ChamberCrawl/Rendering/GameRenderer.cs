@@ -12,8 +12,8 @@ namespace ChamberCrawl.Rendering;
 public static class GameRenderer
 {
     private const int HudPad = 8;
-    private const int HeartSize = 16;
-    private const int IconSize = 16;
+    private const int HeartSize = 20;
+    private const int IconSize = 20;
     private const int DigitW = 10;
     private const int DigitH = 14;
     private const int DigitGap = 2;
@@ -58,7 +58,7 @@ public static class GameRenderer
             if (!TrySprite(entity, state, atlas, out var texture, out var tint, out var opacity))
                 continue;
 
-            var size = MathF.Max(entity.Radius * 2f, 8f);
+            var size = SpriteDrawSize(entity);
             var dest = new Rectangle(
                 (int)MathF.Round(entity.X - size / 2f),
                 (int)MathF.Round(entity.Y - size / 2f),
@@ -67,6 +67,19 @@ public static class GameRenderer
             spriteBatch.Draw(texture, dest, tint * opacity);
         }
     }
+
+    private static float SpriteDrawSize(Entity entity) =>
+        entity switch
+        {
+            ProjectileEntity => MathF.Max(entity.Radius * 2.5f, 12f),
+            EnemyEntity { Enemy: EnemyKind.Boss } => MathF.Max(entity.Radius * 3.2f, 40f),
+            PlayerEntity => MathF.Max(entity.Radius * 2.8f, 28f),
+            EnemyEntity => MathF.Max(entity.Radius * 2.8f, 26f),
+            PickupEntity { Pickup: PickupKind.Portal } => 36f,
+            PickupEntity => 28f,
+            DoorEntity => 30f,
+            _ => MathF.Max(entity.Radius * 2f, 16f),
+        };
 
     private static bool TrySprite(
         Entity entity,
@@ -107,8 +120,10 @@ public static class GameRenderer
                     opacity = 0.45f;
                 return true;
             case DoorEntity door:
+                // Open exits use door-tile only. Door sprite overlays when locked.
+                if (!door.Locked)
+                    return false;
                 texture = atlas.Get("door");
-                opacity = door.Locked ? 1f : 0.4f;
                 return true;
             default:
                 return false;
