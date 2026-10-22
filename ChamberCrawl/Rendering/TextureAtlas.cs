@@ -31,9 +31,11 @@ public sealed class TextureAtlas : IDisposable
             throw new DirectoryNotFoundException($"Texturas não encontradas: {texturesDir}");
 
         var byName = new Dictionary<string, Texture2D>(StringComparer.OrdinalIgnoreCase);
-        foreach (var path in Directory.EnumerateFiles(texturesDir, "*.png"))
+        foreach (var path in Directory.EnumerateFiles(texturesDir, "*.png", SearchOption.AllDirectories))
         {
             var name = Path.GetFileNameWithoutExtension(path);
+            if (byName.ContainsKey(name))
+                throw new InvalidOperationException($"Textura duplicada: {name} ({path})");
             using var stream = File.OpenRead(path);
             byName[name] = Texture2D.FromStream(device, stream);
         }
