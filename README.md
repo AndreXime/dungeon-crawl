@@ -8,14 +8,13 @@ Sobreviva em salas geradas proceduralmente, derrote inimigos, colete moedas, com
 
 ## Requisitos
 
-- [.NET SDK](https://dotnet.microsoft.com/download) 8 ou superior
+- [.NET SDK](https://dotnet.microsoft.com/download) 9 (ou 8+ com roll-forward)
 - Plataforma MonoGame DesktopGL (incluída no projeto)
 
 ### Instalar .NET e PATH (Linux)
 
 ```bash
-# Exemplo com instalador oficial em $HOME/.dotnet
-curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 8.0
+curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 9.0
 export DOTNET_ROOT=$HOME/.dotnet
 export PATH=$PATH:$HOME/.dotnet
 ```
@@ -40,5 +39,7 @@ dotnet build
 
 | Tecla | Ação |
 |-------|------|
-| WASD ou setas | Mover |
+| WASD | Mover |
+| Setas | Atirar |
 | R | Reiniciar a run |
+| Esc | Sair |
