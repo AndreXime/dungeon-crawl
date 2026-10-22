@@ -54,7 +54,7 @@ public class DoorsTests
     }
 
     [Fact]
-    public void Update_CollectsLooseCoinsOnClear()
+    public void Update_KeepsLooseCoinsOnClear()
     {
         var state = RunFactory.Create(42);
         var target = FirstNormalRoom(state);
@@ -65,14 +65,51 @@ public class DoorsTests
             Id = "coin-x",
             Pickup = PickupKind.Coin,
             Amount = 2,
+            X = 80,
+            Y = 80,
             Radius = 8,
         });
+        var coinsBefore = state.Coins;
 
         Doors.Update(state);
 
-        Assert.Equal(2, state.Coins);
-        Assert.DoesNotContain(state.Entities, e => e.Id == "coin-x");
+        Assert.Equal(coinsBefore, state.Coins);
+        Assert.Contains(state.Entities, e => e.Id == "coin-x");
+        Assert.True(state.Floor.Rooms[target.Id].Cleared);
     }
+
+    [Fact]
+    public void EnterRoom_PreservesLooseCoinsWhenReturning()
+    {
+        var state = RunFactory.Create(42);
+        var startId = state.CurrentRoomId;
+        var neighbor = state.Floor.Rooms[startId].Neighbors.First();
+        state.Entities.Add(new PickupEntity
+        {
+            Id = "coin-stay",
+            Pickup = PickupKind.Coin,
+            Amount = 3,
+            X = 96,
+            Y = 96,
+            Radius = 8,
+        });
+
+        RunFactory.EnterRoom(state, neighbor.Value, neighbor.Key);
+        RunFactory.EnterRoom(state, startId, Opp(neighbor.Key));
+
+        var coin = Assert.Single(state.Entities.OfType<PickupEntity>(), p => p.Pickup == PickupKind.Coin);
+        Assert.Equal(3, coin.Amount);
+        Assert.Equal(96, coin.X);
+        Assert.Equal(96, coin.Y);
+    }
+
+    private static Dir Opp(Dir dir) => dir switch
+    {
+        Dir.N => Dir.S,
+        Dir.S => Dir.N,
+        Dir.E => Dir.W,
+        _ => Dir.E,
+    };
 
     [Fact]
     public void Update_DoesNotEnterThroughLockedDoor()

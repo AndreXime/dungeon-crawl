@@ -33,13 +33,45 @@ public static class RunFactory
         if (!state.Floor.Rooms.TryGetValue(roomId, out var node))
             throw new InvalidOperationException($"Sala inexistente: {roomId}");
 
+        StashLooseCoins(state);
+
         node.Visited = true;
         state.CurrentRoomId = roomId;
         state.Room = RoomGen.Generate(node, node.Neighbors.Keys.ToList());
         state.Entities = SpawnRoomEntities(state.Room, node, entryDir);
+        RestoreLooseCoins(state, node);
 
         var player = state.Entities.OfType<PlayerEntity>().First();
         player.Hp = state.PlayerStats.Hp;
+    }
+
+    private static void StashLooseCoins(RunState state)
+    {
+        if (!state.Floor.Rooms.TryGetValue(state.CurrentRoomId, out var previous))
+            return;
+
+        previous.LooseCoins = state.Entities
+            .OfType<PickupEntity>()
+            .Where(p => p.Pickup == PickupKind.Coin)
+            .Select(p => new LooseCoin { X = p.X, Y = p.Y, Amount = p.Amount })
+            .ToList();
+    }
+
+    private static void RestoreLooseCoins(RunState state, FloorRoomNode node)
+    {
+        var i = 0;
+        foreach (var coin in node.LooseCoins)
+        {
+            state.Entities.Add(new PickupEntity
+            {
+                Id = $"coin-stash-{node.Id}-{i++}",
+                Pickup = PickupKind.Coin,
+                Amount = coin.Amount,
+                X = coin.X,
+                Y = coin.Y,
+                Radius = PickupRadius,
+            });
+        }
     }
 
     public static List<Entity> SpawnRoomEntities(RoomData room, FloorRoomNode node, Dir? entryDir)

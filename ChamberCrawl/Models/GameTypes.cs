@@ -31,6 +31,14 @@ public sealed class FloorRoomNode
     public bool Visited { get; set; }
     public int RoomSeed { get; set; }
     public List<int> ClaimedSpawns { get; set; } = new();
+    public List<LooseCoin> LooseCoins { get; set; } = new();
+}
+
+public sealed class LooseCoin
+{
+    public float X { get; set; }
+    public float Y { get; set; }
+    public int Amount { get; set; }
 }
 
 public sealed class Floor

@@ -17,7 +17,6 @@ public static class Doors
         if (IsRoomCleared(state.Entities))
         {
             node.Cleared = true;
-            CollectLooseCoins(state);
             foreach (var entity in state.Entities)
             {
                 if (entity is DoorEntity door) door.Locked = false;
@@ -37,18 +36,5 @@ public static class Doors
             RunFactory.EnterRoom(state, neighborId, door.Dir);
             return;
         }
-    }
-
-    private static void CollectLooseCoins(RunState state)
-    {
-        var remaining = new List<Entity>();
-        foreach (var entity in state.Entities)
-        {
-            if (entity is PickupEntity { Pickup: PickupKind.Coin } coin)
-                state.Coins += coin.Amount;
-            else
-                remaining.Add(entity);
-        }
-        state.Entities = remaining;
     }
 }

@@ -61,7 +61,7 @@ Reescrever o roguelike tempo real estilo Binding of Isaac no **MonoGame DesktopG
 Trazer do protótipo web:
 
 1. `claimedSpawns` por sala: itens/loja não respawnam ao reentrar
-2. Ao limpar a sala, auto-coletar moedas soltas
+2. Moedas soltas ficam no chão até o jogador coletar (e persistem se sair e voltar à sala)
 3. Portal do boss andar 1: offset do centro + atraso (~500 ms) antes de ativar
 4. I-frames e dano de contato no sistema de combate
 5. Boss inicia `phase = 0`
