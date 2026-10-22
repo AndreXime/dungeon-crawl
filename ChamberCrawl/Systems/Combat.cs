@@ -86,7 +86,7 @@ public static class Combat
         state.ShootCooldown = 1f / stats.FireRate;
     }
 
-    private static void DamagePlayer(RunState state, float amount)
+    public static void DamagePlayer(RunState state, float amount)
     {
         if (state.TimeMs < state.PlayerStats.IframeUntil) return;
         state.PlayerStats.Hp = Math.Max(0, state.PlayerStats.Hp - (int)MathF.Ceiling(amount));
@@ -140,6 +140,12 @@ public static class Combat
                 var target = enemies.FirstOrDefault(enemy => enemy.Hp > 0 && Collision.CirclesOverlap(
                     projectile.X, projectile.Y, projectile.Radius, enemy.X, enemy.Y, enemy.Radius));
                 if (target is null) continue;
+
+                if (state.TimeMs < target.IframeUntil)
+                {
+                    removed.Add(projectile);
+                    continue;
+                }
 
                 target.Hp -= projectile.Damage;
                 removed.Add(projectile);

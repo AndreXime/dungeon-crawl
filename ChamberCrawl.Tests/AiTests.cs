@@ -118,4 +118,48 @@ public class AiTests
 
         Ai.Update(run, 1f / 60f);
     }
+
+    [Fact]
+    public void Update_AdwareKing_FiresButtonBurstOnEnterPhase1()
+    {
+        var run = OpenRoomRun();
+        var boss = AddEnemy(run, EnemyKind.AdwareKing, 200, 160, 24);
+        boss.Hp = 40;
+        boss.Phase = 0;
+        boss.Cooldown = 0;
+        Ai.Update(run, Dt);
+        Assert.Equal(1, boss.Phase);
+        Assert.Equal(12, run.Entities.OfType<ProjectileEntity>().Count());
+    }
+
+    [Fact]
+    public void Update_AdwareKing_SpawnsThreePspamsOnPhase3()
+    {
+        var run = OpenRoomRun();
+        var boss = AddEnemy(run, EnemyKind.AdwareKing, 200, 160, 24);
+        boss.Phase = 2;
+        boss.Cooldown = 0;
+        Ai.Update(run, Dt);
+        Assert.Equal(3, run.Entities.OfType<EnemyEntity>().Count(e => e.Enemy == EnemyKind.Pspam));
+        Assert.All(
+            run.Entities.OfType<EnemyEntity>().Where(e => e.Enemy == EnemyKind.Pspam),
+            p => Assert.False(p.CanSplit));
+    }
+
+    [Fact]
+    public void Combat_IgnoresDamageWhileEnemyIframes()
+    {
+        var run = OpenRoomRun();
+        var boss = AddEnemy(run, EnemyKind.AdwareKing, 200, 160, 24);
+        boss.Hp = 40;
+        boss.IframeUntil = 10_000;
+        run.TimeMs = 100;
+        run.Entities.Add(new ProjectileEntity
+        {
+            Id = "hit", FromPlayer = true, X = 200, Y = 160, Vx = 0, Vy = 0,
+            Radius = 4, Damage = 5, Life = 1,
+        });
+        Combat.Update(run, new InputSnapshot(), Dt);
+        Assert.Equal(40, boss.Hp);
+    }
 }
