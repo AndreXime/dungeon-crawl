@@ -7,6 +7,8 @@ namespace ChamberCrawl.Tests;
 
 public class AiTests
 {
+    private const float Dt = 1f / 60f;
+
     private static RunState OpenRoomRun()
     {
         var run = new RunState();
@@ -66,6 +68,30 @@ public class AiTests
         Ai.Update(run, 5f);
         Assert.Contains(run.Entities, e => e.Id == child.Id);
         Assert.Single(run.Entities.OfType<EnemyEntity>());
+    }
+
+    [Fact]
+    public void Update_Trojan_StaysIdleFarAway()
+    {
+        var run = OpenRoomRun();
+        var enemy = AddEnemy(run, EnemyKind.Trojan, 100, 160);
+        enemy.Phase = 0;
+        run.Entities.OfType<PlayerEntity>().Single().X = 300;
+        Ai.Update(run, Dt);
+        Assert.Equal(0, enemy.Phase);
+        Assert.Equal(100, enemy.X);
+    }
+
+    [Fact]
+    public void Update_Trojan_ChargesWhenPlayerClose()
+    {
+        var run = OpenRoomRun();
+        var enemy = AddEnemy(run, EnemyKind.Trojan, 200, 160);
+        enemy.Phase = 0;
+        run.Entities.OfType<PlayerEntity>().Single().X = 250;
+        Ai.Update(run, Dt);
+        Assert.Equal(1, enemy.Phase);
+        Assert.True(enemy.X > 200);
     }
 
     [Fact]

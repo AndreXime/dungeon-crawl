@@ -8,6 +8,7 @@ namespace ChamberCrawl.Systems;
 public static class Ai
 {
     public const float PspamSplitMs = 4000f;
+    public const float TrojanWakeRadius = 80f;
     public const float WanderMinMs = 500f;
     public const float WanderMaxMs = 1500f;
     private const float PspamSplitOffsetPx = 8f;
@@ -29,6 +30,8 @@ public static class Ai
                     UpdatePspam(state, enemy, dt, random);
                     break;
                 case EnemyKind.Trojan:
+                    UpdateTrojan(state, enemy, player, dt);
+                    break;
                 case EnemyKind.AdwareKing:
                     break;
             }
@@ -95,6 +98,40 @@ public static class Ai
         var y = enemy.Y;
         MoveWithTiles(state, enemy, enemy.Vx * dt, enemy.Vy * dt);
         if (enemy.X == x && enemy.Y == y) enemy.Phase = 0;
+    }
+
+    private static void UpdateTrojan(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
+    {
+        var def = Enemies.Defs[EnemyKind.Trojan];
+        var dx = player.X - enemy.X;
+        var dy = player.Y - enemy.Y;
+        var dist = MathF.Sqrt(dx * dx + dy * dy);
+
+        if (enemy.Phase == 0)
+        {
+            if (dist > 0 && dist <= TrojanWakeRadius)
+            {
+                enemy.Phase = 1;
+                var dirX = dx / dist;
+                var dirY = dy / dist;
+                var charge = def.ChargeSpeed ?? def.Speed;
+                enemy.Vx = dirX * charge;
+                enemy.Vy = dirY * charge;
+                MoveWithTiles(state, enemy, enemy.Vx * dt, enemy.Vy * dt);
+            }
+
+            return;
+        }
+
+        if (dist == 0) return;
+        Steer(state, enemy, dx / dist, dy / dist, def.Speed, dt);
+    }
+
+    private static void Steer(RunState state, EnemyEntity enemy, float dirX, float dirY, float speed, float dt)
+    {
+        enemy.Vx = dirX * speed;
+        enemy.Vy = dirY * speed;
+        MoveWithTiles(state, enemy, enemy.Vx * dt, enemy.Vy * dt);
     }
 
     private static void MoveWithTiles(RunState state, EnemyEntity enemy, float dx, float dy)
