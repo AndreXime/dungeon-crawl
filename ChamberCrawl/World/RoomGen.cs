@@ -17,6 +17,13 @@ public static class RoomGen
         EnemyKind.Pspam, EnemyKind.Trojan,
     };
 
+    private static readonly int[] PartitionObstacleTiles =
+    {
+        GameConstants.TileFolder,
+        GameConstants.TilePopup,
+        GameConstants.TileBadSector,
+    };
+
     private static (int Tx, int Ty) DoorCoords(Dir dir)
     {
         var midX = GameConstants.RoomW / 2;
@@ -66,7 +73,7 @@ public static class RoomGen
                     var tx = 2 + rng.Next(w - 4);
                     var ty = 2 + rng.Next(h - 4);
                     if (tx == centerX && ty == centerY) continue;
-                    tiles[ty, tx] = GameConstants.TileObstacle;
+                    tiles[ty, tx] = PartitionObstacleTiles[rng.Next(PartitionObstacleTiles.Length)];
                 }
 
                 var enemyCount = 3 + rng.Next(3);

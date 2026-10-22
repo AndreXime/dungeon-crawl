@@ -6,13 +6,39 @@ namespace ChamberCrawl.Tests;
 
 public class RoomGenTests
 {
-    private static FloorRoomNode Node(RoomType type = RoomType.Normal) => new()
+    private static FloorRoomNode Node(RoomType type = RoomType.Normal, int seed = 99) => new()
     {
         Id = "0,0",
         Type = type,
         Neighbors = new() { [Dir.N] = "0,-1", [Dir.E] = "1,0" },
-        RoomSeed = 99,
+        RoomSeed = seed,
     };
+
+    [Fact]
+    public void Generate_Normal_UsesPartitionEnemyPoolAndObstacleTiles()
+    {
+        var room = RoomGen.Generate(Node(RoomType.Normal, seed: 7), new[] { Dir.N, Dir.E });
+        var enemies = room.Spawns.OfType<EnemySpawn>().Select(s => s.Enemy).ToHashSet();
+        Assert.Subset(new HashSet<EnemyKind> { EnemyKind.Pspam, EnemyKind.Trojan }, enemies);
+        Assert.DoesNotContain(EnemyKind.AdwareKing, enemies);
+
+        var obstacleTiles = new HashSet<int>();
+        for (var y = 0; y < GameConstants.RoomH; y++)
+            for (var x = 0; x < GameConstants.RoomW; x++)
+            {
+                var t = room.Tiles[y, x];
+                if (t is GameConstants.TileFolder or GameConstants.TilePopup or GameConstants.TileBadSector)
+                    obstacleTiles.Add(t);
+            }
+        Assert.NotEmpty(obstacleTiles);
+    }
+
+    [Fact]
+    public void Generate_Boss_SpawnsAdwareKing()
+    {
+        var boss = RoomGen.Generate(Node(RoomType.Boss), new[] { Dir.N });
+        Assert.Contains(boss.Spawns.OfType<EnemySpawn>(), s => s.Enemy == EnemyKind.AdwareKing);
+    }
 
     [Fact]
     public void Generate_CreatesWallBorderAndDoorsOnNeighbors()
