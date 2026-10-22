@@ -74,7 +74,7 @@ export interface ProjectileEntity extends EntityBase {
 
 export interface PickupEntity extends EntityBase {
   kind: "pickup";
-  pickup: "coin" | "item";
+  pickup: "coin" | "item" | "portal";
   itemId?: string;
   price?: number;
   amount?: number;
