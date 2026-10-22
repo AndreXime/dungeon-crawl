@@ -14,4 +14,18 @@ public static class FloorThemes
         GameConstants.TileObstacle => "obstacle",
         _ => "floor",
     };
+
+    /// <summary>Obstáculos são sprites sobre o chão; parede/porta/chão não usam overlay.</summary>
+    public static bool TryOverlayTexture(int tile, out string textureName)
+    {
+        textureName = tile switch
+        {
+            GameConstants.TileFolder => "folder",
+            GameConstants.TilePopup => "popup",
+            GameConstants.TileBadSector => "bad-sector",
+            GameConstants.TileObstacle => "obstacle",
+            _ => "",
+        };
+        return textureName.Length > 0;
+    }
 }
