@@ -119,9 +119,18 @@ public static class Combat
             projectile.Y += projectile.Vy * dt;
             projectile.Life -= dt;
 
-            if (projectile.Life <= 0
-                || Collision.CircleHitsSolid(projectile.X, projectile.Y, projectile.Radius, state.Room.Tiles))
+            if (projectile.Life <= 0)
             {
+                removed.Add(projectile);
+                continue;
+            }
+
+            if (Collision.TrySampleSolidTile(
+                    projectile.X, projectile.Y, projectile.Radius, state.Room.Tiles,
+                    out var hitTx, out var hitTy, out var hitTile))
+            {
+                if (projectile.FromPlayer && hitTile == GameConstants.TileFolder)
+                    state.Room.Tiles[hitTy, hitTx] = GameConstants.TileFloor;
                 removed.Add(projectile);
                 continue;
             }
