@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CELL, ROOM_W } from "../src/game/constants";
+import { CELL, PLAYER_RADIUS, ROOM_W } from "../src/game/constants";
 import { createRun, enterRoom } from "../src/game/run";
 import { updateMovement } from "../src/systems/movement";
 
@@ -23,10 +23,10 @@ describe("run", () => {
     expect(player).toBeDefined();
   });
 
-  it("não atravessa paredes", () => {
+  it("não sai dos limites da sala", () => {
     const state = createRun(42);
     for (let i = 0; i < 600; i++) updateMovement(state, { ...idle, moveX: -1 }, 1 / 60);
     const player = state.entities.find((e) => e.kind === "player");
-    expect(player?.x).toBeGreaterThan(CELL);
+    expect(player?.x).toBeGreaterThanOrEqual(PLAYER_RADIUS - 0.001);
   });
 });
