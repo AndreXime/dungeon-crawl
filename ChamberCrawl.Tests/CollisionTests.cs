@@ -36,6 +36,28 @@ public class CollisionTests
         Assert.True(Collision.CircleHitsSolid(-10, -10, 5, tiles));
     }
 
+    [Theory]
+    [InlineData(GameConstants.TileFolder)]
+    [InlineData(GameConstants.TilePopup)]
+    [InlineData(GameConstants.TileBadSector)]
+    public void CircleHitsSolid_BlocksNewPartitionTiles(int tile)
+    {
+        var tiles = new[,] { { GameConstants.TileFloor, tile }, { GameConstants.TileDoor, GameConstants.TileFloor } };
+        Assert.True(Collision.CircleHitsSolid(GameConstants.Cell * 1.5f, GameConstants.Cell * 0.5f, 6, tiles));
+    }
+
+    [Fact]
+    public void TrySampleSolidTile_ReturnsFolderUnderProjectile()
+    {
+        var tiles = new[,] { { GameConstants.TileFloor, GameConstants.TileFolder } };
+        var ok = Collision.TrySampleSolidTile(
+            GameConstants.Cell * 1.5f, GameConstants.Cell * 0.5f, 4, tiles, out var tx, out var ty, out var tile);
+        Assert.True(ok);
+        Assert.Equal(1, tx);
+        Assert.Equal(0, ty);
+        Assert.Equal(GameConstants.TileFolder, tile);
+    }
+
     [Fact]
     public void IsRoomCleared_ChecksForLivingEnemies()
     {

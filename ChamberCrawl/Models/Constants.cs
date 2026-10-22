@@ -14,4 +14,7 @@ public static class GameConstants
     public const int TileWall = 1;
     public const int TileDoor = 2;
     public const int TileObstacle = 3;
+    public const int TileFolder = 4;
+    public const int TilePopup = 5;
+    public const int TileBadSector = 6;
 }

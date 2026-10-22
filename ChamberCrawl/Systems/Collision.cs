@@ -27,10 +27,38 @@ public static class Collision
         return false;
     }
 
+    public static bool IsSolidTile(int tile) =>
+        tile is GameConstants.TileWall
+            or GameConstants.TileObstacle
+            or GameConstants.TileFolder
+            or GameConstants.TilePopup
+            or GameConstants.TileBadSector;
+
     private static bool IsTileSolid(int tx, int ty, int[,] tiles)
     {
         if (ty < 0 || ty >= tiles.GetLength(0) || tx < 0 || tx >= tiles.GetLength(1)) return true;
-        var tile = tiles[ty, tx];
-        return tile == GameConstants.TileWall || tile == GameConstants.TileObstacle;
+        return IsSolidTile(tiles[ty, tx]);
+    }
+
+    public static bool TrySampleSolidTile(
+        float x, float y, float radius, int[,] tiles, out int tx, out int ty, out int tile)
+    {
+        tx = ty = 0;
+        tile = GameConstants.TileFloor;
+        for (var i = 0; i < SampleCount; i++)
+        {
+            var angle = MathF.PI * 0.25f * i;
+            var sx = (int)MathF.Floor((x + MathF.Cos(angle) * radius) / GameConstants.Cell);
+            var sy = (int)MathF.Floor((y + MathF.Sin(angle) * radius) / GameConstants.Cell);
+            if (sy < 0 || sy >= tiles.GetLength(0) || sx < 0 || sx >= tiles.GetLength(1))
+                continue;
+            var t = tiles[sy, sx];
+            if (!IsSolidTile(t)) continue;
+            tx = sx;
+            ty = sy;
+            tile = t;
+            return true;
+        }
+        return false;
     }
 }
