@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { CELL, ROOM_H, ROOM_W } from "../src/game/constants";
 import { createRun, enterRoom } from "../src/game/run";
 import type { Dir, EnemyEntity, PlayerEntity, RunState } from "../src/game/types";
 import { isRoomCleared, updateDoors } from "../src/systems/doors";
@@ -65,6 +66,27 @@ describe("updateDoors", () => {
     ).toBe(true);
   });
 
+  it("coleta moedas soltas ao limpar a sala", () => {
+    const state = createRun(42);
+    const target = firstNormalRoom(state);
+    enterRoom(state, target.id, target.dir);
+    state.entities = state.entities.filter((e) => e.kind !== "enemy");
+    state.entities.push({
+      id: "coin-x",
+      kind: "pickup",
+      pickup: "coin",
+      amount: 2,
+      x: 0,
+      y: 0,
+      vx: 0,
+      vy: 0,
+      radius: 8,
+    });
+    updateDoors(state);
+    expect(state.coins).toBe(2);
+    expect(state.entities.some((e) => e.id === "coin-x")).toBe(false);
+  });
+
   it("não atravessa porta trancada", () => {
     const state = createRun(42);
     const target = firstNormalRoom(state);
@@ -107,9 +129,25 @@ describe("updateProgression", () => {
     if (!portal) return;
     moveOnto(state, portal.x, portal.y);
     updateProgression(state);
+    expect(state.floor.depth).toBe(1);
+    state.timeMs += 600;
+    updateProgression(state);
     expect(state.floor.depth).toBe(2);
     expect(state.currentRoomId).toBe(state.floor.startRoomId);
     expect(state.status).toBe("playing");
+  });
+
+  it("não avança se o jogador está no centro quando o boss morre", () => {
+    const state = inBossRoom(1);
+    const center = {
+      x: (Math.floor(ROOM_W / 2) + 0.5) * CELL,
+      y: (Math.floor(ROOM_H / 2) + 0.5) * CELL,
+    };
+    moveOnto(state, center.x, center.y);
+    updateProgression(state);
+    state.timeMs += 600;
+    updateProgression(state);
+    expect(state.floor.depth).toBe(1);
   });
 
   it("vence ao limpar o boss do andar 2", () => {

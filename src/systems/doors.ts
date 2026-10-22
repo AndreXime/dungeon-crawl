@@ -6,6 +6,18 @@ export function isRoomCleared(entities: Entity[]): boolean {
   return !entities.some((e) => e.kind === "enemy" && e.hp > 0);
 }
 
+function collectLooseCoins(state: RunState): void {
+  const remaining: Entity[] = [];
+  for (const entity of state.entities) {
+    if (entity.kind === "pickup" && entity.pickup === "coin") {
+      state.coins += entity.amount ?? 1;
+    } else {
+      remaining.push(entity);
+    }
+  }
+  state.entities = remaining;
+}
+
 export function updateDoors(state: RunState): void {
   if (state.status !== "playing") return;
   const node = state.floor.rooms[state.currentRoomId];
@@ -13,6 +25,7 @@ export function updateDoors(state: RunState): void {
 
   if (isRoomCleared(state.entities)) {
     node.cleared = true;
+    collectLooseCoins(state);
     for (const entity of state.entities) {
       if (entity.kind === "door") entity.locked = false;
     }

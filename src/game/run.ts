@@ -96,15 +96,17 @@ export function spawnRoomEntities(
           radius: def.radius,
           hp: def.hp,
           cooldown: def.fireCooldownMs,
-          ...(spawn.enemy === "boss" ? { phase: 1 } : {}),
+          ...(spawn.enemy === "boss" ? { phase: 0 } : {}),
         });
         break;
       }
       case "item":
+        if (node.claimedSpawns.includes(index)) return;
         entities.push({
           kind: "pickup",
           id: `item-${index}`,
           pickup: "item",
+          spawnIndex: index,
           itemId: spawn.itemId,
           ...(spawn.price !== undefined ? { price: spawn.price } : {}),
           ...pos,

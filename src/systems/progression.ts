@@ -1,12 +1,13 @@
 import { CELL, ROOM_H, ROOM_W } from "../game/constants";
 import { enterRoom } from "../game/run";
-import type { PlayerEntity, RunState } from "../game/types";
+import type { PickupEntity, PlayerEntity, RunState } from "../game/types";
 import { generateFloor } from "../world/floorGen";
 import { circlesOverlap } from "./collision";
 import { isRoomCleared } from "./doors";
 
 const PORTAL_ID = "portal";
 const PORTAL_RADIUS = 14;
+const PORTAL_ACTIVATION_DELAY_MS = 500;
 
 export function advanceFloor(state: RunState): void {
   state.floor = generateFloor(state.seed, 2);
@@ -23,17 +24,20 @@ export function updateProgression(state: RunState): void {
     return;
   }
 
-  let portal = state.entities.find((e) => e.id === PORTAL_ID);
+  let portal = state.entities.find(
+    (e): e is PickupEntity => e.kind === "pickup" && e.id === PORTAL_ID,
+  );
   if (!portal) {
     portal = {
       kind: "pickup",
       id: PORTAL_ID,
       pickup: "portal",
       x: (Math.floor(ROOM_W / 2) + 0.5) * CELL,
-      y: (Math.floor(ROOM_H / 2) + 0.5) * CELL,
+      y: (Math.floor(ROOM_H / 2) + 1.5) * CELL,
       vx: 0,
       vy: 0,
       radius: PORTAL_RADIUS,
+      activeAt: state.timeMs + PORTAL_ACTIVATION_DELAY_MS,
     };
     state.entities.push(portal);
   }
@@ -43,6 +47,7 @@ export function updateProgression(state: RunState): void {
   );
   if (
     player &&
+    state.timeMs >= (portal.activeAt ?? 0) &&
     circlesOverlap(player.x, player.y, player.radius, portal.x, portal.y, portal.radius)
   ) {
     advanceFloor(state);

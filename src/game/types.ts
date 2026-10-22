@@ -24,6 +24,7 @@ export interface FloorRoomNode {
   cleared: boolean;
   visited: boolean;
   roomSeed: number;
+  claimedSpawns: number[];
 }
 
 export interface Floor {
@@ -78,6 +79,8 @@ export interface PickupEntity extends EntityBase {
   itemId?: string;
   price?: number;
   amount?: number;
+  spawnIndex?: number;
+  activeAt?: number;
 }
 
 export interface DoorEntity extends EntityBase {

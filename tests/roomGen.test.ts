@@ -8,6 +8,7 @@ const base: FloorRoomNode = {
   type: "normal",
   neighbors: { N: "0,-1", E: "1,0" },
   cleared: false,
+  claimedSpawns: [],
   visited: false,
   roomSeed: 99,
 };

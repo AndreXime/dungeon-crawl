@@ -9,6 +9,7 @@ export function updatePickups(state: RunState): void {
   );
   if (!player) return;
 
+  const node = state.floor.rooms[state.currentRoomId];
   const removed = new Set<Entity>();
 
   for (const entity of state.entities) {
@@ -39,6 +40,9 @@ export function updatePickups(state: RunState): void {
       state.playerStats = applyItem(state.playerStats, entity.itemId);
       player.hp = state.playerStats.hp;
       state.inventory.push(entity.itemId);
+      if (node && entity.spawnIndex !== undefined) {
+        node.claimedSpawns.push(entity.spawnIndex);
+      }
       removed.add(entity);
     }
   }

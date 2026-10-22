@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createRun } from "../src/game/run";
-import type { PickupEntity, PlayerEntity, RunState } from "../src/game/types";
+import { createRun, enterRoom } from "../src/game/run";
+import type { Entity, PickupEntity, PlayerEntity, RunState } from "../src/game/types";
 import { updatePickups } from "../src/systems/pickups";
 
 function getPlayer(state: RunState): PlayerEntity {
@@ -9,7 +9,31 @@ function getPlayer(state: RunState): PlayerEntity {
   return player;
 }
 
+function itemRoom(state: RunState): string {
+  const entry = Object.values(state.floor.rooms).find((r) => r.type === "item");
+  if (!entry) throw new Error("sem sala de item");
+  return entry.id;
+}
+
 describe("updatePickups", () => {
+  it("não reaparece item já pego ao reentrar na sala", () => {
+    const state = createRun(42);
+    const roomId = itemRoom(state);
+    enterRoom(state, roomId);
+    const isItem = (e: Entity) => e.kind === "pickup" && e.pickup === "item";
+    const item = state.entities.find(isItem);
+    if (item?.kind !== "pickup") throw new Error("sem item");
+    const player = getPlayer(state);
+    player.x = item.x;
+    player.y = item.y;
+    updatePickups(state);
+    expect(state.inventory).toHaveLength(1);
+
+    enterRoom(state, state.floor.startRoomId);
+    enterRoom(state, roomId);
+    expect(state.entities.some(isItem)).toBe(false);
+  });
+
   it("coleta moedas e soma amount", () => {
     const state = createRun(42);
     const player = getPlayer(state);

@@ -49,6 +49,7 @@ export function generateFloor(seed: number, depth: 1 | 2): Floor {
       type: "normal",
       neighbors: {},
       cleared: false,
+      claimedSpawns: [],
       visited: false,
       roomSeed: (seed ^ (pos.x * 73856093) ^ (pos.y * 19349663) ^ depth) >>> 0,
     };
