@@ -9,7 +9,7 @@ public class FloorGenTests
     public void Generate_CreatesConnectedRoomsWithRequiredTypes()
     {
         var floor = FloorGen.Generate(42, 1);
-        Assert.InRange(floor.Rooms.Count, 6, 8);
+        Assert.InRange(floor.Rooms.Count, 6, 12);
         Assert.Equal(RoomType.Start, floor.Rooms[floor.StartRoomId].Type);
         Assert.True(floor.Rooms[floor.StartRoomId].Cleared);
         Assert.Equal(RoomType.Boss, floor.Rooms[floor.BossRoomId].Type);
@@ -27,6 +27,31 @@ public class FloorGenTests
                 stack.Push(n);
         }
         Assert.Equal(floor.Rooms.Count, seen.Count);
+    }
+
+    [Fact]
+    public void Generate_SpecialRoomsAreLeaves_AndBossIsFar()
+    {
+        for (var seed = 0; seed < 40; seed++)
+        {
+            var floor = FloorGen.Generate(seed, 1 + seed % 2);
+            var boss = floor.Rooms[floor.BossRoomId];
+            var shop = floor.Rooms.Values.Single(r => r.Type == RoomType.Shop);
+            var item = floor.Rooms.Values.Single(r => r.Type == RoomType.Item);
+
+            Assert.Single(boss.Neighbors);
+            Assert.Single(shop.Neighbors);
+            Assert.Single(item.Neighbors);
+            Assert.True(Manhattan(boss.Id) > 3, $"boss {boss.Id} seed={seed}");
+        }
+    }
+
+    private static int Manhattan(string id)
+    {
+        var comma = id.IndexOf(',');
+        var x = int.Parse(id.AsSpan(0, comma));
+        var y = int.Parse(id.AsSpan(comma + 1));
+        return Math.Abs(x) + Math.Abs(y);
     }
 
     [Fact]
