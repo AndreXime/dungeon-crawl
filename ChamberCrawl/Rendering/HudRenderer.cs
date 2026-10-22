@@ -130,47 +130,44 @@ public static class HudRenderer
 
     private static void DrawMinimap(SpriteBatch spriteBatch, RunState state, TextureAtlas atlas)
     {
-        var cells = new List<(FloorRoomNode Room, int X, int Y)>();
-        foreach (var room in state.Floor.Rooms.Values)
-        {
-            if (!room.Visited && room.Id != state.CurrentRoomId) continue;
-            if (!TryParseRoomCoords(room.Id, out var rx, out var ry)) continue;
-            cells.Add((room, rx, ry));
-        }
+        var cells = MinimapVisibility.Collect(state);
         if (cells.Count == 0) return;
 
         var minX = int.MaxValue;
         var minY = int.MaxValue;
         var maxX = int.MinValue;
         var maxY = int.MinValue;
-        foreach (var (_, cx, cy) in cells)
+        foreach (var cell in cells)
         {
-            if (cx < minX) minX = cx;
-            if (cy < minY) minY = cy;
-            if (cx > maxX) maxX = cx;
-            if (cy > maxY) maxY = cy;
+            if (cell.X < minX) minX = cell.X;
+            if (cell.Y < minY) minY = cell.Y;
+            if (cell.X > maxX) maxX = cell.X;
+            if (cell.Y > maxY) maxY = cell.Y;
         }
 
         var mapW = (maxX - minX + 1) * MinimapCell;
-        var mapH = (maxY - minY + 1) * MinimapCell;
         var originX = GameConstants.RoomW * GameConstants.Cell - mapW - HudPad;
         var originY = HudPad;
 
-        spriteBatch.Draw(
-            atlas.Pixel,
-            new Rectangle(originX - 2, originY - 2, mapW + 4, mapH + 4),
-            new Color(0, 0, 0, 140));
-
-        foreach (var (room, cx, cy) in cells)
+        foreach (var cell in cells)
         {
-            var current = room.Id == state.CurrentRoomId;
-            var color = RoomColor(room.Type, current);
             var dest = new Rectangle(
-                originX + (cx - minX) * MinimapCell + 1,
-                originY + (cy - minY) * MinimapCell + 1,
+                originX + (cell.X - minX) * MinimapCell + 1,
+                originY + (cell.Y - minY) * MinimapCell + 1,
                 MinimapCell - 2,
                 MinimapCell - 2);
-            spriteBatch.Draw(atlas.Pixel, dest, color);
+
+            if (cell.Unknown)
+            {
+                spriteBatch.Draw(atlas.Pixel, dest, new Color(40, 42, 50));
+                var qx = dest.X + (dest.Width - GlyphFont.GlyphW) / 2;
+                var qy = dest.Y + (dest.Height - GlyphFont.GlyphH) / 2;
+                GlyphFont.Draw(spriteBatch, atlas.Pixel, "?", qx, qy, new Color(180, 185, 195), scale: 1);
+                continue;
+            }
+
+            var current = cell.Room.Id == state.CurrentRoomId;
+            spriteBatch.Draw(atlas.Pixel, dest, RoomColor(cell.Room.Type, current));
         }
     }
 
@@ -182,16 +179,6 @@ public static class HudRenderer
         RoomType.Start => current ? new Color(140, 255, 140) : new Color(60, 140, 60),
         _ => current ? new Color(220, 220, 230) : new Color(100, 100, 120),
     };
-
-    private static bool TryParseRoomCoords(string id, out int x, out int y)
-    {
-        x = 0;
-        y = 0;
-        var comma = id.IndexOf(',');
-        if (comma <= 0) return false;
-        return int.TryParse(id.AsSpan(0, comma), NumberStyles.Integer, CultureInfo.InvariantCulture, out x)
-            && int.TryParse(id.AsSpan(comma + 1), NumberStyles.Integer, CultureInfo.InvariantCulture, out y);
-    }
 
     private static void DrawBanner(SpriteBatch spriteBatch, RunState state, TextureAtlas atlas)
     {
