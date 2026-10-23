@@ -130,7 +130,7 @@ public static class Combat
                     projectile.X, projectile.Y, projectile.Radius, state.Room.Tiles,
                     out var hitTx, out var hitTy, out var hitTile))
             {
-                if (projectile.FromPlayer && hitTile == GameConstants.TileFolder)
+                if (projectile.FromPlayer && hitTile == GameConstants.TileCrate)
                     state.Room.Tiles[hitTy, hitTx] = GameConstants.TileFloor;
                 removed.Add(projectile);
                 continue;

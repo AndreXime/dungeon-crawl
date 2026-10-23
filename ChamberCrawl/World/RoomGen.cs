@@ -22,9 +22,9 @@ public static class RoomGen
 
     private static readonly int[] PartitionObstacleTiles =
     {
-        GameConstants.TileFolder,
-        GameConstants.TilePopup,
-        GameConstants.TileBadSector,
+        GameConstants.TileCrate,
+        GameConstants.TileBarrel,
+        GameConstants.TileSpike,
     };
 
     private static (int Tx, int Ty) DoorCoords(Dir dir)

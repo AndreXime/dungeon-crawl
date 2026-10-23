@@ -6,9 +6,9 @@ namespace ChamberCrawl.Tests;
 public class FloorThemesTests
 {
     [Theory]
-    [InlineData(GameConstants.TileFolder, "folder")]
-    [InlineData(GameConstants.TilePopup, "popup")]
-    [InlineData(GameConstants.TileBadSector, "bad-sector")]
+    [InlineData(GameConstants.TileCrate, "crate")]
+    [InlineData(GameConstants.TileBarrel, "barrel")]
+    [InlineData(GameConstants.TileSpike, "spike")]
     [InlineData(GameConstants.TileObstacle, "obstacle")]
     public void TryOverlayTexture_ReturnsObstacleSprites(int tile, string expected)
     {

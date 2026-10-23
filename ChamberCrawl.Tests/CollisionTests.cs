@@ -37,9 +37,9 @@ public class CollisionTests
     }
 
     [Theory]
-    [InlineData(GameConstants.TileFolder)]
-    [InlineData(GameConstants.TilePopup)]
-    [InlineData(GameConstants.TileBadSector)]
+    [InlineData(GameConstants.TileCrate)]
+    [InlineData(GameConstants.TileBarrel)]
+    [InlineData(GameConstants.TileSpike)]
     public void CircleHitsSolid_BlocksNewPartitionTiles(int tile)
     {
         var tiles = new[,] { { GameConstants.TileFloor, tile }, { GameConstants.TileDoor, GameConstants.TileFloor } };
@@ -49,13 +49,13 @@ public class CollisionTests
     [Fact]
     public void TrySampleSolidTile_ReturnsFolderUnderProjectile()
     {
-        var tiles = new[,] { { GameConstants.TileFloor, GameConstants.TileFolder } };
+        var tiles = new[,] { { GameConstants.TileFloor, GameConstants.TileCrate } };
         var ok = Collision.TrySampleSolidTile(
             GameConstants.Cell * 1.5f, GameConstants.Cell * 0.5f, 4, tiles, out var tx, out var ty, out var tile);
         Assert.True(ok);
         Assert.Equal(1, tx);
         Assert.Equal(0, ty);
-        Assert.Equal(GameConstants.TileFolder, tile);
+        Assert.Equal(GameConstants.TileCrate, tile);
     }
 
     [Fact]

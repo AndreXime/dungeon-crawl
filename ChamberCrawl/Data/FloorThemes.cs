@@ -8,9 +8,9 @@ public static class FloorThemes
     {
         GameConstants.TileWall => "wall",
         GameConstants.TileDoor => "door-tile",
-        GameConstants.TileFolder => "folder",
-        GameConstants.TilePopup => "popup",
-        GameConstants.TileBadSector => "bad-sector",
+        GameConstants.TileCrate => "crate",
+        GameConstants.TileBarrel => "barrel",
+        GameConstants.TileSpike => "spike",
         GameConstants.TileObstacle => "obstacle",
         _ => "floor",
     };
@@ -20,9 +20,9 @@ public static class FloorThemes
     {
         textureName = tile switch
         {
-            GameConstants.TileFolder => "folder",
-            GameConstants.TilePopup => "popup",
-            GameConstants.TileBadSector => "bad-sector",
+            GameConstants.TileCrate => "crate",
+            GameConstants.TileBarrel => "barrel",
+            GameConstants.TileSpike => "spike",
             GameConstants.TileObstacle => "obstacle",
             _ => "",
         };

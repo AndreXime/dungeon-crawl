@@ -30,9 +30,9 @@ public static class Collision
     public static bool IsSolidTile(int tile) =>
         tile is GameConstants.TileWall
             or GameConstants.TileObstacle
-            or GameConstants.TileFolder
-            or GameConstants.TilePopup
-            or GameConstants.TileBadSector;
+            or GameConstants.TileCrate
+            or GameConstants.TileBarrel
+            or GameConstants.TileSpike;
 
     private static bool IsTileSolid(int tx, int ty, int[,] tiles)
     {
