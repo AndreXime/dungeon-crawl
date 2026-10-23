@@ -18,8 +18,9 @@ public static class Enemies
 {
     public static readonly IReadOnlyDictionary<EnemyKind, EnemyDef> Defs = new Dictionary<EnemyKind, EnemyDef>
     {
-        [EnemyKind.Pspam] = new(2, 50, 1, 9, 0, 0, "enemy-pspam"),
-        [EnemyKind.Trojan] = new(3, 70, 1, 10, 0, 0, "enemy-trojan", ChargeSpeed: 140),
-        [EnemyKind.AdwareKing] = new(40, 45, 2, 24, 1200, 160, "enemy-adware-king", ChargeSpeed: 90),
+        [EnemyKind.Bat] = new(3, 70, 1, 10, 0, 0, "enemy-bat"),
+        [EnemyKind.Skeleton] = new(3, 40, 1, 10, 1200, 160, "enemy-skeleton", PreferredDist: 90),
+        [EnemyKind.Slime] = new(2, 50, 1, 9, 0, 0, "enemy-slime"),
+        [EnemyKind.Ogre] = new(40, 45, 2, 24, 1200, 160, "enemy-ogre", ChargeSpeed: 90),
     };
 }

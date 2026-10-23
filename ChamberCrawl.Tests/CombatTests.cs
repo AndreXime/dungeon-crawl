@@ -28,7 +28,7 @@ public class CombatTests
         return run;
     }
 
-    private static EnemyEntity AddEnemy(RunState run, float x, float y, float hp = 2, EnemyKind kind = EnemyKind.Trojan)
+    private static EnemyEntity AddEnemy(RunState run, float x, float y, float hp = 2, EnemyKind kind = EnemyKind.Bat)
     {
         var enemy = new EnemyEntity { Id = $"e{run.Entities.Count}", Enemy = kind, X = x, Y = y, Radius = 10, Hp = hp };
         run.Entities.Add(enemy);
@@ -266,9 +266,9 @@ public class CombatTests
     public void SpawnEnemyProjectile_AimsAtTargetWithEnemySpeed()
     {
         var run = OpenRoomRun();
-        var adware = AddEnemy(run, 200, 160, kind: EnemyKind.AdwareKing);
+        var ogre = AddEnemy(run, 200, 160, kind: EnemyKind.Ogre);
 
-        Combat.SpawnEnemyProjectile(run, adware, 100, 160, 1);
+        Combat.SpawnEnemyProjectile(run, ogre, 100, 160, 1);
 
         var shot = Assert.Single(run.Entities.OfType<ProjectileEntity>());
         Assert.False(shot.FromPlayer);
@@ -281,10 +281,10 @@ public class CombatTests
     public void SpawnEnemyProjectile_ZeroDistanceOrNoProjectileSpeed_SpawnsNothing()
     {
         var run = OpenRoomRun();
-        var trojan = AddEnemy(run, 200, 160, kind: EnemyKind.Trojan);
+        var bat = AddEnemy(run, 200, 160, kind: EnemyKind.Bat);
 
-        Combat.SpawnEnemyProjectile(run, trojan, 200, 160, 1);
-        Combat.SpawnEnemyProjectile(run, trojan, 100, 160, 1);
+        Combat.SpawnEnemyProjectile(run, bat, 200, 160, 1);
+        Combat.SpawnEnemyProjectile(run, bat, 100, 160, 1);
 
         Assert.Empty(run.Entities.OfType<ProjectileEntity>());
     }

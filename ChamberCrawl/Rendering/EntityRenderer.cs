@@ -26,10 +26,10 @@ public static class EntityRenderer
 
     private static float SpriteDrawSize(Entity entity, RunState state)
     {
-        if (entity is EnemyEntity { Enemy: EnemyKind.AdwareKing } adware)
+        if (entity is EnemyEntity { Enemy: EnemyKind.Ogre } ogre)
         {
-            var size = MathF.Max(adware.Radius * 3.2f, 40f);
-            if (adware.IframeUntil > state.TimeMs)
+            var size = MathF.Max(ogre.Radius * 3.2f, 40f);
+            if (ogre.IframeUntil > state.TimeMs)
                 size *= 0.45f;
             return size;
         }
@@ -67,11 +67,7 @@ public static class EntityRenderer
                     opacity = 0.35f;
                 return true;
             case EnemyEntity enemy:
-                texture = enemy.Enemy switch
-                {
-                    EnemyKind.Trojan => atlas.Get(enemy.Phase == 0 ? "enemy-trojan" : "enemy-trojan-active"),
-                    _ => atlas.Get(Enemies.Defs[enemy.Enemy].Texture),
-                };
+                texture = atlas.Get(Enemies.Defs[enemy.Enemy].Texture);
                 return true;
             case ProjectileEntity proj:
                 if (proj.FromPlayer)

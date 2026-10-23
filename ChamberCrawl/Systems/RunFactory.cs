@@ -101,12 +101,12 @@ public static class RunFactory
                         Hp = def.Hp,
                         Cooldown = enemy.Enemy switch
                         {
-                            EnemyKind.Pspam => Ai.PspamSplitMs,
-                            EnemyKind.AdwareKing => Ai.AdwareIdleMs,
+                            EnemyKind.Slime => Ai.SlimeSplitMs,
+                            EnemyKind.Ogre => 0,
                             _ => def.FireCooldownMs,
                         },
                         Phase = 0,
-                        CanSplit = enemy.Enemy == EnemyKind.Pspam,
+                        CanSplit = enemy.Enemy == EnemyKind.Slime,
                     });
                     break;
                 case ItemSpawn item when !node.ClaimedSpawns.Contains(index):

@@ -17,7 +17,7 @@ public static class RoomGen
 
     private static readonly EnemyKind[] EnemyPool =
     {
-        EnemyKind.Pspam, EnemyKind.Trojan,
+        EnemyKind.Bat, EnemyKind.Skeleton, EnemyKind.Slime,
     };
 
     private static readonly int[] PartitionObstacleTiles =
@@ -91,9 +91,7 @@ public static class RoomGen
                     var placed = false;
                     for (var attempt = 0; attempt < 40 && !placed; attempt++)
                     {
-                        var (tx, ty) = enemy == EnemyKind.Trojan
-                            ? PickTrojanTile(rng, w, h)
-                            : (2 + rng.Next(w - 4), 2 + rng.Next(h - 4));
+                        var (tx, ty) = (2 + rng.Next(w - 4), 2 + rng.Next(h - 4));
                         if (tiles[ty, tx] != GameConstants.TileFloor) continue;
                         if (!FarFromEntries(tx, ty, entries, MinEnemySpawnDistFromEntry)) continue;
                         if (!occupied.Add((tx, ty))) continue;
@@ -140,25 +138,11 @@ public static class RoomGen
                 break;
             }
             case RoomType.Boss:
-                spawns.Add(new EnemySpawn { Enemy = EnemyKind.AdwareKing, Tx = centerX, Ty = centerY });
+                spawns.Add(new EnemySpawn { Enemy = EnemyKind.Ogre, Tx = centerX, Ty = centerY });
                 break;
         }
 
         return new RoomData { Tiles = tiles, Spawns = spawns };
-    }
-
-    /// <summary>Prefere cantos / longe do centro da sala para Trojan.</summary>
-    private static (int Tx, int Ty) PickTrojanTile(Random rng, int w, int h)
-    {
-        var corner = rng.Next(4);
-        var (baseX, baseY) = corner switch
-        {
-            0 => (2, 2),
-            1 => (w - 5, 2),
-            2 => (2, h - 5),
-            _ => (w - 5, h - 5),
-        };
-        return (baseX + rng.Next(3), baseY + rng.Next(3));
     }
 
     /// <summary>Tile onde o jogador aparece ao entrar por aquela porta da sala.</summary>

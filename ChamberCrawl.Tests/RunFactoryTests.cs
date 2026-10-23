@@ -48,9 +48,9 @@ public class RunFactoryTests
     {
         var run = RunFactory.Create(7);
         RunFactory.EnterRoom(run, run.Floor.BossRoomId, null);
-        var boss = run.Entities.OfType<EnemyEntity>().Single(e => e.Enemy == EnemyKind.AdwareKing);
+        var boss = run.Entities.OfType<EnemyEntity>().Single(e => e.Enemy == EnemyKind.Ogre);
         Assert.Equal(0, boss.Phase);
-        Assert.Equal(Ai.AdwareIdleMs, boss.Cooldown);
+        Assert.Equal(0, boss.Cooldown);
 
         run.Floor.Rooms[run.Floor.BossRoomId].Cleared = true;
         RunFactory.EnterRoom(run, run.Floor.BossRoomId, null);

@@ -19,8 +19,8 @@ public class RoomGenTests
     {
         var room = RoomGen.Generate(Node(RoomType.Normal, seed: 7), new[] { Dir.N, Dir.E });
         var enemies = room.Spawns.OfType<EnemySpawn>().Select(s => s.Enemy).ToHashSet();
-        Assert.Subset(new HashSet<EnemyKind> { EnemyKind.Pspam, EnemyKind.Trojan }, enemies);
-        Assert.DoesNotContain(EnemyKind.AdwareKing, enemies);
+        Assert.Subset(new HashSet<EnemyKind> { EnemyKind.Bat, EnemyKind.Skeleton, EnemyKind.Slime }, enemies);
+        Assert.DoesNotContain(EnemyKind.Ogre, enemies);
 
         var obstacleTiles = new HashSet<int>();
         for (var y = 0; y < GameConstants.RoomH; y++)
@@ -34,30 +34,10 @@ public class RoomGenTests
     }
 
     [Fact]
-    public void Generate_Boss_SpawnsAdwareKing()
+    public void Generate_Boss_SpawnsOgre()
     {
         var boss = RoomGen.Generate(Node(RoomType.Boss), new[] { Dir.N });
-        Assert.Contains(boss.Spawns.OfType<EnemySpawn>(), s => s.Enemy == EnemyKind.AdwareKing);
-    }
-
-    [Fact]
-    public void Generate_Normal_TrojansSpawnAwayFromCenter()
-    {
-        var centerX = GameConstants.RoomW / 2;
-        var centerY = GameConstants.RoomH / 2;
-        var trojans = new List<EnemySpawn>();
-        for (var seed = 0; seed < 80; seed++)
-        {
-            var room = RoomGen.Generate(Node(RoomType.Normal, seed), new[] { Dir.N, Dir.E });
-            trojans.AddRange(room.Spawns.OfType<EnemySpawn>().Where(s => s.Enemy == EnemyKind.Trojan));
-        }
-
-        Assert.NotEmpty(trojans);
-        Assert.All(trojans, t =>
-        {
-            var dist = Math.Abs(t.Tx - centerX) + Math.Abs(t.Ty - centerY);
-            Assert.True(dist >= 4, $"Trojan at ({t.Tx},{t.Ty}) too close to center ({centerX},{centerY})");
-        });
+        Assert.Contains(boss.Spawns.OfType<EnemySpawn>(), s => s.Enemy == EnemyKind.Ogre);
     }
 
     [Fact]
@@ -115,7 +95,7 @@ public class RoomGenTests
         Assert.All(shopItems, s => Assert.True(s.Price > 0));
 
         var boss = RoomGen.Generate(Node(RoomType.Boss), new[] { Dir.N });
-        var bosses = boss.Spawns.OfType<EnemySpawn>().Where(s => s.Enemy == EnemyKind.AdwareKing).ToList();
+        var bosses = boss.Spawns.OfType<EnemySpawn>().Where(s => s.Enemy == EnemyKind.Ogre).ToList();
         Assert.Single(bosses);
         Assert.Equal(GameConstants.RoomW / 2, bosses[0].Tx);
         Assert.Equal(GameConstants.RoomH / 2, bosses[0].Ty);
