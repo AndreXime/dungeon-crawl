@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ChamberCrawl.Audio;
 using ChamberCrawl.Data;
 using ChamberCrawl.Models;
 using ChamberCrawl.World;
@@ -40,9 +41,23 @@ public static class RunFactory
         state.Room = RoomGen.Generate(node, node.Neighbors.Keys.ToList());
         state.Entities = SpawnRoomEntities(state.Room, node, entryDir);
         RestoreLooseCoins(state, node);
+        PlayRoomOpenSfx(node.Type);
 
         var player = state.Entities.OfType<PlayerEntity>().First();
         player.Hp = state.PlayerStats.Hp;
+    }
+
+    private static void PlayRoomOpenSfx(RoomType type)
+    {
+        switch (type)
+        {
+            case RoomType.Boss:
+                Sfx.Play("OpeningBossRoom");
+                break;
+            case RoomType.Item:
+                Sfx.Play("OpeningTreasureRoom");
+                break;
+        }
     }
 
     private static void StashLooseCoins(RunState state)
