@@ -120,14 +120,42 @@ public class AiTests
         Assert.True(enemy.X > before);
     }
 
-    [Theory]
-    [InlineData(EnemyKind.Ogre)]
-    public void Update_Playing_StubDoesNotThrow(EnemyKind kind)
+    [Fact]
+    public void Update_Ogre_ChasesInPhase0()
     {
         var run = OpenRoomRun();
-        run.Entities.Add(new EnemyEntity { Id = "e1", Enemy = kind, X = 100, Y = 160, Radius = 10, Hp = 5 });
-
+        var boss = AddEnemy(run, EnemyKind.Ogre, 100, 160, 24);
+        boss.Phase = 0;
+        boss.Cooldown = Ai.OgrePhase1MaxMs;
+        boss.Hp = 40;
+        run.Entities.OfType<PlayerEntity>().Single().X = 300;
+        var before = boss.X;
         Ai.Update(run, Dt);
+        Assert.Equal(0, boss.Phase);
+        Assert.True(boss.X > before);
+    }
+
+    [Fact]
+    public void Update_Ogre_EntersPhase1AtHalfHp()
+    {
+        var run = OpenRoomRun();
+        var boss = AddEnemy(run, EnemyKind.Ogre, 200, 160, 24);
+        boss.Phase = 0;
+        boss.Cooldown = Ai.OgrePhase1MaxMs;
+        boss.Hp = Enemies.Defs[EnemyKind.Ogre].Hp * 0.5f;
+        Ai.Update(run, Dt);
+        Assert.Equal(1, boss.Phase);
+    }
+
+    [Fact]
+    public void Update_Ogre_ShootsInPhase1()
+    {
+        var run = OpenRoomRun();
+        var boss = AddEnemy(run, EnemyKind.Ogre, 200, 160, 24);
+        boss.Phase = 1;
+        boss.Cooldown = 0;
+        Ai.Update(run, Dt);
+        Assert.NotEmpty(run.Entities.OfType<ProjectileEntity>());
     }
 
     [Fact]

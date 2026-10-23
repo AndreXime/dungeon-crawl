@@ -50,7 +50,7 @@ public class RunFactoryTests
         RunFactory.EnterRoom(run, run.Floor.BossRoomId, null);
         var boss = run.Entities.OfType<EnemyEntity>().Single(e => e.Enemy == EnemyKind.Ogre);
         Assert.Equal(0, boss.Phase);
-        Assert.Equal(0, boss.Cooldown);
+        Assert.Equal(Ai.OgrePhase1MaxMs, boss.Cooldown);
 
         run.Floor.Rooms[run.Floor.BossRoomId].Cleared = true;
         RunFactory.EnterRoom(run, run.Floor.BossRoomId, null);

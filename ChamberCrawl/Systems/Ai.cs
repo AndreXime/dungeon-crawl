@@ -8,6 +8,7 @@ namespace ChamberCrawl.Systems;
 public static class Ai
 {
     public const float SlimeSplitMs = 4000f;
+    public const float OgrePhase1MaxMs = 8000f;
     public const float WanderMinMs = 500f;
     public const float WanderMaxMs = 1500f;
     private const float SlimeSplitOffsetPx = 8f;
@@ -164,5 +165,35 @@ public static class Ai
 
     private static void UpdateOgre(RunState state, EnemyEntity enemy, PlayerEntity player, float dt, Func<float>? rng)
     {
+        var def = Enemies.Defs[EnemyKind.Ogre];
+        if ((int)enemy.Phase == 0)
+        {
+            enemy.Cooldown -= dt * 1000f;
+            if (enemy.Hp <= def.Hp * 0.5f || enemy.Cooldown <= 0)
+            {
+                enemy.Phase = 1;
+                enemy.Cooldown = def.FireCooldownMs;
+            }
+            else
+            {
+                var dx = player.X - enemy.X;
+                var dy = player.Y - enemy.Y;
+                var dist = MathF.Sqrt(dx * dx + dy * dy);
+                if (dist > 0)
+                    Steer(state, enemy, dx / dist, dy / dist, def.ChargeSpeed ?? def.Speed, dt);
+                return;
+            }
+        }
+
+        var dx1 = player.X - enemy.X;
+        var dy1 = player.Y - enemy.Y;
+        var dist1 = MathF.Sqrt(dx1 * dx1 + dy1 * dy1);
+        if (dist1 > 0)
+            Steer(state, enemy, dx1 / dist1, dy1 / dist1, def.Speed, dt);
+
+        enemy.Cooldown -= dt * 1000f;
+        if (enemy.Cooldown > 0) return;
+        Combat.SpawnEnemyProjectile(state, enemy, player.X, player.Y, def.Damage);
+        enemy.Cooldown = def.FireCooldownMs;
     }
 }

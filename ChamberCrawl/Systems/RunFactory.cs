@@ -102,7 +102,7 @@ public static class RunFactory
                         Cooldown = enemy.Enemy switch
                         {
                             EnemyKind.Slime => Ai.SlimeSplitMs,
-                            EnemyKind.Ogre => 0,
+                            EnemyKind.Ogre => Ai.OgrePhase1MaxMs,
                             _ => def.FireCooldownMs,
                         },
                         Phase = 0,
