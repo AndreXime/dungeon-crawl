@@ -1,5 +1,5 @@
 {
   "size": 32,
   "mode": "canvas",
-  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#2a1f14', W='#8b5a2b', WL='#c48a4a', WD='#5a3a18', M='#9aa3ad';\n  px(5,9,22,20,O);\n  px(6,10,20,18,W);\n  px(6,10,20,2,WL); px(6,26,20,2,WD);\n  px(6,10,1,18,WL); px(25,10,1,18,WD);\n  for (let i=0;i<14;i++) {\n    px(7+i,11+Math.floor(i*12/13),1,2,WD);\n    px(24-i,11+Math.floor(i*12/13),1,2,WD);\n  }\n  px(6,18,20,1,O);\n  px(14,20,4,5,M); px(15,22,2,2,O);\n}\n"
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const O = '#0d0a08', W1 = '#3d2814', W2 = '#8b5a2b', W3 = '#c4a06a';\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n  px(4, 10, 24, 18, O);\n  px(5, 11, 22, 16, W2);\n  px(5, 11, 22, 2, W3);\n  px(5, 11, 2, 14, W3);\n  px(25, 11, 2, 14, W1);\n  px(5, 25, 22, 2, W1);\n  px(5, 17, 22, 1, O);\n  for (let i = 0; i < 11; i++) {\n    const t = i / 10;\n    px(6 + i, 12 + Math.floor(t * 4), 1, 5, W1);\n    px(25 - i, 12 + Math.floor(t * 4), 1, 5, W1);\n  }\n  px(14, 18, 4, 6, O);\n  px(15, 19, 2, 4, W1);\n  px(15, 20, 1, 1, W3);\n}\n"
 }

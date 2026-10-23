@@ -1,5 +1,5 @@
 {
   "size": 32,
   "mode": "canvas",
-  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#2a1f14', S='#6b6358', SL='#8a8276', SD='#4a443c';\n  px(0,0,32,32,O);\n  for (let y=0;y<32;y+=8) {\n    px(0,y,32,1,SD);\n    const off=(y/8)%2?4:0;\n    for (let x=-off;x<32;x+=8) px(x,y+1,7,7,S);\n  }\n  px(2,2,1,28,SL); px(30,2,1,28,SD);\n}\n"
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const O = '#0d0a08', P1 = '#2a2620', P2 = '#4a443c', P3 = '#6a6358';\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n  px(0, 0, 32, 32, P1);\n  for (let row = 0; row < 4; row++) {\n    const y = row * 8;\n    px(0, y, 32, 1, O);\n    const off = row % 2 ? 4 : 0;\n    for (let x = -off; x < 32; x += 8) {\n      if (x >= 0) {\n        px(x, y + 1, 7, 7, P2);\n        px(x, y + 1, 3, 1, P3);\n        px(x, y + 1, 1, 3, P3);\n      }\n    }\n  }\n  px(0, 0, 32, 1, O);\n  px(0, 0, 1, 32, O);\n  px(31, 0, 1, 32, O);\n  px(0, 31, 32, 1, O);\n  px(12, 10, 1, 6, P1);\n  px(22, 18, 1, 8, P1);\n}\n"
 }
