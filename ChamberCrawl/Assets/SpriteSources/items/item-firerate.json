@@ -1,5 +1,5 @@
 {
   "size": 64,
   "mode": "canvas",
-  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#2a1f14', P='#d4cbb4', PL='#f0e8d6', PD='#a89878', Ink='#4a3080';\n  px(16,12,32,44,O); px(18,14,28,40,P);\n  px(18,14,28,2,PL); px(18,52,28,2,PD);\n  px(22,20,20,2,Ink); px(22,26,16,2,Ink); px(22,32,18,2,Ink);\n  px(22,38,12,2,Ink); px(36,18,4,4,O);\n}\n"
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const O = '#0d0a08', P1 = '#c4b898', P2 = '#e8dcc0', P3 = '#a89878';\n  const Ink = '#4a2060';\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n  px(14, 10, 36, 46, O); px(16, 12, 32, 42, P1);\n  px(16, 12, 32, 4, P2); px(16, 50, 32, 4, P3);\n  px(14, 18, 4, 30, O); px(15, 20, 2, 26, P3);\n  px(46, 18, 4, 30, O); px(47, 20, 2, 26, P3);\n  px(20, 20, 24, 2, Ink); px(20, 26, 20, 2, Ink);\n  px(20, 32, 22, 2, Ink); px(20, 38, 14, 2, Ink);\n  px(20, 44, 18, 2, Ink);\n  px(38, 14, 6, 4, O); px(39, 15, 4, 2, P3);\n}\n"
 }

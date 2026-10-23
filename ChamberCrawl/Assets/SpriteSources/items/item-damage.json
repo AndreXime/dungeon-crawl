@@ -1,5 +1,5 @@
 {
   "size": 64,
   "mode": "canvas",
-  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#2a1f14', M='#9aa3ad', ML='#c8cdd2', MD='#5a6068', H='#8b5a2b';\n  px(12,20,40,8,O); px(14,22,36,4,M);\n  px(14,22,36,1,ML); px(14,25,36,1,MD);\n  px(48,16,8,16,O); px(50,18,4,12,ML);\n  px(10,24,6,4,H); px(11,25,4,2,MD);\n}\n"
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const O = '#0d0a08', W1 = '#3d2814', W2 = '#8b5a2b', W3 = '#c4a06a';\n  const B1 = '#c4b898', B2 = '#e8dcc0', B3 = '#6a6358';\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n  px(10, 28, 14, 10, O); px(12, 30, 10, 6, W2);\n  px(12, 30, 10, 2, W3); px(12, 34, 10, 2, W1);\n  for (let i = 0; i < 34; i++) {\n    const bx = 22 + i, by = 30 - Math.floor(i * 0.35);\n    px(bx, by, 2, 6, O); px(bx + 1, by + 1, 1, 4, B2);\n    if (i < 8) px(bx + 1, by + 1, 1, 2, B3);\n  }\n  px(52, 14, 6, 6, O); px(53, 15, 4, 4, B2);\n  px(54, 15, 2, 2, B3);\n}\n"
 }

@@ -1,5 +1,5 @@
 {
   "size": 64,
   "mode": "canvas",
-  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#2a1f14', M='#9aa3ad', ML='#c8cdd2', H='#8b5a2b';\n  px(10,24,12,28,O); px(12,26,8,24,M);\n  px(26,20,12,32,O); px(28,22,8,28,M);\n  px(42,28,12,24,O); px(44,30,8,20,M);\n  px(12,26,8,2,ML); px(28,22,8,2,ML);\n  px(10,24,4,6,H); px(26,20,4,6,H); px(42,28,4,6,H);\n}\n"
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const O = '#0d0a08', W1 = '#3d2814', W2 = '#8b5a2b', W3 = '#c4a06a';\n  const B1 = '#c4b898', B2 = '#e8dcc0', B3 = '#6a6358';\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n  px(28, 34, 8, 22, O); px(30, 36, 4, 18, W2);\n  px(30, 36, 4, 2, W3); px(30, 52, 4, 2, W1);\n  const prong = (bx, lean) => {\n    for (let i = 0; i < 22; i++) {\n      const x = bx + Math.floor(lean * i * 0.15);\n      const y = 30 - i;\n      px(x, y, 4, 4, O); px(x + 1, y + 1, 2, 2, B2);\n      if (i < 4) px(x + 1, y + 1, 2, 1, B3);\n    }\n  };\n  prong(12, -1); prong(28, 0); prong(44, 1);\n  px(14, 10, 4, 4, B2); px(30, 6, 4, 4, B2); px(46, 10, 4, 4, B2);\n}\n"
 }
