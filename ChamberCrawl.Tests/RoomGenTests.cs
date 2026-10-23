@@ -27,7 +27,7 @@ public class RoomGenTests
             for (var x = 0; x < GameConstants.RoomW; x++)
             {
                 var t = room.Tiles[y, x];
-                if (t is GameConstants.TileFolder or GameConstants.TilePopup or GameConstants.TileBadSector)
+                if (t is GameConstants.TileCrate or GameConstants.TileBarrel or GameConstants.TileSpike)
                     obstacleTiles.Add(t);
             }
         Assert.NotEmpty(obstacleTiles);
