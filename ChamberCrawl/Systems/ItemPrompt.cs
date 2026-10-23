@@ -40,20 +40,26 @@ public static class ItemPrompt
 
     public static string FormatDetail(ItemDef def, int? price)
     {
+        var rarity = Items.RarityLabel(def.Rarity);
         var effect = FormatEffect(def);
-        if (price is > 0) return $"{effect} - {price.Value}";
-        return effect;
+        var body = $"{rarity} - {effect}";
+        if (price is > 0) return $"{body} - {price.Value}";
+        return body;
     }
 
     public static string FormatEffect(ItemDef def)
     {
-        if (def.Damage is { } d) return $"DANO MAIS {FormatNum(d)}";
-        if (def.Speed is { } s) return $"VELOCIDADE MAIS {FormatNum(s)}";
-        if (def.MaxHp is { } hp) return $"CORACAO MAIS {FormatNum(hp / 2f)}";
-        if (def.FireRate is { } fr) return $"TIRO MAIS {FormatNum(fr)}";
-        if (def.TripleShot == true) return "TIRO TRIPLO";
-        if (def.CoinMultiplier is { } c) return $"MULT MOEDAS MAIS {FormatNum(c)}";
-        return "UPGRADE";
+        var parts = new List<string>();
+        if (def.Damage is { } d) parts.Add($"DANO MAIS {FormatNum(d)}");
+        if (def.Speed is { } s) parts.Add($"VELOCIDADE MAIS {FormatNum(s)}");
+        if (def.MaxHp is { } hp) parts.Add($"CORACAO MAIS {FormatNum(hp / 2f)}");
+        if (def.Heal is { } heal && (def.MaxHp is null || heal != def.MaxHp))
+            parts.Add($"CURA MAIS {FormatNum(heal / 2f)}");
+        if (def.FireRate is { } fr) parts.Add($"TIRO MAIS {FormatNum(fr)}");
+        if (def.Range is { } range) parts.Add($"ALCANCE MAIS {FormatNum(range)}");
+        if (def.TripleShot == true) parts.Add("TIRO TRIPLO");
+        if (def.CoinMultiplier is { } c) parts.Add($"MULT MOEDAS MAIS {FormatNum(c)}");
+        return parts.Count > 0 ? string.Join(" ", parts) : "UPGRADE";
     }
 
     private static string FormatNum(float value)

@@ -27,7 +27,7 @@ public class ItemPromptTests
         };
         Assert.True(ItemPrompt.TryResolve(entities, out var name, out var detail));
         Assert.Equal("LAMINA", name);
-        Assert.Equal("DANO MAIS 1", detail);
+        Assert.Equal("COMUM - DANO MAIS 1", detail);
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class ItemPromptTests
             },
         };
         Assert.True(ItemPrompt.TryResolve(entities, out _, out var detail));
-        Assert.Equal("DANO MAIS 1 - 5", detail);
+        Assert.Equal("COMUM - DANO MAIS 1 - 5", detail);
     }
 
     [Theory]
@@ -57,8 +57,23 @@ public class ItemPromptTests
     [InlineData("fire_rate", "TIRO MAIS 1-5")]
     [InlineData("triple", "TIRO TRIPLO")]
     [InlineData("greedy", "MULT MOEDAS MAIS 1")]
+    [InlineData("range_up", "ALCANCE MAIS 80")]
+    [InlineData("sharpness", "DANO MAIS 2")]
+    [InlineData("haste", "VELOCIDADE MAIS 15 TIRO MAIS 2")]
+    [InlineData("vigor", "CORACAO MAIS 1 CURA MAIS 2")]
+    [InlineData("fortune", "MULT MOEDAS MAIS 2")]
     public void FormatEffect_MatchesSpec(string id, string expected)
     {
         Assert.Equal(expected, ItemPrompt.FormatEffect(Items.Defs[id]));
+    }
+
+    [Theory]
+    [InlineData("damage_up", "COMUM")]
+    [InlineData("triple", "RARO")]
+    [InlineData("fortune", "LENDARIO")]
+    public void FormatDetail_IncludesRarity(string id, string rarity)
+    {
+        var detail = ItemPrompt.FormatDetail(Items.Defs[id], null);
+        Assert.StartsWith($"{rarity} - ", detail);
     }
 }

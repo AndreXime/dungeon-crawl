@@ -1,4 +1,5 @@
 using System.Linq;
+using ChamberCrawl.Data;
 using ChamberCrawl.Models;
 using ChamberCrawl.World;
 
@@ -88,11 +89,30 @@ public class RoomGenTests
         var freeItems = item.Spawns.OfType<ItemSpawn>().ToList();
         Assert.Single(freeItems);
         Assert.Null(freeItems[0].Price);
+        Assert.True(Items.Defs.ContainsKey(freeItems[0].ItemId));
 
         var shop = RoomGen.Generate(Node(RoomType.Shop), new[] { Dir.E });
         var shopItems = shop.Spawns.OfType<ItemSpawn>().ToList();
         Assert.InRange(shopItems.Count, 2, 3);
-        Assert.All(shopItems, s => Assert.True(s.Price > 0));
+        Assert.All(shopItems, s =>
+        {
+            Assert.True(s.Price > 0);
+            Assert.True(Items.Defs.ContainsKey(s.ItemId));
+            var rarity = Items.Defs[s.ItemId].Rarity;
+            var price = s.Price!.Value;
+            switch (rarity)
+            {
+                case ItemRarity.Common:
+                    Assert.InRange(price, 4, 7);
+                    break;
+                case ItemRarity.Rare:
+                    Assert.InRange(price, 8, 12);
+                    break;
+                case ItemRarity.Legendary:
+                    Assert.InRange(price, 15, 20);
+                    break;
+            }
+        });
 
         var boss = RoomGen.Generate(Node(RoomType.Boss), new[] { Dir.N });
         var bosses = boss.Spawns.OfType<EnemySpawn>().Where(s => s.Enemy == EnemyKind.Ogre).ToList();

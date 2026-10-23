@@ -41,6 +41,11 @@ const JOBS = [
   { id: 'items/item-firerate', gen: 'gen-item-firerate.jpg', size: 64, opaque: false },
   { id: 'items/item-triple', gen: 'gen-item-triple.jpg', size: 64, opaque: false },
   { id: 'items/item-greedy', gen: 'gen-item-greedy.jpg', size: 64, opaque: false },
+  { id: 'items/item-range', gen: 'gen-item-range.jpg', size: 64, opaque: false },
+  { id: 'items/item-sharp', gen: 'gen-item-sharp.jpg', size: 64, opaque: false },
+  { id: 'items/item-haste', gen: 'gen-item-haste.jpg', size: 64, opaque: false },
+  { id: 'items/item-vigor', gen: 'gen-item-vigor.jpg', size: 64, opaque: false },
+  { id: 'items/item-fortune', gen: 'gen-item-fortune.jpg', size: 64, opaque: false },
 ];
 
 function hexToRgb(hex) {

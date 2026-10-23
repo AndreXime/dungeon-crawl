@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ChamberCrawl.Data;
 using ChamberCrawl.Models;
 
 namespace ChamberCrawl.World;
@@ -9,11 +10,6 @@ public static class RoomGen
 {
     /// <summary>Distância Manhattan mínima entre inimigo e cada tile de entrada (porta).</summary>
     public const int MinEnemySpawnDistFromEntry = 4;
-
-    private static readonly string[] ItemIds =
-    {
-        "damage_up", "speed_up", "hp_up", "fire_rate", "triple", "greedy",
-    };
 
     private static readonly EnemyKind[] EnemyPool =
     {
@@ -111,27 +107,32 @@ public static class RoomGen
                 break;
             }
             case RoomType.Item:
+            {
+                var free = Items.PickWeighted(rng);
                 spawns.Add(new ItemSpawn
                 {
-                    ItemId = ItemIds[rng.Next(ItemIds.Length)],
+                    ItemId = free.Id,
                     Tx = centerX,
                     Ty = centerY,
                     SpawnIndex = itemIndex++,
                 });
                 break;
+            }
             case RoomType.Shop:
             {
                 var count = 2 + rng.Next(2);
-                var pool = ItemIds.OrderBy(_ => rng.NextDouble()).ToList();
+                var picked = new List<string>();
                 var startX = centerX - count / 2 * 2;
                 for (var i = 0; i < count; i++)
                 {
+                    var def = Items.PickWeighted(rng, picked);
+                    picked.Add(def.Id);
                     spawns.Add(new ItemSpawn
                     {
-                        ItemId = pool[i],
+                        ItemId = def.Id,
                         Tx = startX + i * 2,
                         Ty = centerY,
-                        Price = 5 + rng.Next(6),
+                        Price = Items.ShopPrice(def.Rarity, rng),
                         SpawnIndex = itemIndex++,
                     });
                 }
