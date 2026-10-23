@@ -20,7 +20,7 @@ public static class RoomGen
         EnemyKind.Bat, EnemyKind.Skeleton, EnemyKind.Slime,
     };
 
-    private static readonly int[] PartitionObstacleTiles =
+    private static readonly int[] DungeonObstacleTiles =
     {
         GameConstants.TileCrate,
         GameConstants.TileBarrel,
@@ -76,7 +76,7 @@ public static class RoomGen
                     var tx = 2 + rng.Next(w - 4);
                     var ty = 2 + rng.Next(h - 4);
                     if (tx == centerX && ty == centerY) continue;
-                    tiles[ty, tx] = PartitionObstacleTiles[rng.Next(PartitionObstacleTiles.Length)];
+                    tiles[ty, tx] = DungeonObstacleTiles[rng.Next(DungeonObstacleTiles.Length)];
                 }
 
                 var enemyCount = 3 + rng.Next(3);

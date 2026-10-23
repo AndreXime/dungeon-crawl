@@ -15,7 +15,7 @@ public class RoomGenTests
     };
 
     [Fact]
-    public void Generate_Normal_UsesPartitionEnemyPoolAndObstacleTiles()
+    public void Generate_Normal_UsesDungeonEnemyPoolAndObstacleTiles()
     {
         var room = RoomGen.Generate(Node(RoomType.Normal, seed: 7), new[] { Dir.N, Dir.E });
         var enemies = room.Spawns.OfType<EnemySpawn>().Select(s => s.Enemy).ToHashSet();
