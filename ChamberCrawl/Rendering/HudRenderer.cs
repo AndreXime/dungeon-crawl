@@ -44,7 +44,59 @@ public static class HudRenderer
         DrawNumber(spriteBatch, atlas, state.Floor.Depth, x + 16, y + 1, Color.LightSkyBlue);
 
         DrawMinimap(spriteBatch, state, atlas);
+        DrawStatsPanel(spriteBatch, state, atlas);
         DrawItemPrompt(spriteBatch, state, atlas);
+    }
+
+    private static void DrawStatsPanel(SpriteBatch spriteBatch, RunState state, TextureAtlas atlas)
+    {
+        var stats = state.PlayerStats;
+        var lines = new List<string>
+        {
+            $"DANO {FormatStat(stats.Damage)}",
+            $"VEL {FormatStat(stats.Speed)}",
+            $"TIRO {FormatStat(stats.FireRate)}",
+            $"ALC {FormatStat(stats.Range)}",
+            $"MOED x{stats.CoinMultiplier}",
+        };
+        if (stats.TripleShot)
+            lines.Add("TRIPLO");
+
+        const int scale = 1;
+        const int lineGap = 3;
+        var lineH = GlyphFont.GlyphH * scale + lineGap;
+        var panelH = lines.Count * lineH - lineGap;
+        var roomW = GameConstants.RoomW * GameConstants.Cell;
+        var roomH = GameConstants.RoomH * GameConstants.Cell;
+        var maxW = 0;
+        foreach (var line in lines)
+            maxW = Math.Max(maxW, GlyphFont.MeasureWidth(line, scale));
+
+        var originX = roomW - HudPad - maxW;
+        var originY = roomH - HudPad - panelH;
+        var color = new Color(210, 215, 230);
+
+        for (var i = 0; i < lines.Count; i++)
+        {
+            var line = lines[i];
+            var w = GlyphFont.MeasureWidth(line, scale);
+            GlyphFont.Draw(
+                spriteBatch,
+                atlas.Pixel,
+                line,
+                originX + (maxW - w),
+                originY + i * lineH,
+                color,
+                scale);
+        }
+    }
+
+    private static string FormatStat(float value)
+    {
+        if (Math.Abs(value - MathF.Round(value)) < 0.001f)
+            return ((int)MathF.Round(value)).ToString(CultureInfo.InvariantCulture);
+        var tenths = (int)MathF.Round(value * 10f);
+        return $"{tenths / 10}-{tenths % 10}";
     }
 
     private static void DrawItemPrompt(SpriteBatch spriteBatch, RunState state, TextureAtlas atlas)
