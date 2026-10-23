@@ -110,7 +110,6 @@ public sealed class ProjectileEntity : Entity
     public bool FromPlayer { get; set; }
     public float Damage { get; set; }
     public float Life { get; set; }
-    public int BitGlyph { get; set; }
     public ProjectileEntity() { Kind = EntityKind.Projectile; }
 }
 

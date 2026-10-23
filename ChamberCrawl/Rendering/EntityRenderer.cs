@@ -27,12 +27,7 @@ public static class EntityRenderer
     private static float SpriteDrawSize(Entity entity, RunState state)
     {
         if (entity is EnemyEntity { Enemy: EnemyKind.Ogre } ogre)
-        {
-            var size = MathF.Max(ogre.Radius * 3.2f, 40f);
-            if (ogre.IframeUntil > state.TimeMs)
-                size *= 0.45f;
-            return size;
-        }
+            return MathF.Max(ogre.Radius * 3.2f, 40f);
 
         return entity switch
         {
@@ -71,7 +66,7 @@ public static class EntityRenderer
                 return true;
             case ProjectileEntity proj:
                 if (proj.FromPlayer)
-                    texture = atlas.Get(proj.BitGlyph == 0 ? "bit-0" : "bit-1");
+                    texture = atlas.Get("bolt");
                 else
                 {
                     texture = atlas.Get("projectile");

@@ -20,10 +20,10 @@ public static class Items
 {
     public static readonly IReadOnlyDictionary<string, ItemDef> Defs = new Dictionary<string, ItemDef>
     {
-        ["damage_up"] = new("damage_up", "Dente Afiado", "item-damage", Damage: 1),
+        ["damage_up"] = new("damage_up", "Lâmina", "item-damage", Damage: 1),
         ["speed_up"] = new("speed_up", "Botas", "item-speed", Speed: 30),
-        ["hp_up"] = new("hp_up", "Coração Extra", "item-hp", MaxHp: 2, Heal: 2),
-        ["fire_rate"] = new("fire_rate", "Cafeína", "item-firerate", FireRate: 1.5f),
+        ["hp_up"] = new("hp_up", "Poção", "item-hp", MaxHp: 2, Heal: 2),
+        ["fire_rate"] = new("fire_rate", "Pergaminho", "item-firerate", FireRate: 1.5f),
         ["triple"] = new("triple", "Tridente", "item-triple", TripleShot: true),
         ["greedy"] = new("greedy", "Ímã", "item-greedy", CoinMultiplier: 1),
     };

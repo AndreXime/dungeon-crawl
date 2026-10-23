@@ -36,7 +36,7 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        Window.Title = "Diskette";
+        Window.Title = "Dungeon Crawl";
         _settings = GameSettings.Load();
         ApplyDisplaySettings();
         _state = RunFactory.Create(Environment.TickCount);

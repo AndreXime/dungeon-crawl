@@ -81,7 +81,6 @@ public static class Combat
                 Radius = GameConstants.ProjectileRadius,
                 Damage = stats.Damage,
                 Life = stats.Range / PlayerProjectileSpeed,
-                BitGlyph = projectileCounter & 1,
             });
         }
         state.ShootCooldown = 1f / stats.FireRate;

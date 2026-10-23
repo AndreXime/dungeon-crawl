@@ -1,4 +1,4 @@
-# Diskette — Guideline de sprites
+# Dungeon Crawl — Guideline de sprites
 
 Referência positiva: `Assets/Textures/items/coin.png`  
 Anti-exemplo: `heart.png` / vários `item-*.png` que parecem ilustração em alta resoluçao encolhida (bordas moles, milhares de cores, anti-alias).
@@ -8,7 +8,7 @@ Anti-exemplo: `heart.png` / vários `item-*.png` que parecem ilustração em alt
 | Uso | Tamanho | Notas |
 |-----|---------|--------|
 | Tiles de mapa | **32×32** | 1 tile = 1 célula (`Cell = 32`) |
-| Player, Bits, overlays de obstáculo | **32×32** | Silhueta legível em 1 célula |
+| Player, bolt, overlays de obstáculo | **32×32** | Silhueta legível em 1 célula |
 | Itens, coin, heart (HUD), portal, projétil inimigo, boss | **64×64** | Mais detalhe, mas ainda pixel art nativo |
 
 Nunca desenhar em 512/1024 e “só reduzir”. O pixel tem que nascer no tamanho final.
@@ -31,11 +31,11 @@ Nunca desenhar em 512/1024 e “só reduzir”. O pixel tem que nascer no tamanh
 - Silhueta confusa (ex.: coração que vira “dente”)
 - Fundo preto opaco colado no sprite (só aceitável se for tile de chão/parede)
 
-## Temática Diskette
+## Temática Dungeon Crawl
 
-- Estética retro PC anos 90 / Win95 / hardware
-- Cores saturadas e legíveis (ouro, vermelho UI, amarelo pasta, azul chrome)
-- Ícones “de sistema” quando fizer sentido (pasta, janela, disquete), não realismo
+- Estética medieval dungeon: pedra, madeira, tochas, âmbar
+- Cores legíveis em fundo escuro (ouro, vermelho poção, verde slime, cinza pedra)
+- Silhuetas de fantasia clássica (mago, morcego, esqueleto, ogro), não realismo
 
 ## Prompt / geração (Cursor GenerateImage)
 
@@ -57,11 +57,11 @@ Depois da geração:
 ## Inventário alvo (nomes atuais)
 
 - `items/coin.png` — referência
-- `items/heart.png` — regenerado (HUD HP), lote 2026-10-22
-- `items/item-*.png` — regenerados no estilo coin, lote 2026-10-22
-- `player/player.png`, `bit-0.png`, `bit-1.png` — regenerados 32×32, lote 2026-10-22
-- Tiles Partition C — ok como bloco temático; revisar se surgir blur
-- `enemies/*` — priorizar os usados (pspam, trojan, adware-king); legados podem esperar
+- `items/heart.png` — HUD HP
+- `items/item-*.png` — loot medieval (lâmina, botas, poção, etc.)
+- `player/player.png`, `player/bolt.png` — mago e projétil 32×32
+- Tiles dungeon — `floor`, `wall`, `door`, `crate`, `barrel`, `spike`
+- `enemies/enemy-bat`, `enemy-skeleton`, `enemy-slime`, `enemy-ogre` — pool do depth 1
 
 ## Checklist antes de merge
 

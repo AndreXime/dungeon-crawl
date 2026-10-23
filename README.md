@@ -1,10 +1,10 @@
-# Diskette
+# Dungeon Crawl
 
-Roguelike top-down em C# com MonoGame (DesktopGL). Você controla **Diskette**, um disquete 3,5" que dispara Bits pelos setores corrompidos do PC.
+Roguelike top-down em C# com MonoGame (DesktopGL). Você controla um **mago** que dispara **bolts** mágicos por salas de dungeon medieval.
 
 ## Objetivo do MVP
 
-Sobreviva em salas geradas proceduralmente na **Partition C**, derrote inimigos (Pspam, Trojan), colete moedas, compre itens na loja e vença o **Adware King** para completar a run.
+Sobreviva em salas geradas proceduralmente no **dungeon** (depth 1), derrote inimigos (Morcego, Esqueleto, Slime), colete moedas, compre itens na loja e vença o **Ogre** para completar a run.
 
 ## Requisitos
 

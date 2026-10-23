@@ -26,7 +26,7 @@ public class ItemPromptTests
             new PickupEntity { Id = "near", Pickup = PickupKind.Item, ItemId = "damage_up", X = 10, Y = 0 },
         };
         Assert.True(ItemPrompt.TryResolve(entities, out var name, out var detail));
-        Assert.Equal("DENTE AFIADO", name);
+        Assert.Equal("LAMINA", name);
         Assert.Equal("DANO MAIS 1", detail);
     }
 

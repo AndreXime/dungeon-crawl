@@ -17,7 +17,7 @@ public static class MenuRenderer
     {
         DrawBackdrop(spriteBatch, atlas, screenW, screenH);
 
-        var title = "DISKETTE";
+        var title = "DUNGEON CRAWL";
         var titleX = (screenW - GlyphFont.MeasureWidth(title)) / 2;
         GlyphFont.Draw(spriteBatch, atlas.Pixel, title, titleX, 48, new Color(120, 200, 255));
 

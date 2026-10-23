@@ -39,7 +39,7 @@ public class CombatTests
     private static readonly InputSnapshot Idle = new(0, 0, 0, 0, false);
 
     [Fact]
-    public void PlayerShot_SpawnsFromTopWithAlternatingBitGlyph()
+    public void PlayerShot_SpawnsFromTopOfPlayer()
     {
         var run = OpenRoomRun();
         var player = run.Entities.OfType<PlayerEntity>().Single();
@@ -47,7 +47,6 @@ public class CombatTests
         var shots = run.Entities.OfType<ProjectileEntity>().Where(p => p.FromPlayer).ToList();
         Assert.NotEmpty(shots);
         Assert.All(shots, s => Assert.True(s.Y < player.Y));
-        Assert.Contains(shots, s => s.BitGlyph is 0 or 1);
     }
 
     [Fact]
