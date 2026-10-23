@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using ChamberCrawl.Data;
 using ChamberCrawl.Models;
 
 namespace ChamberCrawl.Systems;
@@ -10,6 +10,8 @@ public static class Ai
     public const float SlimeSplitMs = 4000f;
     public const float WanderMinMs = 500f;
     public const float WanderMaxMs = 1500f;
+    private const float SlimeSplitOffsetPx = 8f;
+    private const float SlimeNoSplitCooldownMs = 999_999f;
 
     /// <summary>Dano de contato fica em Combat.Update. Movimenta inimigos por kind (stubs até Tasks 3–6).</summary>
     public static void Update(RunState state, float dt, Func<float>? rng = null)
@@ -17,6 +19,7 @@ public static class Ai
         if (state.Status != RunStatus.Playing) return;
         var player = state.Entities.OfType<PlayerEntity>().FirstOrDefault();
         if (player is null) return;
+        var random = rng ?? Random.Shared.NextSingle;
 
         foreach (var enemy in state.Entities.OfType<EnemyEntity>().Where(e => e.Hp > 0).ToList())
         {
@@ -29,7 +32,7 @@ public static class Ai
                     UpdateSkeleton(state, enemy, player, dt, rng);
                     break;
                 case EnemyKind.Slime:
-                    UpdateSlime(state, enemy, player, dt, rng);
+                    UpdateSlime(state, enemy, dt, random);
                     break;
                 case EnemyKind.Ogre:
                     UpdateOgre(state, enemy, player, dt, rng);
@@ -46,8 +49,84 @@ public static class Ai
     {
     }
 
-    private static void UpdateSlime(RunState state, EnemyEntity enemy, PlayerEntity player, float dt, Func<float>? rng)
+    private static void UpdateSlime(RunState state, EnemyEntity enemy, float dt, Func<float> rng)
     {
+        enemy.Cooldown -= dt * 1000f;
+        if (enemy.Cooldown <= 0)
+        {
+            if (enemy.CanSplit && enemy.Hp > 0)
+            {
+                SplitSlime(state, enemy);
+                return;
+            }
+            if (!enemy.CanSplit)
+                enemy.Cooldown = SlimeNoSplitCooldownMs;
+        }
+
+        UpdateSlimeWander(state, enemy, dt, rng);
+    }
+
+    private static void SplitSlime(RunState state, EnemyEntity parent)
+    {
+        var def = Enemies.Defs[EnemyKind.Slime];
+        var childRadius = def.Radius * 0.7f;
+        var px = parent.X;
+        var py = parent.Y;
+        state.Entities.Remove(parent);
+
+        SpawnChild(-SlimeSplitOffsetPx);
+        SpawnChild(SlimeSplitOffsetPx);
+
+        void SpawnChild(float offsetX)
+        {
+            state.Entities.Add(new EnemyEntity
+            {
+                Id = $"{parent.Id}-child-{offsetX}",
+                Enemy = EnemyKind.Slime,
+                X = px + offsetX,
+                Y = py,
+                Radius = childRadius,
+                Hp = 1,
+                CanSplit = false,
+                Cooldown = SlimeSplitMs,
+            });
+        }
+    }
+
+    private static void UpdateSlimeWander(RunState state, EnemyEntity enemy, float dt, Func<float> rng)
+    {
+        var speed = Enemies.Defs[EnemyKind.Slime].Speed;
+        enemy.Phase -= dt * 1000f;
+        if (enemy.Phase <= 0)
+        {
+            var angle = rng() * MathF.PI * 2f;
+            enemy.Vx = MathF.Cos(angle) * speed;
+            enemy.Vy = MathF.Sin(angle) * speed;
+            enemy.Phase = WanderMinMs + rng() * (WanderMaxMs - WanderMinMs);
+        }
+
+        var x = enemy.X;
+        var y = enemy.Y;
+        MoveWithTiles(state, enemy, enemy.Vx * dt, enemy.Vy * dt);
+        if (enemy.X == x && enemy.Y == y) enemy.Phase = 0;
+    }
+
+    private static void MoveWithTiles(RunState state, EnemyEntity enemy, float dx, float dy)
+    {
+        var tiles = state.Room.Tiles;
+        var nextX = enemy.X + dx;
+        var nextY = enemy.Y + dy;
+
+        if (!Collision.CircleHitsSolid(nextX, nextY, enemy.Radius, tiles))
+        {
+            enemy.X = nextX;
+            enemy.Y = nextY;
+            return;
+        }
+        if (!Collision.CircleHitsSolid(nextX, enemy.Y, enemy.Radius, tiles)) enemy.X = nextX;
+        else enemy.Vx = 0;
+        if (!Collision.CircleHitsSolid(enemy.X, nextY, enemy.Radius, tiles)) enemy.Y = nextY;
+        else enemy.Vy = 0;
     }
 
     private static void UpdateOgre(RunState state, EnemyEntity enemy, PlayerEntity player, float dt, Func<float>? rng)

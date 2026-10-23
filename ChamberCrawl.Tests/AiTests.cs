@@ -53,10 +53,39 @@ public class AiTests
         Assert.Equal(100, enemy.X);
     }
 
+    [Fact]
+    public void Update_Slime_SplitsIntoTwoChildrenAfter4Seconds()
+    {
+        var run = OpenRoomRun();
+        var parent = AddEnemy(run, EnemyKind.Slime, 200, 160);
+        parent.CanSplit = true;
+        parent.Cooldown = 4000f;
+        parent.Hp = 2;
+
+        Ai.Update(run, 4.1f);
+
+        Assert.DoesNotContain(run.Entities, e => e.Id == parent.Id);
+        var kids = run.Entities.OfType<EnemyEntity>().Where(e => e.Enemy == EnemyKind.Slime).ToList();
+        Assert.Equal(2, kids.Count);
+        Assert.All(kids, k => Assert.False(k.CanSplit));
+        Assert.All(kids, k => Assert.Equal(1, k.Hp));
+    }
+
+    [Fact]
+    public void Update_SlimeChild_DoesNotSplit()
+    {
+        var run = OpenRoomRun();
+        var child = AddEnemy(run, EnemyKind.Slime, 200, 160);
+        child.CanSplit = false;
+        child.Cooldown = 4000f;
+        Ai.Update(run, 5f);
+        Assert.Contains(run.Entities, e => e.Id == child.Id);
+        Assert.Single(run.Entities.OfType<EnemyEntity>());
+    }
+
     [Theory]
     [InlineData(EnemyKind.Bat)]
     [InlineData(EnemyKind.Skeleton)]
-    [InlineData(EnemyKind.Slime)]
     [InlineData(EnemyKind.Ogre)]
     public void Update_Playing_StubDoesNotThrow(EnemyKind kind)
     {
