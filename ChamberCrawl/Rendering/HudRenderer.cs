@@ -188,29 +188,41 @@ public static class HudRenderer
         var roomH = GameConstants.RoomH * GameConstants.Cell;
         spriteBatch.Draw(atlas.Pixel, new Rectangle(0, 0, roomW, roomH), new Color(0, 0, 0, 160));
 
-        var bannerW = 220;
-        var bannerH = 56;
+        var won = state.Status == RunStatus.Won;
+        var title = won ? "VITORIA" : "DERROTA";
+        var hint = "R PARA REINICIAR";
+        var titleColor = won ? new Color(140, 255, 160) : new Color(255, 140, 140);
+        var hintColor = new Color(220, 220, 230);
+
+        var titleScale = 3;
+        var titleW = GlyphFont.MeasureWidth(title, titleScale);
+        var hintW = GlyphFont.MeasureWidth(hint, scale: 1);
+        var bannerW = Math.Max(titleW, hintW) + 32;
+        var bannerH = 72;
         var bx = (roomW - bannerW) / 2;
         var by = (roomH - bannerH) / 2;
-        var fill = state.Status == RunStatus.Won
+        var fill = won
             ? new Color(40, 120, 60, 230)
             : new Color(140, 40, 40, 230);
         spriteBatch.Draw(atlas.Pixel, new Rectangle(bx, by, bannerW, bannerH), fill);
         spriteBatch.Draw(atlas.Pixel, new Rectangle(bx, by, bannerW, 4), Color.White * 0.7f);
         spriteBatch.Draw(atlas.Pixel, new Rectangle(bx, by + bannerH - 4, bannerW, 4), Color.White * 0.35f);
 
-        var iconX = bx + bannerW / 2 - 20;
-        var iconY = by + 16;
-        spriteBatch.Draw(atlas.Get("coin"), new Rectangle(iconX, iconY, 20, 20), Color.White);
-        DrawRestartMark(spriteBatch, atlas, iconX + 28, iconY + 2);
-    }
-
-    private static void DrawRestartMark(SpriteBatch spriteBatch, TextureAtlas atlas, int x, int y)
-    {
-        spriteBatch.Draw(atlas.Pixel, new Rectangle(x, y, 3, 16), Color.White);
-        spriteBatch.Draw(atlas.Pixel, new Rectangle(x, y, 10, 3), Color.White);
-        spriteBatch.Draw(atlas.Pixel, new Rectangle(x + 8, y, 3, 7), Color.White);
-        spriteBatch.Draw(atlas.Pixel, new Rectangle(x, y + 6, 10, 3), Color.White);
-        spriteBatch.Draw(atlas.Pixel, new Rectangle(x + 6, y + 9, 3, 7), Color.White);
+        GlyphFont.Draw(
+            spriteBatch,
+            atlas.Pixel,
+            title,
+            bx + (bannerW - titleW) / 2,
+            by + 14,
+            titleColor,
+            titleScale);
+        GlyphFont.Draw(
+            spriteBatch,
+            atlas.Pixel,
+            hint,
+            bx + (bannerW - hintW) / 2,
+            by + 46,
+            hintColor,
+            scale: 1);
     }
 }
