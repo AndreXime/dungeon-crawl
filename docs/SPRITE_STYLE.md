@@ -66,11 +66,11 @@ Depois da geração:
 
 ## Inventário alvo (24 ids)
 
-**Canvas 32×32:** `floor`, `wall`, `door`, `door-tile`, `crate`, `barrel`, `spike`, `obstacle`, `portal` (64×64 se já for padrão do atlas).
+Tudo via **GenerateImage** + quantize (`tools/sprite-studio/quantize-characters.js` / `import-generated.js`), fonte `mode: "pixels"`.
 
-**Canvas 64×64:** `coin`, `heart`, `item-damage`, `item-speed`, `item-hp`, `item-firerate`, `item-triple`, `item-greedy`.
+**32×32:** `floor`, `wall`, `door`, `door-tile`, `crate`, `barrel`, `spike`, `obstacle`, `player`, `bolt`, `enemy-bat`, `enemy-skeleton`, `enemy-slime`.
 
-**GenerateImage:** `player`, `bolt`, `enemy-bat`, `enemy-skeleton`, `enemy-slime` (32×32); `enemy-ogre`, `projectile` (64×64).
+**64×64:** `portal`, `coin`, `heart`, `item-damage`, `item-speed`, `item-hp`, `item-firerate`, `item-triple`, `item-greedy`, `enemy-ogre`, `projectile`.
 
 ## Checklist antes de merge
 

@@ -1,6 +1,6 @@
 # Paleta compartilhada — kit Isaac / dungeon clássico
 
-Referência para humanos e agentes ao desenhar no Sprite Studio (Canvas) ou gerar personagens (GenerateImage). Hex copiados da spec `docs/superpowers/specs/2026-10-23-sprite-cohesion-isaac-design.md`.
+Referência para humanos e agentes ao gerar sprites (GenerateImage + quantize). Hex copiados da spec `docs/superpowers/specs/2026-10-23-sprite-cohesion-isaac-design.md`.
 
 ## Kit visual (obrigatório)
 
