@@ -43,6 +43,19 @@ public static class Ai
 
     private static void UpdateBat(RunState state, EnemyEntity enemy, PlayerEntity player, float dt, Func<float>? rng)
     {
+        var def = Enemies.Defs[EnemyKind.Bat];
+        var dx = player.X - enemy.X;
+        var dy = player.Y - enemy.Y;
+        var dist = MathF.Sqrt(dx * dx + dy * dy);
+        if (dist == 0) return;
+        Steer(state, enemy, dx / dist, dy / dist, def.Speed, dt);
+    }
+
+    private static void Steer(RunState state, EnemyEntity enemy, float dirX, float dirY, float speed, float dt)
+    {
+        enemy.Vx = dirX * speed;
+        enemy.Vy = dirY * speed;
+        MoveWithTiles(state, enemy, enemy.Vx * dt, enemy.Vy * dt);
     }
 
     private static void UpdateSkeleton(RunState state, EnemyEntity enemy, PlayerEntity player, float dt, Func<float>? rng)

@@ -83,8 +83,18 @@ public class AiTests
         Assert.Single(run.Entities.OfType<EnemyEntity>());
     }
 
+    [Fact]
+    public void Update_Bat_ChasesPlayer()
+    {
+        var run = OpenRoomRun();
+        var enemy = AddEnemy(run, EnemyKind.Bat, 100, 160);
+        run.Entities.OfType<PlayerEntity>().Single().X = 300;
+        var before = enemy.X;
+        Ai.Update(run, Dt);
+        Assert.True(enemy.X > before);
+    }
+
     [Theory]
-    [InlineData(EnemyKind.Bat)]
     [InlineData(EnemyKind.Skeleton)]
     [InlineData(EnemyKind.Ogre)]
     public void Update_Playing_StubDoesNotThrow(EnemyKind kind)
