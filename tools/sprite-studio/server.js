@@ -17,10 +17,10 @@ const STUDIO = __dirname;
 const FOLDERS = ['enemies', 'items', 'player', 'tiles'];
 
 const SIZE_DEFAULTS = {
-  'enemies/enemy-pspam': 32,
-  'enemies/enemy-trojan': 32,
-  'enemies/enemy-trojan-active': 32,
-  'enemies/enemy-adware-king': 64,
+  'enemies/enemy-bat': 32,
+  'enemies/enemy-skeleton': 32,
+  'enemies/enemy-slime': 32,
+  'enemies/enemy-ogre': 64,
   'enemies/projectile': 64,
   'items/coin': 64,
   'items/heart': 64,
@@ -31,16 +31,15 @@ const SIZE_DEFAULTS = {
   'items/item-speed': 64,
   'items/item-triple': 64,
   'player/player': 32,
-  'player/bit-0': 32,
-  'player/bit-1': 32,
+  'player/bolt': 32,
   'tiles/floor': 32,
   'tiles/wall': 32,
   'tiles/door': 32,
   'tiles/door-tile': 32,
-  'tiles/folder': 32,
-  'tiles/popup': 32,
+  'tiles/crate': 32,
+  'tiles/barrel': 32,
   'tiles/obstacle': 32,
-  'tiles/bad-sector': 32,
+  'tiles/spike': 32,
   'tiles/portal': 64,
 };
 

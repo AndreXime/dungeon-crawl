@@ -1,5 +1,5 @@
 {
   "size": 64,
   "mode": "canvas",
-  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#5a3a10', Bag='#c45c14', BagLt='#e07830', BagDk='#8a3c0c', Gold='#f4c020';\n  // money bag\n  px(18,20,28,34,O); px(19,21,26,32,Bag);\n  px(19,21,26,3,BagLt); px(19,50,26,3,BagDk);\n  // neck\n  px(26,12,12,12,O); px(27,13,10,10,BagLt);\n  // $ \n  px(28,30,8,2,Gold); px(30,28,4,16,Gold); px(28,34,8,2,Gold); px(28,42,8,2,Gold);\n\n}\n"
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#2a1f14', I='#5a6068', IL='#9aa3ad', ID='#2a1f14', Gold='#e0a820';\n  px(20,16,24,32,O);\n  px(22,18,20,28,I);\n  px(22,18,20,4,IL);\n  px(22,42,20,4,ID);\n  px(24,22,16,16,O);\n  px(26,24,12,12,Gold);\n  px(28,26,8,8,ID);\n  px(30,28,4,4,Gold);\n}\n"
 }

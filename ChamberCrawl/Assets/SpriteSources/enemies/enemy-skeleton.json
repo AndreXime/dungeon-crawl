@@ -1,0 +1,5 @@
+{
+  "size": 32,
+  "mode": "canvas",
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#2a1f14', Bone='#d4cbb4', BL='#f0e8d6', BD='#a89878', Eye='#38bdf8';\n  px(12,3,8,8,O); px(13,4,6,6,Bone);\n  px(14,6,2,2,Eye); px(18,6,2,2,Eye);\n  px(15,9,2,1,O);\n  px(14,11,4,10,O); px(15,12,2,8,Bone);\n  px(8,13,6,2,O); px(18,13,6,2,O);\n  px(8,13,2,8,O); px(22,13,2,8,O);\n  px(12,21,8,2,O); px(13,22,2,6,O); px(17,22,2,6,O);\n  px(24,14,2,10,BD); px(24,12,4,2,BL);\n}\n"
+}

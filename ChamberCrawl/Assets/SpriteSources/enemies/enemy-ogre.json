@@ -1,0 +1,5 @@
+{
+  "size": 64,
+  "mode": "canvas",
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#2a1f14', Skin='#8a9a6a', SL='#a8b888', SD='#5a6848';\n  const Cloth='#4a3080', CL='#6b4aa8';\n  px(16,8,32,48,O);\n  px(18,10,28,44,Skin);\n  px(18,10,28,4,SL); px(18,50,28,4,SD);\n  px(20,14,24,16,Cloth); px(20,14,24,2,CL);\n  px(22,18,8,6,O); px(34,18,8,6,O);\n  px(24,20,4,2,'#c43c3c'); px(36,20,4,2,'#c43c3c');\n  px(28,28,8,4,O); px(30,30,4,2,SD);\n  px(10,22,8,20,O); px(46,22,8,20,O);\n  px(12,24,4,16,Skin); px(48,24,4,16,Skin);\n  px(14,52,10,8,O); px(40,52,10,8,O);\n  px(16,54,6,4,SD); px(42,54,6,4,SD);\n  px(24,4,16,8,O); px(26,2,12,4,SD);\n}\n"
+}

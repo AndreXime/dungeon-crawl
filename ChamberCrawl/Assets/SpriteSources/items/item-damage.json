@@ -1,5 +1,5 @@
 {
   "size": 64,
   "mode": "canvas",
-  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#051428', Blade='#d8dee8', BladeLt='#f5f7fa', Hilt='#8b4510', Gem='#e03050';\n  // sword vertical\n  px(28,6,8,36,O); px(29,7,6,34,Blade); px(29,7,6,2,BladeLt);\n  px(30,8,2,30,BladeLt);\n  // guard\n  px(18,38,28,6,O); px(19,39,26,4,Hilt);\n  // grip\n  px(28,42,8,14,O); px(29,43,6,12,Hilt);\n  px(30,46,4,2,Gem);\n\n}\n"
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#2a1f14', M='#9aa3ad', ML='#c8cdd2', MD='#5a6068', H='#8b5a2b';\n  px(12,20,40,8,O); px(14,22,36,4,M);\n  px(14,22,36,1,ML); px(14,25,36,1,MD);\n  px(48,16,8,16,O); px(50,18,4,12,ML);\n  px(10,24,6,4,H); px(11,25,4,2,MD);\n}\n"
 }

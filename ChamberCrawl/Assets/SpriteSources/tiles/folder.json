@@ -1,5 +1,0 @@
-{
-  "size": 32,
-  "mode": "canvas",
-  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#5a3a10', Y='#e0a820', YLt='#f4d060', YDk='#b07818';\n  // tab\n  px(4,6,12,6,O); px(5,7,10,5,YLt);\n  // body\n  px(4,10,24,18,O); px(5,11,22,16,Y);\n  px(5,11,22,2,YLt); px(5,25,22,2,YDk);\n\n}\n"
-}

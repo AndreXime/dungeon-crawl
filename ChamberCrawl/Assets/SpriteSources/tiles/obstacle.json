@@ -1,5 +1,5 @@
 {
   "size": 32,
   "mode": "canvas",
-  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#051428', Box='#6b7380', BoxLt='#9aa3ad', BoxDk='#4a5568', Stripe='#f4c020';\n  px(4,6,24,22,O); px(5,7,22,20,Box);\n  px(5,7,22,2,BoxLt); px(5,25,22,2,BoxDk);\n  px(8,12,16,2,Stripe); px(8,18,16,2,Stripe);\n\n}\n"
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#2a1f14', S='#6b6358', SL='#8a8276', SD='#4a443c';\n  px(4,8,24,18,O);\n  px(5,9,22,16,S);\n  px(5,9,22,2,SL); px(5,23,22,2,SD);\n  px(8,12,16,8,SD);\n  px(10,14,12,4,SL);\n}\n"
 }

@@ -1,5 +1,5 @@
 {
   "size": 64,
   "mode": "canvas",
-  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#051428', Cross='#e03050', CrossLt='#ff6a80', Box='#f0e8d6', BoxDk='#c4bfa8';\n  // medkit\n  px(10,14,44,36,O); px(11,15,42,34,Box); px(11,15,42,2, '#fff8ea'); px(11,47,42,2,BoxDk);\n  // red cross\n  px(28,20,8,24,Cross); px(20,28,24,8,Cross);\n  px(28,20,8,2,CrossLt); px(20,28,24,2,CrossLt);\n\n}\n"
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#2a1f14', G='#208040', GL='#40a060', GD='#105028', L='#f0e8d6';\n  px(24,14,16,40,O); px(26,16,12,36,G);\n  px(26,16,12,4,GL); px(26,48,12,4,GD);\n  px(28,18,8,30,L);\n  px(30,22,4,8,'#c43c3c'); px(31,24,2,4,'#e85858');\n}\n"
 }

@@ -1,5 +1,5 @@
 {
   "size": 64,
   "mode": "canvas",
-  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#051428', Ring='#6d28d9', RingLt='#a78bfa', Core='#38bdf8', CoreLt='#e0f2fe';\n  // outer ring\n  for (let y=4;y<60;y++) for (let x=4;x<60;x++) {\n    const dx=x-32, dy=y-32, r=dx*dx+dy*dy;\n    if (r<=27*27 && r>=22*22) px(x,y,1,1,Ring);\n    if (r<=22*22 && r>=18*18) px(x,y,1,1,RingLt);\n    if (r<=14*14) px(x,y,1,1,Core);\n    if (r<=6*6) px(x,y,1,1,CoreLt);\n  }\n  px(30,8,4,4,O); px(30,52,4,4,O); px(8,30,4,4,O); px(52,30,4,4,O);\n\n}\n"
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#2a1f14', A='#e0a820', AL='#f4d060', AD='#b07818', V='#6b4a8a';\n  for (let y=8;y<56;y++) for (let x=8;x<56;x++) {\n    const dx=x-32, dy=y-32, r=Math.sqrt(dx*dx+dy*dy);\n    if (r<=24&&r>=18) px(x,y,1,1,A);\n    else if (r<18) px(x,y,1,1,V);\n  }\n  for (let y=8;y<56;y++) for (let x=8;x<56;x++) {\n    const dx=x-32, dy=y-32;\n    if (dx*dx+dy*dy<=24*24 && dx*dx+dy*dy>=22*22) px(x,y,1,1,O);\n  }\n  px(30,12,4,4,AL); px(44,28,3,3,AL); px(18,40,3,3,AD);\n}\n"
 }
