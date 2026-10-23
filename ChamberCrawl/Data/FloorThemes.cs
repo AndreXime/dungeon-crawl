@@ -9,6 +9,19 @@ public static class FloorThemes
         _ => "FirstFloorTheme",
     };
 
+    public static string MusicFor(RunState state)
+    {
+        if (!state.Floor.Rooms.TryGetValue(state.CurrentRoomId, out var node))
+            return MusicForDepth(state.Floor.Depth);
+
+        return node.Type switch
+        {
+            RoomType.Shop => "ShopTheme",
+            RoomType.Boss => "BossTheme",
+            _ => MusicForDepth(state.Floor.Depth),
+        };
+    }
+
     public static string TextureForTile(int tile) => tile switch
     {
         GameConstants.TileWall => "wall",

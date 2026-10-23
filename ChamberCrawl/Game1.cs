@@ -85,7 +85,7 @@ public class Game1 : Game
                 break;
 
             case AppScreen.Playing:
-                _music.PlayLoop(FloorThemes.MusicForDepth(_state.Floor.Depth));
+                _music.PlayLoop(FloorThemes.MusicFor(_state));
                 UpdatePlaying(kb, dt);
                 break;
 
@@ -130,7 +130,7 @@ public class Game1 : Game
     private void StartRun()
     {
         _state = RunFactory.Create(Environment.TickCount);
-        _music.PlayLoop(FloorThemes.MusicForDepth(_state.Floor.Depth));
+        _music.PlayLoop(FloorThemes.MusicFor(_state));
         _screen = AppScreen.Playing;
     }
 
