@@ -1,5 +1,5 @@
 {
   "size": 64,
   "mode": "canvas",
-  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#051428', Boot='#335d92', BootLt='#5c8dc5', Stripe='#38bdf8';\n  // boot\n  px(14,18,28,28,O); px(15,19,26,26,Boot);\n  px(15,19,26,3,BootLt);\n  // toe\n  px(36,32,16,14,O); px(37,33,14,12,Boot);\n  // speed lines\n  px(6,24,8,2,Stripe); px(4,30,10,2,Stripe); px(6,36,8,2,Stripe);\n\n}\n"
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#2a1f14', L='#8b5a2b', LL='#c48a4a', LD='#5a3a18';\n  px(14,40,36,12,O); px(16,42,32,8,L);\n  px(16,42,32,2,LL); px(16,48,32,2,LD);\n  px(18,28,14,16,O); px(20,30,10,12,L);\n  px(34,28,14,16,O); px(36,30,10,12,L);\n}\n"
 }

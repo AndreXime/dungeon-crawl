@@ -1,5 +1,5 @@
 {
   "size": 32,
   "mode": "canvas",
-  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#0a0e18', Brick='#3d4f6f', BrickLt='#5a6f94', Mortar='#1a2233';\n  px(0,0,32,32,Mortar);\n  const rows=[[0,0],[0,8],[0,16],[0,24]];\n  rows.forEach((r,i)=>{\n    const off=i%2?4:0;\n    for (let x=-4+off;x<32;x+=10) {\n      px(x,r[1],9,7,Brick); px(x,r[1],9,1,BrickLt); px(x,r[1]+6,9,1,O);\n    }\n  });\n\n}\n"
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#2a1f14', S='#6b6358', SL='#8a8276', SD='#4a443c';\n  px(0,0,32,32,O);\n  for (let y=0;y<32;y+=8) {\n    px(0,y,32,1,SD);\n    const off=(y/8)%2?4:0;\n    for (let x=-off;x<32;x+=8) px(x,y+1,7,7,S);\n  }\n  px(2,2,1,28,SL); px(30,2,1,28,SD);\n}\n"
 }

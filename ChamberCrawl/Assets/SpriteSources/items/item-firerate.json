@@ -1,5 +1,5 @@
 {
   "size": 64,
   "mode": "canvas",
-  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#051428', Y='#f4c020', YLt='#ffe066', Gun='#4a5568', GunLt='#718096';\n  // blaster\n  px(10,26,40,14,O); px(11,27,38,12,Gun); px(11,27,38,2,GunLt);\n  px(44,28,12,10,O); px(45,29,10,8,Y);\n  px(48,31,4,4,YLt);\n  // bolts\n  px(52,20,4,6,Y); px(56,14,3,5,YLt); px(58,8,2,4,Y);\n\n}\n"
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#2a1f14', P='#d4cbb4', PL='#f0e8d6', PD='#a89878', Ink='#4a3080';\n  px(16,12,32,44,O); px(18,14,28,40,P);\n  px(18,14,28,2,PL); px(18,52,28,2,PD);\n  px(22,20,20,2,Ink); px(22,26,16,2,Ink); px(22,32,18,2,Ink);\n  px(22,38,12,2,Ink); px(36,18,4,4,O);\n}\n"
 }

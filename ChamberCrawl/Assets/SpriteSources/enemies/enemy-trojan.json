@@ -1,5 +1,0 @@
-{
-  "size": 32,
-  "mode": "canvas",
-  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n  const O = '#051428', Wood = '#8b5a2b', WoodLt = '#c48a4a', WoodDk = '#5a3a18';\n  const Metal = '#9aa3ad', Eye = '#c43c3c', Shine = '#f0e8d6';\n\n  // crate\n  px(6, 10, 20, 18, O);\n  px(7, 11, 18, 16, Wood);\n  px(7, 11, 18, 2, WoodLt);\n  px(7, 25, 18, 2, WoodDk);\n  px(7, 11, 1, 16, WoodLt);\n  px(24, 11, 1, 16, WoodDk);\n  // X boards\n  for (let i = 0; i < 16; i++) {\n    px(8 + i, 12 + Math.floor(i * 14 / 15), 1, 2, WoodDk);\n    px(23 - i, 12 + Math.floor(i * 14 / 15), 1, 2, WoodDk);\n  }\n  // lid seam\n  px(7, 17, 18, 1, O);\n  // peep eye in crack\n  px(14, 14, 4, 3, O);\n  px(15, 15, 2, 1, Eye);\n  px(15, 15, 1, 1, Shine);\n  // lock\n  px(14, 20, 4, 5, Metal);\n  px(15, 21, 2, 2, O);\n}\n"
-}
