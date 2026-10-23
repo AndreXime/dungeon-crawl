@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using ChamberCrawl.Audio;
 using ChamberCrawl.Data;
 using ChamberCrawl.Models;
 
@@ -26,6 +27,7 @@ public static class Pickups
             if (pickup.Pickup == PickupKind.Coin)
             {
                 state.Coins += pickup.Amount;
+                Sfx.Play("pickupCoin");
                 removed.Add(pickup);
                 continue;
             }
@@ -39,6 +41,7 @@ public static class Pickups
                 state.PlayerStats = Items.Apply(state.PlayerStats, itemId);
                 player.Hp = state.PlayerStats.Hp;
                 state.Inventory.Add(itemId);
+                Sfx.Play("powerUp");
 
                 if (node is not null && pickup.SpawnIndex is { } spawnIndex)
                     node.ClaimedSpawns.Add(spawnIndex);

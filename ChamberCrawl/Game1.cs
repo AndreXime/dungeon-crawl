@@ -1,4 +1,5 @@
-﻿using ChamberCrawl.Data;
+﻿using ChamberCrawl.Audio;
+using ChamberCrawl.Data;
 using ChamberCrawl.Models;
 using ChamberCrawl.Rendering;
 using ChamberCrawl.Systems;
@@ -17,6 +18,8 @@ public class Game1 : Game
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch = null!;
     private TextureAtlas _atlas = null!;
+    private MusicBank _music = null!;
+    private SoundBank _sounds = null!;
     private RenderTarget2D _scene = null!;
     private RunState _state = null!;
     private GameSettings _settings = null!;
@@ -48,6 +51,9 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         _atlas = TextureAtlas.Load(GraphicsDevice, AppContext.BaseDirectory);
+        _music = MusicBank.Load(AppContext.BaseDirectory);
+        _sounds = SoundBank.Load(AppContext.BaseDirectory);
+        Sfx.Bank = _sounds;
         EnsureSceneTarget();
     }
 
@@ -55,6 +61,9 @@ public class Game1 : Game
     {
         _scene?.Dispose();
         _atlas.Dispose();
+        _music.Dispose();
+        Sfx.Bank = null;
+        _sounds.Dispose();
     }
 
     protected override void Update(GameTime gameTime)
@@ -76,10 +85,12 @@ public class Game1 : Game
                 break;
 
             case AppScreen.Playing:
+                _music.PlayLoop(FloorThemes.MusicForDepth(_state.Floor.Depth));
                 UpdatePlaying(kb, dt);
                 break;
 
             case AppScreen.Paused:
+                _music.Pause();
                 _screen = _menu.UpdatePause(_screen, () => { }, ReturnToMenu, kb);
                 break;
         }
@@ -94,6 +105,7 @@ public class Game1 : Game
         {
             _menu.ResetPauseSelection();
             _menu.SyncInput(kb);
+            _music.Pause();
             _screen = AppScreen.Paused;
             return;
         }
@@ -118,11 +130,13 @@ public class Game1 : Game
     private void StartRun()
     {
         _state = RunFactory.Create(Environment.TickCount);
+        _music.PlayLoop(FloorThemes.MusicForDepth(_state.Floor.Depth));
         _screen = AppScreen.Playing;
     }
 
     private void ReturnToMenu()
     {
+        _music.Stop();
         _menu.ResetSelection();
         _screen = AppScreen.MainMenu;
     }

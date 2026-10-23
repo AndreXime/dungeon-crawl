@@ -4,6 +4,11 @@ namespace ChamberCrawl.Data;
 
 public static class FloorThemes
 {
+    public static string MusicForDepth(int depth) => depth switch
+    {
+        _ => "FirstFloorTheme",
+    };
+
     public static string TextureForTile(int tile) => tile switch
     {
         GameConstants.TileWall => "wall",

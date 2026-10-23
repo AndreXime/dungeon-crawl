@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ChamberCrawl.Audio;
 using ChamberCrawl.Data;
 using ChamberCrawl.Models;
 
@@ -83,6 +84,7 @@ public static class Combat
                 Life = stats.Range / PlayerProjectileSpeed,
             });
         }
+        Sfx.Play("playerShoot");
         state.ShootCooldown = 1f / stats.FireRate;
     }
 
@@ -91,6 +93,7 @@ public static class Combat
         if (state.TimeMs < state.PlayerStats.IframeUntil) return;
         state.PlayerStats.Hp = Math.Max(0, state.PlayerStats.Hp - (int)MathF.Ceiling(amount));
         state.PlayerStats.IframeUntil = state.TimeMs + GameConstants.IframeMs;
+        Sfx.Play("playerHurt");
     }
 
     private static void DropCoin(RunState state, EnemyEntity enemy, Func<float> rng)
@@ -148,6 +151,7 @@ public static class Combat
                 }
 
                 target.Hp -= projectile.Damage;
+                Sfx.Play("enemyHurt");
                 removed.Add(projectile);
                 if (target.Hp <= 0)
                 {
