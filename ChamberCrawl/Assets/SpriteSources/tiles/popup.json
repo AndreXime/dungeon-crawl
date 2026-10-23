@@ -1,0 +1,5 @@
+{
+  "size": 32,
+  "mode": "canvas",
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#051428', Win='#c0c0c0', Title='#000080', TitleLt='#1084d0', X='#c43c3c', Face='#ffffff';\n  px(2,4,28,24,O); px(3,5,26,22,Win);\n  px(3,5,26,5,Title); px(3,5,26,1,TitleLt);\n  px(24,6,4,3,X);\n  px(6,14,8,8,Face); px(18,14,8,8,Face);\n  px(8,22,16,2,O);\n\n}\n"
+}

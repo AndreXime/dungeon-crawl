@@ -1,0 +1,5 @@
+{
+  "size": 32,
+  "mode": "canvas",
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n  const O = '#051428', Ink = '#0f1419';\n  const Paper = '#f0e8d6', PaperDk = '#d4cbb4', PaperLt = '#fff8ea';\n  const Red = '#c43c3c', RedDk = '#8a2020', Yellow = '#f4c020', Blue = '#335d92';\n\n  // envelope body\n  px(4, 8, 24, 18, O);\n  px(5, 9, 22, 16, Paper);\n  px(5, 9, 22, 1, PaperLt);\n  px(5, 24, 22, 1, PaperDk);\n  // flap V\n  px(5, 9, 1, 8, PaperDk);\n  px(26, 9, 1, 8, PaperDk);\n  for (let i = 0; i < 11; i++) {\n    px(5 + i, 9 + i, 1, 1, Blue);\n    px(26 - i, 9 + i, 1, 1, Blue);\n  }\n  px(15, 19, 2, 1, Blue);\n  // spam badge\n  px(18, 4, 10, 10, O);\n  px(19, 5, 8, 8, Red);\n  px(19, 5, 8, 1, Yellow);\n  px(22, 7, 2, 4, Yellow);\n  px(22, 12, 2, 1, Yellow);\n  // stamp\n  px(7, 20, 5, 4, RedDk);\n  px(8, 21, 3, 2, Red);\n}\n"
+}

@@ -1,0 +1,5 @@
+{
+  "size": 64,
+  "mode": "canvas",
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#051428', Boot='#335d92', BootLt='#5c8dc5', Stripe='#38bdf8';\n  // boot\n  px(14,18,28,28,O); px(15,19,26,26,Boot);\n  px(15,19,26,3,BootLt);\n  // toe\n  px(36,32,16,14,O); px(37,33,14,12,Boot);\n  // speed lines\n  px(6,24,8,2,Stripe); px(4,30,10,2,Stripe); px(6,36,8,2,Stripe);\n\n}\n"
+}

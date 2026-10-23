@@ -1,0 +1,5 @@
+{
+  "size": 32,
+  "mode": "canvas",
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#051428', Wood='#6b4423', WoodLt='#8b5a2b', WoodDk='#4a2f18', Knob='#f4c020';\n  px(6,2,20,28,O); px(7,3,18,26,Wood);\n  px(7,3,18,2,WoodLt); px(7,27,18,2,WoodDk);\n  px(8,8,16,1,WoodDk); px(8,16,16,1,WoodDk); px(8,24,16,1,WoodDk);\n  px(20,16,3,3,O); px(20,16,2,2,Knob);\n\n}\n"
+}

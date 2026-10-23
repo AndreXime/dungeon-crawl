@@ -1,0 +1,5 @@
+{
+  "size": 32,
+  "mode": "canvas",
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#051428', Blue='#335d92', BlueLt='#5c8dc5', Glow='#38bdf8';\n  // zero ring\n  px(10,8,12,16,O);\n  px(11,9,10,14,Blue);\n  px(13,11,6,10, '#00000000'); ctx.clearRect(13,11,6,10);\n  px(11,9,10,1,BlueLt); px(14,12,1,8,Glow);\n\n}\n"
+}

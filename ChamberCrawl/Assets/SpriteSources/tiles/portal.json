@@ -1,0 +1,5 @@
+{
+  "size": 64,
+  "mode": "canvas",
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#051428', Ring='#6d28d9', RingLt='#a78bfa', Core='#38bdf8', CoreLt='#e0f2fe';\n  // outer ring\n  for (let y=4;y<60;y++) for (let x=4;x<60;x++) {\n    const dx=x-32, dy=y-32, r=dx*dx+dy*dy;\n    if (r<=27*27 && r>=22*22) px(x,y,1,1,Ring);\n    if (r<=22*22 && r>=18*18) px(x,y,1,1,RingLt);\n    if (r<=14*14) px(x,y,1,1,Core);\n    if (r<=6*6) px(x,y,1,1,CoreLt);\n  }\n  px(30,8,4,4,O); px(30,52,4,4,O); px(8,30,4,4,O); px(52,30,4,4,O);\n\n}\n"
+}

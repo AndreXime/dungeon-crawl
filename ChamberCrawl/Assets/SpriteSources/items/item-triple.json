@@ -1,0 +1,5 @@
+{
+  "size": 64,
+  "mode": "canvas",
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#051428', Shot='#38bdf8', ShotLt='#a5f3fc', Core='#e0f2fe';\n  // three projectiles\n  for (const [ox,oy] of [[12,28],[28,18],[44,28]]) {\n    px(ox,oy,10,18,O); px(ox+1,oy+1,8,16,Shot); px(ox+3,oy+3,4,10,Core);\n    px(ox+1,oy+1,8,2,ShotLt);\n  }\n\n}\n"
+}

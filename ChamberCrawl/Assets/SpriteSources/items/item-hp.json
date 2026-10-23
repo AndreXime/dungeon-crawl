@@ -1,0 +1,5 @@
+{
+  "size": 64,
+  "mode": "canvas",
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const O='#051428', Cross='#e03050', CrossLt='#ff6a80', Box='#f0e8d6', BoxDk='#c4bfa8';\n  // medkit\n  px(10,14,44,36,O); px(11,15,42,34,Box); px(11,15,42,2, '#fff8ea'); px(11,47,42,2,BoxDk);\n  // red cross\n  px(28,20,8,24,Cross); px(20,28,24,8,Cross);\n  px(28,20,8,2,CrossLt); px(20,28,24,2,CrossLt);\n\n}\n"
+}

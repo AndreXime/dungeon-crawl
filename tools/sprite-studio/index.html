@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sprite Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+    .checkerboard {
+      background-color: #0f172a;
+      background-image:
+        linear-gradient(45deg, #1e293b 25%, transparent 25%),
+        linear-gradient(-45deg, #1e293b 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #1e293b 75%),
+        linear-gradient(-45deg, transparent 75%, #1e293b 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    }
+    .pixelated {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+    #editorCanvas { cursor: crosshair; touch-action: none; }
+    .swatch.active { outline: 2px solid #38bdf8; outline-offset: 2px; }
+    #spriteList button.active {
+      background: #0284c7;
+      color: #fff;
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50 px-4 py-3 sm:px-6">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div>
+          <h1 class="text-lg font-bold bg-gradient-to-r from-white via-slate-200 to-sky-400 bg-clip-text text-transparent">
+            Sprite Studio
+          </h1>
+          <p class="text-xs text-slate-400">Edite sprites no disco · autosave para SpriteSources + PNG</p>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 text-xs">
+        <span id="modeBadge" class="px-2 py-1 rounded bg-slate-800 border border-slate-700 font-mono text-sky-300">—</span>
+        <span id="saveStatus" class="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300">—</span>
+        <button id="btnUndo" class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 hover:border-sky-500/50 transition" title="Ctrl+Z">
+          <i class="fa-solid fa-rotate-left"></i> Desfazer
+        </button>
+        <button id="btnSaveNow" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 font-medium transition">
+          <i class="fa-solid fa-floppy-disk"></i> Salvar
+        </button>
+        <button id="btnDownloadPng" class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 hover:border-sky-500/50 transition" title="Download local (não substitui autosave)">
+          <i class="fa-solid fa-download"></i> PNG
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <div id="toast" class="fixed bottom-6 right-6 z-50 hidden bg-slate-800 text-slate-100 border border-sky-500/50 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+      <i class="fa-solid fa-circle-check text-sky-400"></i>
+      <span id="toastMsg" class="text-sm font-medium"></span>
+    </div>
+
+    <aside class="lg:col-span-3 flex flex-col gap-4">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3 shadow-xl">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300">Sprites</h2>
+        <div id="spriteList" class="flex flex-col gap-1 max-h-[28rem] overflow-y-auto"></div>
+      </div>
+
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3 shadow-xl">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300">Ferramenta</h2>
+        <div class="grid grid-cols-3 gap-2 text-xs">
+          <button data-tool="paint" class="tool-btn px-2 py-2 rounded-lg bg-sky-600 text-white font-medium border border-sky-400/30">
+            <i class="fa-solid fa-paintbrush"></i> Pintar
+          </button>
+          <button data-tool="erase" class="tool-btn px-2 py-2 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">
+            <i class="fa-solid fa-eraser"></i> Apagar
+          </button>
+          <button data-tool="pick" class="tool-btn px-2 py-2 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">
+            <i class="fa-solid fa-eye-dropper"></i> Conta-gotas
+          </button>
+        </div>
+        <label class="flex items-center gap-2 text-xs text-slate-400 mt-1">
+          <input type="checkbox" id="chkGrid" checked class="accent-sky-500" />
+          Mostrar grade
+        </label>
+      </div>
+
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3 shadow-xl">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300">Paleta</h2>
+          <input type="color" id="customColor" value="#335d92" class="w-8 h-8 rounded cursor-pointer border-0 bg-transparent" title="Cor custom" />
+        </div>
+        <div id="palette" class="grid grid-cols-5 gap-2"></div>
+        <div class="flex items-center gap-2 text-xs text-slate-400">
+          <span>Atual:</span>
+          <span id="activeSwatch" class="w-6 h-6 rounded border border-slate-600"></span>
+          <span id="activeHex" class="font-mono text-slate-300">#335d92</span>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col gap-2 shadow-xl">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300">Preview 1×</h2>
+        <div class="checkerboard rounded-xl p-3 flex items-center justify-center border border-slate-800">
+          <canvas id="previewNative" width="32" height="32" class="w-16 h-16 pixelated border border-slate-700"></canvas>
+        </div>
+        <p class="text-[10px] text-slate-500">Clique direito no editor também apaga. Arraste para pintar. Autosave ~400ms.</p>
+      </div>
+    </aside>
+
+    <section class="lg:col-span-9 flex flex-col gap-3">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col gap-3">
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <span id="editorMeta">Editor · zoom 16×</span>
+          <span id="cursorPos" class="font-mono text-sky-400">—</span>
+        </div>
+        <div class="checkerboard rounded-xl p-3 sm:p-4 flex items-center justify-center border border-slate-800 overflow-auto">
+          <canvas id="editorCanvas" width="512" height="512" class="pixelated max-w-full shadow-2xl rounded border border-slate-700"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const PAL = {
+      outline: '#051428',
+      ink:     '#0f1419',
+      shell:   '#335d92',
+      shellMd: '#366196',
+      shellDk: '#234775',
+      shellDp: '#163357',
+      shellLt: '#5384bb',
+      shellHi: '#5c8dc5',
+      metal:   '#b3b0a9',
+      metalMd: '#9e9d97',
+      metalDk: '#6b6e73',
+      metalLt: '#c2bfb7',
+      label:   '#f0e8d6',
+      labelMd: '#ede5d4',
+      labelDk: '#eae2cf',
+      labelLn: '#e0dcd3',
+      shine:   '#ffffff',
+      red:     '#c43c3c',
+      yellow:  '#f4c020',
+      blue:    '#000080',
+      gray:    '#808080',
+      cream:   '#e8dcc8',
+      sand:    '#c4b8a0',
+      dark:    '#1a1010',
+    };
+
+    const ZOOM = 16;
+    const MAX_UNDO = 40;
+
+    const editorCanvas = document.getElementById('editorCanvas');
+    const editorCtx = editorCanvas.getContext('2d');
+    const previewNative = document.getElementById('previewNative');
+    const previewCtx = previewNative.getContext('2d');
+
+    let currentId = null;
+    let nativeSize = 32;
+    let sourceMode = 'canvas';
+    let pixels = [];
+    let saveTimer = null;
+    let tool = 'paint';
+    let color = PAL.shell;
+    let painting = false;
+    let showGrid = true;
+    const undoStack = [];
+
+    function createEmpty(size) {
+      const n = size || nativeSize;
+      return Array.from({ length: n }, () => Array(n).fill(null));
+    }
+
+    function clonePixels(src) {
+      return src.map((row) => row.slice());
+    }
+
+    function pushUndo() {
+      undoStack.push(clonePixels(pixels));
+      if (undoStack.length > MAX_UNDO) undoStack.shift();
+    }
+
+    function clearUndo() {
+      undoStack.length = 0;
+    }
+
+    function undo() {
+      if (!undoStack.length) return;
+      pixels = undoStack.pop();
+      redraw();
+      scheduleSave();
+      showToast('Desfeito');
+    }
+
+    function rasterizeCanvasCode(canvasCode, size) {
+      const off = document.createElement('canvas');
+      off.width = size;
+      off.height = size;
+      const ctx = off.getContext('2d', { willReadFrequently: true });
+      ctx.imageSmoothingEnabled = false;
+      ctx.clearRect(0, 0, size, size);
+      const runner = new Function(
+        'ctx',
+        'size',
+        `${canvasCode}\n; if (typeof draw !== 'function') throw new Error('draw() missing'); draw(ctx, size);`
+      );
+      runner(ctx, size);
+      const { data } = ctx.getImageData(0, 0, size, size);
+      const next = [];
+      for (let y = 0; y < size; y++) {
+        const row = [];
+        for (let x = 0; x < size; x++) {
+          const i = (y * size + x) * 4;
+          const a = data[i + 3];
+          row.push(
+            a < 16
+              ? null
+              : '#' + [data[i], data[i + 1], data[i + 2]].map((v) => v.toString(16).padStart(2, '0')).join('')
+          );
+        }
+        next.push(row);
+      }
+      return next;
+    }
+
+    function blitPixelsToCtx(ctx, size) {
+      ctx.imageSmoothingEnabled = false;
+      ctx.clearRect(0, 0, size, size);
+      const scale = size / nativeSize;
+      for (let y = 0; y < nativeSize; y++) {
+        for (let x = 0; x < nativeSize; x++) {
+          const hex = pixels[y] && pixels[y][x];
+          if (!hex) continue;
+          ctx.fillStyle = hex;
+          ctx.fillRect(x * scale, y * scale, scale, scale);
+        }
+      }
+    }
+
+    function redraw() {
+      editorCtx.imageSmoothingEnabled = false;
+      editorCtx.clearRect(0, 0, editorCanvas.width, editorCanvas.height);
+      blitPixelsToCtx(editorCtx, editorCanvas.width);
+
+      if (showGrid) {
+        editorCtx.strokeStyle = 'rgba(148, 163, 184, 0.25)';
+        editorCtx.lineWidth = 1;
+        for (let i = 0; i <= nativeSize; i++) {
+          const p = i * ZOOM + 0.5;
+          editorCtx.beginPath();
+          editorCtx.moveTo(p, 0);
+          editorCtx.lineTo(p, editorCanvas.height);
+          editorCtx.stroke();
+          editorCtx.beginPath();
+          editorCtx.moveTo(0, p);
+          editorCtx.lineTo(editorCanvas.width, p);
+          editorCtx.stroke();
+        }
+      }
+
+      blitPixelsToCtx(previewCtx, nativeSize);
+    }
+
+    function resizeEditorSurfaces() {
+      editorCanvas.width = nativeSize * ZOOM;
+      editorCanvas.height = nativeSize * ZOOM;
+      previewNative.width = nativeSize;
+      previewNative.height = nativeSize;
+      const css = nativeSize === 64 ? 'w-24 h-24' : 'w-16 h-16';
+      previewNative.className = css + ' pixelated border border-slate-700';
+      document.getElementById('editorMeta').textContent =
+        `Editor ${nativeSize}×${nativeSize} · zoom ${ZOOM}×`;
+    }
+
+    async function refreshList() {
+      const { sprites } = await fetch('/api/sprites').then((r) => r.json());
+      const list = document.getElementById('spriteList');
+      list.innerHTML = '';
+      sprites.forEach((s) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className =
+          'text-left px-2 py-1.5 rounded-lg bg-slate-800 border border-slate-700 hover:border-sky-500/50 text-xs transition';
+        btn.textContent = `${s.id} · ${s.size} · ${s.mode}`;
+        btn.dataset.id = s.id;
+        btn.addEventListener('click', () => loadSprite(s.id));
+        list.appendChild(btn);
+      });
+      highlightActiveList();
+    }
+
+    function highlightActiveList() {
+      document.querySelectorAll('#spriteList button').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.id === currentId);
+      });
+    }
+
+    async function loadSprite(id) {
+      currentId = id;
+      highlightActiveList();
+      document.getElementById('saveStatus').textContent = 'Carregando…';
+      const doc = await fetch('/api/sprites/' + encodeURIComponent(id)).then((r) => {
+        if (!r.ok) throw new Error('falha ao carregar');
+        return r.json();
+      });
+      nativeSize = doc.size || 32;
+      sourceMode = doc.mode;
+      document.getElementById('modeBadge').textContent = sourceMode;
+      if (doc.mode === 'pixels') {
+        pixels = doc.pixels;
+      } else {
+        pixels = rasterizeCanvasCode(doc.canvasCode || '', nativeSize);
+      }
+      clearUndo();
+      resizeEditorSurfaces();
+      redraw();
+      document.getElementById('saveStatus').textContent = '—';
+    }
+
+    function buildPngBase64(size) {
+      const off = document.createElement('canvas');
+      off.width = size;
+      off.height = size;
+      const ctx = off.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const hex = pixels[y] && pixels[y][x];
+          if (!hex) continue;
+          ctx.fillStyle = hex;
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+      return off.toDataURL('image/png').split(',')[1];
+    }
+
+    function scheduleSave() {
+      if (!currentId) return;
+      const el = document.getElementById('saveStatus');
+      el.textContent = 'Alterado…';
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(persistPixels, 400);
+    }
+
+    async function persistPixels() {
+      if (!currentId) return;
+      const el = document.getElementById('saveStatus');
+      el.textContent = 'Salvando…';
+      const body = {
+        size: nativeSize,
+        mode: 'pixels',
+        pixels,
+        pngBase64: buildPngBase64(nativeSize),
+      };
+      try {
+        const res = await fetch('/api/sprites/' + encodeURIComponent(currentId), {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) {
+          el.textContent = 'Erro ao salvar';
+          return;
+        }
+        sourceMode = 'pixels';
+        document.getElementById('modeBadge').textContent = 'pixels';
+        el.textContent = 'Salvo';
+        await refreshList();
+      } catch (_) {
+        el.textContent = 'Erro ao salvar';
+      }
+    }
+
+    function eventToCell(e) {
+      const rect = editorCanvas.getBoundingClientRect();
+      const scaleX = editorCanvas.width / rect.width;
+      const scaleY = editorCanvas.height / rect.height;
+      const x = Math.floor(((e.clientX - rect.left) * scaleX) / ZOOM);
+      const y = Math.floor(((e.clientY - rect.top) * scaleY) / ZOOM);
+      if (x < 0 || y < 0 || x >= nativeSize || y >= nativeSize) return null;
+      return { x, y };
+    }
+
+    function applyAt(x, y) {
+      if (tool === 'pick') {
+        const picked = pixels[y][x];
+        if (picked) setColor(picked);
+        return false;
+      }
+      const next = tool === 'erase' ? null : color;
+      if (pixels[y][x] === next) return false;
+      pixels[y][x] = next;
+      return true;
+    }
+
+    function paintFromEvent(e, startStroke) {
+      if (!currentId) return;
+      const cell = eventToCell(e);
+      if (!cell) return;
+      document.getElementById('cursorPos').textContent = `${cell.x}, ${cell.y}`;
+      if (startStroke && tool !== 'pick') pushUndo();
+      if (applyAt(cell.x, cell.y)) {
+        redraw();
+        scheduleSave();
+      }
+    }
+
+    function setColor(hex) {
+      color = hex;
+      document.getElementById('activeHex').textContent = hex;
+      document.getElementById('activeSwatch').style.background = hex;
+      document.getElementById('customColor').value = hex;
+      document.querySelectorAll('.swatch').forEach((el) => {
+        el.classList.toggle('active', el.dataset.color === hex);
+      });
+      if (tool === 'erase') setTool('paint');
+    }
+
+    function setTool(name) {
+      tool = name;
+      document.querySelectorAll('.tool-btn').forEach((btn) => {
+        const on = btn.dataset.tool === name;
+        btn.className = on
+          ? 'tool-btn px-2 py-2 rounded-lg bg-sky-600 text-white font-medium border border-sky-400/30'
+          : 'tool-btn px-2 py-2 rounded-lg bg-slate-800 text-slate-300 border border-slate-700';
+      });
+    }
+
+    function buildPalette() {
+      const root = document.getElementById('palette');
+      const colors = [...new Set(Object.values(PAL))];
+      colors.forEach((hex) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'swatch w-8 h-8 rounded border border-slate-600';
+        btn.style.background = hex;
+        btn.dataset.color = hex;
+        btn.title = hex;
+        btn.addEventListener('click', () => setColor(hex));
+        root.appendChild(btn);
+      });
+    }
+
+    function downloadPng() {
+      if (!currentId || !pixels.length) return;
+      const off = document.createElement('canvas');
+      off.width = nativeSize;
+      off.height = nativeSize;
+      const ctx = off.getContext('2d');
+      blitPixelsToCtx(ctx, nativeSize);
+      const link = document.createElement('a');
+      const name = currentId.replace(/\//g, '-');
+      link.href = off.toDataURL('image/png');
+      link.download = `${name}-${nativeSize}.png`;
+      link.click();
+      showToast(`PNG ${nativeSize}×${nativeSize} baixado`);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.remove('hidden');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toast.classList.add('hidden'), 2200);
+    }
+
+    editorCanvas.addEventListener('pointerdown', (e) => {
+      editorCanvas.setPointerCapture(e.pointerId);
+      painting = true;
+      if (e.button === 2) {
+        const prev = tool;
+        tool = 'erase';
+        paintFromEvent(e, true);
+        tool = prev;
+        return;
+      }
+      paintFromEvent(e, true);
+    });
+    editorCanvas.addEventListener('pointermove', (e) => {
+      const cell = eventToCell(e);
+      document.getElementById('cursorPos').textContent = cell ? `${cell.x}, ${cell.y}` : '—';
+      if (!painting) return;
+      paintFromEvent(e, false);
+    });
+    editorCanvas.addEventListener('pointerup', () => { painting = false; });
+    editorCanvas.addEventListener('pointercancel', () => { painting = false; });
+    editorCanvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    document.querySelectorAll('.tool-btn').forEach((btn) => {
+      btn.addEventListener('click', () => setTool(btn.dataset.tool));
+    });
+    document.getElementById('customColor').addEventListener('input', (e) => setColor(e.target.value));
+    document.getElementById('chkGrid').addEventListener('change', (e) => {
+      showGrid = e.target.checked;
+      redraw();
+    });
+    document.getElementById('btnUndo').addEventListener('click', undo);
+    document.getElementById('btnSaveNow').addEventListener('click', () => {
+      clearTimeout(saveTimer);
+      persistPixels();
+    });
+    document.getElementById('btnDownloadPng').addEventListener('click', downloadPng);
+
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        undo();
+      }
+    });
+
+    buildPalette();
+    setColor(PAL.shell);
+    setTool('paint');
+    pixels = createEmpty(32);
+    redraw();
+
+    refreshList()
+      .then(() => {
+        const first = document.querySelector('#spriteList button');
+        if (first) return loadSprite(first.dataset.id);
+      })
+      .catch((err) => {
+        document.getElementById('saveStatus').textContent = 'Erro API';
+        showToast(String(err && err.message ? err.message : err));
+      });
+  </script>
+</body>
+</html>

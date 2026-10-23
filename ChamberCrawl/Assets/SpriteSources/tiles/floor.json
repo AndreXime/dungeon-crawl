@@ -1,0 +1,5 @@
+{
+  "size": 32,
+  "mode": "canvas",
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n\n  const A='#1a2740', B='#162038', Dot='#243656';\n  px(0,0,32,32,A);\n  for (let y=0;y<32;y+=4) for (let x=0;x<32;x+=4) {\n    if (((x+y)/4)%2===0) px(x,y,4,4,B);\n  }\n  px(4,4,1,1,Dot); px(20,12,1,1,Dot); px(12,24,1,1,Dot);\n\n}\n"
+}

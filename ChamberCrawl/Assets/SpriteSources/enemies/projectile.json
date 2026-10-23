@@ -1,0 +1,5 @@
+{
+  "size": 64,
+  "mode": "canvas",
+  "canvasCode": "function draw(ctx, size) {\n  ctx.imageSmoothingEnabled = false;\n  const px = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); };\n  const O = '#051428', Blue = '#335d92', BlueLt = '#5c8dc5', BlueDk = '#163357';\n  const Cyan = '#38bdf8', White = '#f5f7fa', Gold = '#f4c020';\n\n  // soft glow ring (hard pixels)\n  px(22, 22, 20, 20, BlueDk);\n  px(24, 20, 16, 24, BlueDk);\n  px(20, 24, 24, 16, BlueDk);\n\n  // core diamond / spark\n  px(28, 18, 8, 28, O);\n  px(18, 28, 28, 8, O);\n  px(29, 19, 6, 26, Blue);\n  px(19, 29, 26, 6, Blue);\n  px(30, 22, 4, 20, BlueLt);\n  px(22, 30, 20, 4, BlueLt);\n  px(31, 26, 2, 12, Cyan);\n  px(26, 31, 12, 2, Cyan);\n  // hot center\n  px(30, 30, 4, 4, White);\n  px(31, 31, 2, 2, Gold);\n  // bit ticks\n  px(14, 30, 3, 4, Cyan);\n  px(47, 30, 3, 4, Cyan);\n  px(30, 14, 4, 3, Cyan);\n  px(30, 47, 4, 3, Cyan);\n}\n"
+}
