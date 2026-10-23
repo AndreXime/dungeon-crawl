@@ -94,8 +94,33 @@ public class AiTests
         Assert.True(enemy.X > before);
     }
 
+    [Fact]
+    public void Update_Skeleton_FiresProjectileAfterCooldown()
+    {
+        var run = OpenRoomRun();
+        var enemy = AddEnemy(run, EnemyKind.Skeleton, 200, 160);
+        enemy.Cooldown = 0;
+        Ai.Update(run, Dt);
+        Assert.Single(run.Entities.OfType<ProjectileEntity>());
+        Assert.False(run.Entities.OfType<ProjectileEntity>().Single().FromPlayer);
+        Assert.Equal(Enemies.Defs[EnemyKind.Skeleton].FireCooldownMs, enemy.Cooldown);
+    }
+
+    [Fact]
+    public void Update_Skeleton_MovesAwayWhenTooClose()
+    {
+        var run = OpenRoomRun();
+        var player = run.Entities.OfType<PlayerEntity>().Single();
+        player.X = 200;
+        player.Y = 160;
+        var enemy = AddEnemy(run, EnemyKind.Skeleton, 210, 160);
+        enemy.Cooldown = 99999f;
+        var before = enemy.X;
+        Ai.Update(run, Dt);
+        Assert.True(enemy.X > before);
+    }
+
     [Theory]
-    [InlineData(EnemyKind.Skeleton)]
     [InlineData(EnemyKind.Ogre)]
     public void Update_Playing_StubDoesNotThrow(EnemyKind kind)
     {

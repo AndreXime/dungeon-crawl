@@ -60,6 +60,26 @@ public static class Ai
 
     private static void UpdateSkeleton(RunState state, EnemyEntity enemy, PlayerEntity player, float dt, Func<float>? rng)
     {
+        var def = Enemies.Defs[EnemyKind.Skeleton];
+        var dx = player.X - enemy.X;
+        var dy = player.Y - enemy.Y;
+        var dist = MathF.Sqrt(dx * dx + dy * dy);
+        var preferred = def.PreferredDist ?? 90f;
+
+        if (dist > 0)
+        {
+            float dirX, dirY;
+            if (dist > preferred + 8f) { dirX = dx / dist; dirY = dy / dist; }
+            else if (dist < preferred - 8f) { dirX = -dx / dist; dirY = -dy / dist; }
+            else { dirX = 0; dirY = 0; }
+            if (dirX != 0 || dirY != 0)
+                Steer(state, enemy, dirX, dirY, def.Speed, dt);
+        }
+
+        enemy.Cooldown -= dt * 1000f;
+        if (enemy.Cooldown > 0) return;
+        Combat.SpawnEnemyProjectile(state, enemy, player.X, player.Y, def.Damage);
+        enemy.Cooldown = def.FireCooldownMs;
     }
 
     private static void UpdateSlime(RunState state, EnemyEntity enemy, float dt, Func<float> rng)
