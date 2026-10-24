@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using ChamberCrawl.Data;
 using ChamberCrawl.Models;
 using ChamberCrawl.Systems;
 
@@ -271,9 +272,10 @@ public class CombatTests
 
         var shot = Assert.Single(run.Entities.OfType<ProjectileEntity>());
         Assert.False(shot.FromPlayer);
-        Assert.Equal(-160, shot.Vx, 2);
+        var speed = Enemies.Defs[EnemyKind.Ogre].ProjectileSpeed;
+        Assert.Equal(-speed, shot.Vx, 2);
         Assert.Equal(0, shot.Vy, 2);
-        Assert.Equal(400f / 160f, shot.Life, 3);
+        Assert.Equal(400f / speed, shot.Life, 3);
     }
 
     [Fact]

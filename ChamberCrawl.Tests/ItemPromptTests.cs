@@ -54,7 +54,7 @@ public class ItemPromptTests
     [InlineData("damage_up", "DANO MAIS 1")]
     [InlineData("speed_up", "VELOCIDADE MAIS 30")]
     [InlineData("hp_up", "CORACAO MAIS 1")]
-    [InlineData("fire_rate", "TIRO MAIS 1-5")]
+    [InlineData("fire_rate", "TIRO MAIS 1.5")]
     [InlineData("triple", "TIRO TRIPLO")]
     [InlineData("greedy", "MULT MOEDAS MAIS 1")]
     [InlineData("range_up", "ALCANCE MAIS 80")]
