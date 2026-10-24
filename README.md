@@ -16,24 +16,58 @@ Sobreviva a **5 andares** gerados proceduralmente, limpe salas, colete moedas, c
 
 Loja e salas de item ficam mais generosas em raridade conforme o depth. Inimigos ganham HP/dano por andar.
 
-## Requisitos
+## Baixar e jogar
+
+Na página **Releases** do repositório no GitHub, baixe o zip da sua plataforma (`linux-x64.zip` ou `win-x64.zip`). Não precisa instalar .NET.
+
+**Linux**
+
+```bash
+unzip linux-x64.zip
+cd linux-x64
+chmod +x ChamberCrawl
+./ChamberCrawl
+```
+
+**Windows**
+
+Descompacte `win-x64.zip` e execute `ChamberCrawl.exe`.
+
+Preferências (tela cheia / escala) gravam em `settings.json` na mesma pasta do executável. A pasta precisa ser gravável.
+
+## Desenvolvimento
+
+### Requisitos
 
 - [.NET SDK](https://dotnet.microsoft.com/download) 9 (ou 8+ com roll-forward)
 - Plataforma MonoGame DesktopGL (incluída no projeto)
+- [just](https://github.com/casey/just) opcional (`sudo apt install just`) para atalhos do `justfile`
 
-## Como rodar
-
-```bash
-dotnet restore
-dotnet run --project ChamberCrawl
-```
-
-## Testes e build
+### Como rodar
 
 ```bash
-dotnet test
-dotnet build
+just run
+# ou: dotnet run --project ChamberCrawl
 ```
+
+### Testes e build
+
+```bash
+just test
+just build
+```
+
+### Distribuição (gerar os zips das Releases)
+
+Gera pasta self-contained e zip em `dist/` (são os artefatos publicados nas Releases):
+
+```bash
+just publish-linux   # dist/linux-x64/ + dist/linux-x64.zip
+just publish-win     # dist/win-x64/ + dist/win-x64.zip
+just publish-all
+```
+
+`just` (sem argumentos) lista todas as receitas.
 
 ## Menu
 
