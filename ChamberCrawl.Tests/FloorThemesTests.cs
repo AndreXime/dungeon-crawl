@@ -58,4 +58,15 @@ public class FloorThemesTests
         Assert.Equal("door-4", FloorThemes.DoorTexture(4));
         Assert.Equal("door-5", FloorThemes.DoorTexture(5));
     }
+
+    [Theory]
+    [InlineData(1, "MASMORRA")]
+    [InlineData(2, "CATACUMBAS")]
+    [InlineData(3, "ESGOTOS")]
+    [InlineData(4, "ARSENAL")]
+    [InlineData(5, "SANTUARIO")]
+    public void NameForDepth_MatchesBiome(int depth, string expected)
+    {
+        Assert.Equal(expected, FloorThemes.NameForDepth(depth));
+    }
 }

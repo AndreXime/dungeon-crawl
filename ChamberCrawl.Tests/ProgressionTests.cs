@@ -1,4 +1,5 @@
 using System.Linq;
+using ChamberCrawl.Data;
 using ChamberCrawl.Models;
 using ChamberCrawl.Systems;
 
@@ -78,6 +79,7 @@ public class ProgressionTests
         Assert.Equal(8, state.PlayerStats.MaxHp);
         Assert.Equal(0f, state.TimeMs);
         Assert.Equal(0f, state.PlayerStats.IframeUntil);
+        Assert.Equal(FloorThemes.TitleDurationMs, state.FloorTitleUntil);
         Assert.Equal(state.Floor.StartRoomId, state.CurrentRoomId);
         Assert.Equal(RunStatus.Playing, state.Status);
         Assert.Contains(state.Entities, e => e is PlayerEntity);

@@ -24,6 +24,7 @@ public static class RunFactory
             Floor = floor,
             CurrentRoomId = floor.StartRoomId,
             PlayerStats = InitialStats(),
+            FloorTitleUntil = FloorThemes.TitleDurationMs,
         };
         EnterRoom(state, floor.StartRoomId, null);
         return state;
@@ -49,6 +50,7 @@ public static class RunFactory
         state.TimeMs = 0;
         // IframeUntil é absoluto em TimeMs; sem reset o jogador pisca o andar inteiro.
         state.PlayerStats.IframeUntil = 0;
+        state.FloorTitleUntil = FloorThemes.TitleDurationMs;
         state.Status = RunStatus.Playing;
         EnterRoom(state, floor.StartRoomId, null);
     }

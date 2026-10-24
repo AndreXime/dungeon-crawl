@@ -144,4 +144,6 @@ public sealed class RunState
     public RunStatus Status { get; set; } = RunStatus.Playing;
     public float ShootCooldown { get; set; }
     public float TimeMs { get; set; }
+    /// <summary>Enquanto TimeMs &lt; este valor, mostra o nome do andar no centro.</summary>
+    public float FloorTitleUntil { get; set; }
 }

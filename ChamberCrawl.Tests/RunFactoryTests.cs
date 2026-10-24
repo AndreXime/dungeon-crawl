@@ -1,4 +1,5 @@
 using System.Linq;
+using ChamberCrawl.Data;
 using ChamberCrawl.Models;
 using ChamberCrawl.Systems;
 using Microsoft.Xna.Framework.Input;
@@ -19,6 +20,7 @@ public class RunFactoryTests
         Assert.Equal(200, run.PlayerStats.Range);
         Assert.Single(run.Entities.OfType<PlayerEntity>());
         Assert.Equal(RunStatus.Playing, run.Status);
+        Assert.Equal(FloorThemes.TitleDurationMs, run.FloorTitleUntil);
     }
 
     [Fact]

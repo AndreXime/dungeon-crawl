@@ -4,6 +4,17 @@ namespace ChamberCrawl.Data;
 
 public static class FloorThemes
 {
+    public const float TitleDurationMs = 2800f;
+
+    public static string NameForDepth(int depth) => depth switch
+    {
+        1 => "MASMORRA",
+        2 => "CATACUMBAS",
+        3 => "ESGOTOS",
+        4 => "ARSENAL",
+        _ => "SANTUARIO",
+    };
+
     public static string MusicForDepth(int depth) => depth switch
     {
         _ => "FirstFloorTheme",

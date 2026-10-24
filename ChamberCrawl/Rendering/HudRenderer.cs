@@ -1,4 +1,5 @@
 using System.Globalization;
+using ChamberCrawl.Data;
 using ChamberCrawl.Models;
 using ChamberCrawl.Systems;
 using Microsoft.Xna.Framework;
@@ -19,6 +20,7 @@ public static class HudRenderer
     public static void Draw(SpriteBatch spriteBatch, RunState state, TextureAtlas atlas)
     {
         DrawHud(spriteBatch, state, atlas);
+        DrawFloorTitle(spriteBatch, state, atlas);
         DrawBanner(spriteBatch, state, atlas);
     }
 
@@ -35,17 +37,33 @@ public static class HudRenderer
             new Rectangle(x, y, IconSize, IconSize),
             Color.White);
         DrawNumber(spriteBatch, atlas, state.Coins, x + IconSize + 4, y + 1, Color.Gold);
-        x += IconSize + 4 + NumberWidth(state.Coins) + 16;
-
-        spriteBatch.Draw(
-            atlas.Pixel,
-            new Rectangle(x, y + 2, 12, IconSize - 4),
-            new Color(90, 160, 220));
-        DrawNumber(spriteBatch, atlas, state.Floor.Depth, x + 16, y + 1, Color.LightSkyBlue);
 
         DrawMinimap(spriteBatch, state, atlas);
         DrawStatsPanel(spriteBatch, state, atlas);
         DrawItemPrompt(spriteBatch, state, atlas);
+    }
+
+    private static void DrawFloorTitle(SpriteBatch spriteBatch, RunState state, TextureAtlas atlas)
+    {
+        if (state.Status != RunStatus.Playing) return;
+        if (state.TimeMs >= state.FloorTitleUntil) return;
+
+        var title = FloorThemes.NameForDepth(state.Floor.Depth);
+        var remaining = state.FloorTitleUntil - state.TimeMs;
+        var fade = remaining < 600f ? remaining / 600f : 1f;
+        var scale = 2;
+        var roomW = GameConstants.RoomW * GameConstants.Cell;
+        var titleW = GlyphFont.MeasureWidth(title, scale);
+        var x = (roomW - titleW) / 2;
+        var y = 50;
+        GlyphFont.Draw(
+            spriteBatch,
+            atlas.Pixel,
+            title,
+            x,
+            y,
+            new Color(230, 235, 255) * fade,
+            scale);
     }
 
     private static void DrawStatsPanel(SpriteBatch spriteBatch, RunState state, TextureAtlas atlas)
