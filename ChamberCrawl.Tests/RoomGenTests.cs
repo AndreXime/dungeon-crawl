@@ -135,6 +135,38 @@ public class RoomGenTests
     }
 
     [Fact]
+    public void Generate_Normal_Depth5_UsesSanctumPoolAndHazards()
+    {
+        var foundAcolyte = false;
+        var foundRune = false;
+        var foundPedestal = false;
+        for (var seed = 0; seed < 80; seed++)
+        {
+            var room = RoomGen.Generate(Node(RoomType.Normal, seed), new[] { Dir.N }, depth: 5);
+            foundAcolyte |= room.Spawns.OfType<EnemySpawn>().Any(s => s.Enemy == EnemyKind.Acolyte);
+            for (var y = 0; y < GameConstants.RoomH; y++)
+            for (var x = 0; x < GameConstants.RoomW; x++)
+            {
+                if (room.Tiles[y, x] == GameConstants.TileRune) foundRune = true;
+                if (room.Tiles[y, x] == GameConstants.TilePedestal) foundPedestal = true;
+            }
+            if (foundAcolyte && foundRune && foundPedestal) break;
+        }
+        Assert.True(foundAcolyte);
+        Assert.True(foundRune);
+        Assert.True(foundPedestal);
+        Assert.Equal(EnemyKind.RuneLord, RoomGen.BossFor(5));
+        Assert.Contains(EnemyKind.Acolyte, RoomGen.EnemyPoolFor(5));
+    }
+
+    [Fact]
+    public void Generate_Boss_SpawnsRuneLordOnDepth5()
+    {
+        var boss = RoomGen.Generate(Node(RoomType.Boss), new[] { Dir.N }, depth: 5);
+        Assert.Contains(boss.Spawns.OfType<EnemySpawn>(), s => s.Enemy == EnemyKind.RuneLord);
+    }
+
+    [Fact]
     public void Generate_Normal_Depth3_PlacesPuddles()
     {
         var found = false;

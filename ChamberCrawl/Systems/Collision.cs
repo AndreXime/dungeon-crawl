@@ -32,19 +32,31 @@ public static class Collision
             or GameConstants.TileObstacle
             or GameConstants.TileCrate
             or GameConstants.TileBarrel
-            or GameConstants.TileSpike;
+            or GameConstants.TileSpike
+            or GameConstants.TilePedestal;
 
     public static bool IsSlowTile(int tile) => tile == GameConstants.TilePuddle;
 
-    public static bool IsWalkableFloor(int tile) =>
-        tile is GameConstants.TileFloor or GameConstants.TilePuddle or GameConstants.TileDoor;
+    public static bool IsDamageTile(int tile) => tile == GameConstants.TileRune;
 
-    public static bool IsOnSlowTile(float x, float y, int[,] tiles)
+    public static bool IsWalkableFloor(int tile) =>
+        tile is GameConstants.TileFloor
+            or GameConstants.TilePuddle
+            or GameConstants.TileRune
+            or GameConstants.TileDoor;
+
+    public static bool IsOnSlowTile(float x, float y, int[,] tiles) =>
+        TileAt(x, y, tiles) is { } t && IsSlowTile(t);
+
+    public static bool IsOnDamageTile(float x, float y, int[,] tiles) =>
+        TileAt(x, y, tiles) is { } t && IsDamageTile(t);
+
+    private static int? TileAt(float x, float y, int[,] tiles)
     {
         var tx = (int)MathF.Floor(x / GameConstants.Cell);
         var ty = (int)MathF.Floor(y / GameConstants.Cell);
-        if (ty < 0 || ty >= tiles.GetLength(0) || tx < 0 || tx >= tiles.GetLength(1)) return false;
-        return IsSlowTile(tiles[ty, tx]);
+        if (ty < 0 || ty >= tiles.GetLength(0) || tx < 0 || tx >= tiles.GetLength(1)) return null;
+        return tiles[ty, tx];
     }
 
     private static bool IsTileSolid(int tx, int ty, int[,] tiles)

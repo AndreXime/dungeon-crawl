@@ -27,9 +27,18 @@ public static class Combat
         UpdatePlayerShooting(state, player, input, dt);
         UpdateProjectiles(state, player, dt, rng ?? Random.Shared.NextSingle);
         UpdateContactDamage(state, player);
+        UpdateHazardTiles(state, player);
 
         player.Hp = state.PlayerStats.Hp;
         if (state.PlayerStats.Hp <= 0) state.Status = RunStatus.Dead;
+    }
+
+    public const int RuneDamage = 1;
+
+    private static void UpdateHazardTiles(RunState state, PlayerEntity player)
+    {
+        if (Collision.IsOnDamageTile(player.X, player.Y, state.Room.Tiles))
+            DamagePlayer(state, RuneDamage);
     }
 
     public static void SpawnEnemyProjectile(RunState state, EnemyEntity from, float towardX, float towardY, float damage)

@@ -56,6 +56,17 @@ public class CollisionTests
     }
 
     [Fact]
+    public void CircleHitsSolid_AllowsRuneAndBlocksPedestal()
+    {
+        var rune = new[,] { { GameConstants.TileRune } };
+        Assert.False(Collision.CircleHitsSolid(GameConstants.Cell * 0.5f, GameConstants.Cell * 0.5f, 6, rune));
+        Assert.True(Collision.IsDamageTile(GameConstants.TileRune));
+
+        var pedestal = new[,] { { GameConstants.TilePedestal } };
+        Assert.True(Collision.CircleHitsSolid(GameConstants.Cell * 0.5f, GameConstants.Cell * 0.5f, 6, pedestal));
+    }
+
+    [Fact]
     public void TrySampleSolidTile_ReturnsFolderUnderProjectile()
     {
         var tiles = new[,] { { GameConstants.TileFloor, GameConstants.TileCrate } };

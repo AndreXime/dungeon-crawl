@@ -146,9 +146,16 @@ public static class RunFactory
                             EnemyKind.Necromancer => def.FireCooldownMs,
                             EnemyKind.SlimeKing => def.FireCooldownMs,
                             EnemyKind.IronGolem => def.FireCooldownMs,
+                            EnemyKind.Acolyte => def.FireCooldownMs,
+                            EnemyKind.RuneLord => def.FireCooldownMs,
                             _ => def.FireCooldownMs,
                         },
-                        Phase = enemy.Enemy == EnemyKind.Necromancer ? Ai.NecromancerSummonMs : 0,
+                        Phase = enemy.Enemy switch
+                        {
+                            EnemyKind.Necromancer => Ai.NecromancerSummonMs,
+                            EnemyKind.RuneLord => Ai.RuneLordSummonMs,
+                            _ => 0,
+                        },
                         CanSplit = enemy.Enemy is EnemyKind.Slime or EnemyKind.SlimeKing,
                     });
                     break;

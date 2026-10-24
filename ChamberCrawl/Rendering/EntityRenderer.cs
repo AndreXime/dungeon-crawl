@@ -34,6 +34,8 @@ public static class EntityRenderer
             return MathF.Max(king.Radius * 3.1f, 38f);
         if (entity is EnemyEntity { Enemy: EnemyKind.IronGolem } golem)
             return MathF.Max(golem.Radius * 3.2f, 40f);
+        if (entity is EnemyEntity { Enemy: EnemyKind.RuneLord } lord)
+            return MathF.Max(lord.Radius * 3.1f, 38f);
 
         return entity switch
         {

@@ -32,6 +32,11 @@ public static class RoomGen
         EnemyKind.Guard, EnemyKind.Guard, EnemyKind.Skeleton, EnemyKind.Skeleton, EnemyKind.Slime,
     };
 
+    private static readonly EnemyKind[] EnemyPoolDepth5 =
+    {
+        EnemyKind.Specter, EnemyKind.Guard, EnemyKind.Acolyte, EnemyKind.Acolyte, EnemyKind.Acolyte,
+    };
+
     private static readonly int[] DungeonObstacleTiles =
     {
         GameConstants.TileCrate,
@@ -89,11 +94,15 @@ public static class RoomGen
                     var tx = 2 + rng.Next(w - 4);
                     var ty = 2 + rng.Next(h - 4);
                     if (tx == centerX && ty == centerY) continue;
-                    tiles[ty, tx] = DungeonObstacleTiles[rng.Next(DungeonObstacleTiles.Length)];
+                    tiles[ty, tx] = depth >= 5
+                        ? GameConstants.TilePedestal
+                        : DungeonObstacleTiles[rng.Next(DungeonObstacleTiles.Length)];
                 }
 
                 if (depth == 3)
-                    ScatterPuddles(tiles, rng, centerX, centerY, count: 4 + rng.Next(5));
+                    ScatterFloorHazard(tiles, rng, centerX, centerY, GameConstants.TilePuddle, 4 + rng.Next(5));
+                if (depth >= 5)
+                    ScatterFloorHazard(tiles, rng, centerX, centerY, GameConstants.TileRune, 5 + rng.Next(5));
 
                 var enemyCount = 3 + rng.Next(3)
                     + (depth >= 2 ? 1 : 0)
@@ -111,7 +120,8 @@ public static class RoomGen
                     for (var attempt = 0; attempt < 40 && !placed; attempt++)
                     {
                         var (tx, ty) = (2 + rng.Next(w - 4), 2 + rng.Next(h - 4));
-                        if (tiles[ty, tx] is not (GameConstants.TileFloor or GameConstants.TilePuddle))
+                        if (tiles[ty, tx] is not (
+                            GameConstants.TileFloor or GameConstants.TilePuddle or GameConstants.TileRune))
                             continue;
                         if (!FarFromEntries(tx, ty, entries, MinEnemySpawnDistFromEntry)) continue;
                         if (!occupied.Add((tx, ty))) continue;
@@ -164,7 +174,19 @@ public static class RoomGen
             }
             case RoomType.Boss:
                 if (depth == 3)
-                    ScatterPuddles(tiles, rng, centerX, centerY, count: 3 + rng.Next(3), avoidCenter: true);
+                    ScatterFloorHazard(tiles, rng, centerX, centerY, GameConstants.TilePuddle, 3 + rng.Next(3), avoidCenter: true);
+                if (depth >= 5)
+                {
+                    ScatterFloorHazard(tiles, rng, centerX, centerY, GameConstants.TileRune, 4 + rng.Next(4), avoidCenter: true);
+                    for (var i = 0; i < 3; i++)
+                    {
+                        var tx = 2 + rng.Next(w - 4);
+                        var ty = 2 + rng.Next(h - 4);
+                        if (tx == centerX && ty == centerY) continue;
+                        if (tiles[ty, tx] != GameConstants.TileFloor) continue;
+                        tiles[ty, tx] = GameConstants.TilePedestal;
+                    }
+                }
                 spawns.Add(new EnemySpawn { Enemy = BossFor(depth), Tx = centerX, Ty = centerY });
                 break;
         }
@@ -172,11 +194,12 @@ public static class RoomGen
         return new RoomData { Tiles = tiles, Spawns = spawns };
     }
 
-    private static void ScatterPuddles(
+    private static void ScatterFloorHazard(
         int[,] tiles,
         Random rng,
         int centerX,
         int centerY,
+        int hazardTile,
         int count,
         bool avoidCenter = false)
     {
@@ -190,7 +213,7 @@ public static class RoomGen
                 var ty = 2 + rng.Next(h - 4);
                 if (avoidCenter && tx == centerX && ty == centerY) continue;
                 if (tiles[ty, tx] != GameConstants.TileFloor) continue;
-                tiles[ty, tx] = GameConstants.TilePuddle;
+                tiles[ty, tx] = hazardTile;
                 break;
             }
         }
@@ -198,6 +221,7 @@ public static class RoomGen
 
     public static EnemyKind[] EnemyPoolFor(int depth) => depth switch
     {
+        >= 5 => EnemyPoolDepth5,
         >= 4 => EnemyPoolDepth4,
         >= 3 => EnemyPoolDepth3,
         >= 2 => EnemyPoolDepth2,
@@ -206,6 +230,7 @@ public static class RoomGen
 
     public static EnemyKind BossFor(int depth) => depth switch
     {
+        >= 5 => EnemyKind.RuneLord,
         >= 4 => EnemyKind.IronGolem,
         >= 3 => EnemyKind.SlimeKing,
         >= 2 => EnemyKind.Necromancer,
@@ -261,7 +286,9 @@ public static class RoomGen
         {
             for (var tx = 2; tx < w - 2; tx++)
             {
-                if (tiles[ty, tx] is not (GameConstants.TileFloor or GameConstants.TilePuddle)) continue;
+                if (tiles[ty, tx] is not (
+                    GameConstants.TileFloor or GameConstants.TilePuddle or GameConstants.TileRune))
+                    continue;
                 if (occupied.Contains((tx, ty))) continue;
                 var minEntry = int.MaxValue;
                 foreach (var (ex, ey) in entries)

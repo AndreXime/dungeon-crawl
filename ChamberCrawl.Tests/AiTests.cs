@@ -203,6 +203,47 @@ public class AiTests
     }
 
     [Fact]
+    public void Update_Acolyte_ShootsWhileOrbiting()
+    {
+        var run = OpenRoomRun();
+        var enemy = AddEnemy(run, EnemyKind.Acolyte, 100, 160);
+        enemy.Cooldown = 0;
+        enemy.Phase = 0;
+        run.Entities.OfType<PlayerEntity>().Single().X = 200;
+        Ai.Update(run, Dt);
+        Assert.Single(run.Entities.OfType<ProjectileEntity>());
+        Assert.True(enemy.Phase > 0);
+    }
+
+    [Fact]
+    public void Update_RuneLord_SummonsAcolyteWhenPhaseEnds()
+    {
+        var run = OpenRoomRun();
+        var boss = AddEnemy(run, EnemyKind.RuneLord, 200, 160, 18);
+        boss.Cooldown = 99999f;
+        boss.Phase = 0;
+        boss.Hp = Enemies.Defs[EnemyKind.RuneLord].Hp;
+        Ai.Update(run, Dt);
+        Assert.Contains(run.Entities.OfType<EnemyEntity>(), e => e.Enemy == EnemyKind.Acolyte);
+        Assert.Equal(Ai.RuneLordSummonMs, boss.Phase);
+    }
+
+    [Fact]
+    public void Combat_RuneDamagesPlayerStandingOnIt()
+    {
+        var run = OpenRoomRun();
+        var player = run.Entities.OfType<PlayerEntity>().Single();
+        var tx = (int)(player.X / GameConstants.Cell);
+        var ty = (int)(player.Y / GameConstants.Cell);
+        run.Room.Tiles[ty, tx] = GameConstants.TileRune;
+        run.PlayerStats.Hp = 6;
+        run.PlayerStats.IframeUntil = 0;
+        run.TimeMs = 100;
+        Combat.Update(run, new InputSnapshot(), Dt);
+        Assert.Equal(5, run.PlayerStats.Hp);
+    }
+
+    [Fact]
     public void Update_Guard_ChasesPlayerSlowly()
     {
         var run = OpenRoomRun();

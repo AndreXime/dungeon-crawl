@@ -24,6 +24,11 @@ public static class Ai
     public const float IronGolemPhase0Ms = 6000f;
     public const float IronGolemChargeMs = 2200f;
     public const float IronGolemVulnerableMs = 2800f;
+    public const float AcolyteOrbitSpeed = 1.6f;
+    public const float RuneLordSummonMs = 3600f;
+    public const float RuneLordSummonEnragedMs = 2200f;
+    public const int RuneLordMaxMinions = 3;
+    public const float RuneLordMinionHp = 2f;
     private const float SlimeKingSplitOffsetPx = 14f;
     private const float SlimeSplitOffsetPx = 8f;
     private const float SlimeNoSplitCooldownMs = 999_999f;
@@ -59,6 +64,9 @@ public static class Ai
                 case EnemyKind.Guard:
                     UpdateGuard(state, enemy, player, dt);
                     break;
+                case EnemyKind.Acolyte:
+                    UpdateAcolyte(state, enemy, player, dt);
+                    break;
                 case EnemyKind.Ogre:
                     UpdateOgre(state, enemy, player, dt, rng);
                     break;
@@ -70,6 +78,9 @@ public static class Ai
                     break;
                 case EnemyKind.IronGolem:
                     UpdateIronGolem(state, enemy, player, dt);
+                    break;
+                case EnemyKind.RuneLord:
+                    UpdateRuneLord(state, enemy, player, dt);
                     break;
             }
         }
@@ -216,6 +227,25 @@ public static class Ai
         var dist = MathF.Sqrt(dx * dx + dy * dy);
         if (dist == 0) return;
         Steer(state, enemy, dx / dist, dy / dist, def.Speed, dt);
+    }
+
+    private static void UpdateAcolyte(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
+    {
+        var def = Enemies.Defs[EnemyKind.Acolyte];
+        var orbit = def.PreferredDist ?? 70f;
+        enemy.Phase += dt * AcolyteOrbitSpeed;
+        var targetX = player.X + MathF.Cos(enemy.Phase) * orbit;
+        var targetY = player.Y + MathF.Sin(enemy.Phase) * orbit;
+        var dx = targetX - enemy.X;
+        var dy = targetY - enemy.Y;
+        var dist = MathF.Sqrt(dx * dx + dy * dy);
+        if (dist > 1f)
+            Steer(state, enemy, dx / dist, dy / dist, def.Speed, dt);
+
+        enemy.Cooldown -= dt * 1000f;
+        if (enemy.Cooldown > 0) return;
+        Combat.SpawnEnemyProjectile(state, enemy, player.X, player.Y, def.Damage);
+        enemy.Cooldown = def.FireCooldownMs;
     }
 
     private static void UpdateSpecter(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
@@ -462,6 +492,52 @@ public static class Ai
         else { dirX = 0; dirY = 0; }
         if (dirX != 0 || dirY != 0)
             Steer(state, enemy, dirX, dirY, speed, dt);
+    }
+
+    private static void UpdateRuneLord(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
+    {
+        var def = Enemies.Defs[EnemyKind.RuneLord];
+        var enraged = enemy.Hp <= def.Hp * 0.5f;
+        KeepPreferredDistance(state, enemy, player, def.PreferredDist ?? 105f, def.Speed, dt);
+
+        enemy.Cooldown -= dt * 1000f;
+        if (enemy.Cooldown <= 0)
+        {
+            Combat.SpawnEnemyProjectile(state, enemy, player.X, player.Y, def.Damage + (enraged ? 1 : 0));
+            if (enraged)
+                Combat.SpawnEnemyProjectile(state, enemy, player.X + 24f, player.Y - 18f, def.Damage);
+            enemy.Cooldown = enraged ? def.FireCooldownMs * 0.65f : def.FireCooldownMs;
+        }
+
+        enemy.Phase -= dt * 1000f;
+        if (enemy.Phase > 0) return;
+        enemy.Phase = enraged ? RuneLordSummonEnragedMs : RuneLordSummonMs;
+        TrySummonAcolyte(state, enemy);
+        if (enraged) TrySummonAcolyte(state, enemy);
+    }
+
+    private static void TrySummonAcolyte(RunState state, EnemyEntity boss)
+    {
+        var minions = state.Entities.OfType<EnemyEntity>()
+            .Count(e => e.Hp > 0 && e.Enemy == EnemyKind.Acolyte);
+        if (minions >= RuneLordMaxMinions) return;
+
+        var def = Enemies.Defs[EnemyKind.Acolyte];
+        var angle = (++summonSerial % 8) * (MathF.PI / 4f);
+        var minion = new EnemyEntity
+        {
+            Id = $"{boss.Id}-acolyte-{summonSerial}",
+            Enemy = EnemyKind.Acolyte,
+            X = boss.X + MathF.Cos(angle) * GameConstants.Cell * 1.6f,
+            Y = boss.Y + MathF.Sin(angle) * GameConstants.Cell * 1.6f,
+            Radius = def.Radius,
+            Hp = RuneLordMinionHp,
+            Cooldown = def.FireCooldownMs,
+            Phase = angle,
+            CanSplit = false,
+        };
+        ClampInsideRoom(minion);
+        state.Entities.Add(minion);
     }
 
     /// <summary>Chamado pelo Combat quando o Rei Lodo morre com CanSplit.</summary>

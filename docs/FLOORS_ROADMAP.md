@@ -79,12 +79,13 @@ Hoje: depths 1–5 via portal após o boss (vitória só no depth 5). Andar 2 (C
 | | |
 |---|---|
 | **Clima** | Roxo/carmesim, runas, ritual |
-| **Tiles** | Floor runado, wall pedra negra + glow `#c45cff` |
-| **Inimigos** | Espectro + Guarda remix; **novo: Acólito** (orbita e atira magia) |
-| **Boss** | **Senhor das Runas** — arena com runas no chão (dano), summons, burst final |
-| **Obstáculos** | Runas de dano, pedestais, brasas |
-| **Música** | `SanctumTheme` (drone + lead grave) + boss theme dedicado |
-| **Diff** | Matar o boss = vitória da run (tela VITORIA atual) |
+| **Tiles** | `floor-5` / `wall-5` / `door-5` / `door-tile-5` |
+| **Inimigos** | Espectro, Guarda, **Acólito** (orbita e atira magia) |
+| **Boss** | **Senhor das Runas** — orbes, invoca Acólitos, burst em ≤50% HP |
+| **Obstáculos** | `TileRune` (dano 1 / iframe), `TilePedestal` (sólido) |
+| **Música** | Ainda `FirstFloorTheme` / `BossTheme` (próximo: `SanctumTheme`) |
+| **Diff** | Matar o boss = vitória da run |
+| **Status** | Feito (tiles + Acólito + Senhor das Runas + runas/pedestais) |
 
 ---
 
