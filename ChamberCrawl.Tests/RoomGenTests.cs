@@ -55,10 +55,20 @@ public class RoomGenTests
     }
 
     [Fact]
-    public void Generate_Boss_SpawnsOgre()
+    public void Generate_Boss_SpawnsOgreOnDepth1()
     {
-        var boss = RoomGen.Generate(Node(RoomType.Boss), new[] { Dir.N });
+        var boss = RoomGen.Generate(Node(RoomType.Boss), new[] { Dir.N }, depth: 1);
         Assert.Contains(boss.Spawns.OfType<EnemySpawn>(), s => s.Enemy == EnemyKind.Ogre);
+        Assert.Equal(EnemyKind.Ogre, RoomGen.BossFor(1));
+    }
+
+    [Fact]
+    public void Generate_Boss_SpawnsNecromancerOnDepth2()
+    {
+        var boss = RoomGen.Generate(Node(RoomType.Boss), new[] { Dir.N }, depth: 2);
+        Assert.Contains(boss.Spawns.OfType<EnemySpawn>(), s => s.Enemy == EnemyKind.Necromancer);
+        Assert.DoesNotContain(boss.Spawns.OfType<EnemySpawn>(), s => s.Enemy == EnemyKind.Ogre);
+        Assert.Equal(EnemyKind.Necromancer, RoomGen.BossFor(2));
     }
 
     [Fact]

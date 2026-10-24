@@ -21,6 +21,7 @@ const SIZE_DEFAULTS = {
   'enemies/enemy-skeleton': 32,
   'enemies/enemy-slime': 32,
   'enemies/enemy-specter': 32,
+  'enemies/enemy-necromancer': 64,
   'enemies/enemy-ogre': 64,
   'enemies/projectile': 64,
   'items/coin': 64,

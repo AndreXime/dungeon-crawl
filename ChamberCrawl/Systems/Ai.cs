@@ -14,8 +14,13 @@ public static class Ai
     public const float SpecterBlinkCooldownMs = 1600f;
     public const float SpecterPhaseMs = 380f;
     public const float SpecterBlinkDistance = 48f;
+    public const float NecromancerSummonMs = 3200f;
+    public const float NecromancerSummonEnragedMs = 2000f;
+    public const int NecromancerMaxMinions = 3;
+    public const float NecromancerMinionHp = 1f;
     private const float SlimeSplitOffsetPx = 8f;
     private const float SlimeNoSplitCooldownMs = 999_999f;
+    private static int summonSerial;
 
     /// <summary>Dano de contato fica em Combat.Update. Movimenta inimigos por kind (stubs até Tasks 3–6).</summary>
     public static void Update(RunState state, float dt, Func<float>? rng = null)
@@ -43,6 +48,9 @@ public static class Ai
                     break;
                 case EnemyKind.Ogre:
                     UpdateOgre(state, enemy, player, dt, rng);
+                    break;
+                case EnemyKind.Necromancer:
+                    UpdateNecromancer(state, enemy, player, dt);
                     break;
             }
         }
@@ -246,5 +254,64 @@ public static class Ai
         if (enemy.Cooldown > 0) return;
         Combat.SpawnEnemyProjectile(state, enemy, player.X, player.Y, def.Damage);
         enemy.Cooldown = def.FireCooldownMs;
+    }
+
+    private static void UpdateNecromancer(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
+    {
+        var def = Enemies.Defs[EnemyKind.Necromancer];
+        var enraged = enemy.Hp <= def.Hp * 0.5f;
+        var preferred = def.PreferredDist ?? 110f;
+
+        var dx = player.X - enemy.X;
+        var dy = player.Y - enemy.Y;
+        var dist = MathF.Sqrt(dx * dx + dy * dy);
+        if (dist > 0)
+        {
+            float dirX, dirY;
+            if (dist > preferred + 10f) { dirX = dx / dist; dirY = dy / dist; }
+            else if (dist < preferred - 10f) { dirX = -dx / dist; dirY = -dy / dist; }
+            else { dirX = 0; dirY = 0; }
+            if (dirX != 0 || dirY != 0)
+                Steer(state, enemy, dirX, dirY, def.Speed, dt);
+        }
+
+        enemy.Cooldown -= dt * 1000f;
+        if (enemy.Cooldown <= 0)
+        {
+            Combat.SpawnEnemyProjectile(state, enemy, player.X, player.Y, Math.Max(1, def.Damage + (enraged ? 1 : 0)));
+            enemy.Cooldown = enraged ? def.FireCooldownMs * 0.7f : def.FireCooldownMs;
+        }
+
+        enemy.Phase -= dt * 1000f;
+        if (enemy.Phase > 0) return;
+
+        enemy.Phase = enraged ? NecromancerSummonEnragedMs : NecromancerSummonMs;
+        TrySummonMinion(state, enemy);
+        if (enraged) TrySummonMinion(state, enemy);
+    }
+
+    private static void TrySummonMinion(RunState state, EnemyEntity boss)
+    {
+        var minions = state.Entities.OfType<EnemyEntity>()
+            .Count(e => e.Hp > 0 && e.Enemy is EnemyKind.Skeleton or EnemyKind.Specter or EnemyKind.Bat);
+        if (minions >= NecromancerMaxMinions) return;
+
+        var skel = Enemies.Defs[EnemyKind.Skeleton];
+        var angle = (++summonSerial % 8) * (MathF.PI / 4f);
+        var ox = MathF.Cos(angle) * GameConstants.Cell * 1.5f;
+        var oy = MathF.Sin(angle) * GameConstants.Cell * 1.5f;
+        var minion = new EnemyEntity
+        {
+            Id = $"{boss.Id}-summon-{summonSerial}",
+            Enemy = EnemyKind.Skeleton,
+            X = boss.X + ox,
+            Y = boss.Y + oy,
+            Radius = skel.Radius * 0.85f,
+            Hp = NecromancerMinionHp,
+            Cooldown = skel.FireCooldownMs,
+            CanSplit = false,
+        };
+        ClampInsideRoom(minion);
+        state.Entities.Add(minion);
     }
 }

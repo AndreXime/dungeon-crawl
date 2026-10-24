@@ -23,5 +23,6 @@ public static class Enemies
         [EnemyKind.Slime] = new(2, 50, 1, 9, 0, 0, "enemy-slime"),
         [EnemyKind.Specter] = new(2, 55, 1, 10, 0, 0, "enemy-specter"),
         [EnemyKind.Ogre] = new(40, 45, 2, 24, 1200, 160, "enemy-ogre", ChargeSpeed: 90),
+        [EnemyKind.Necromancer] = new(36, 35, 1, 16, 1100, 140, "enemy-necromancer", PreferredDist: 110),
     };
 }

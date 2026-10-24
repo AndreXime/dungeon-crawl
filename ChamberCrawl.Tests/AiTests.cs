@@ -159,6 +159,50 @@ public class AiTests
     }
 
     [Fact]
+    public void Update_Necromancer_ShootsOrbWhenCooldownEnds()
+    {
+        var run = OpenRoomRun();
+        var boss = AddEnemy(run, EnemyKind.Necromancer, 200, 160, 16);
+        boss.Cooldown = 0;
+        boss.Phase = 99999f;
+        boss.Hp = Enemies.Defs[EnemyKind.Necromancer].Hp;
+        Ai.Update(run, Dt);
+        Assert.Single(run.Entities.OfType<ProjectileEntity>());
+        Assert.False(run.Entities.OfType<ProjectileEntity>().Single().FromPlayer);
+    }
+
+    [Fact]
+    public void Update_Necromancer_SummonsSkeletonWhenPhaseEnds()
+    {
+        var run = OpenRoomRun();
+        var boss = AddEnemy(run, EnemyKind.Necromancer, 200, 160, 16);
+        boss.Cooldown = 99999f;
+        boss.Phase = 0;
+        boss.Hp = Enemies.Defs[EnemyKind.Necromancer].Hp;
+        Ai.Update(run, Dt);
+        var summons = run.Entities.OfType<EnemyEntity>()
+            .Where(e => e.Enemy == EnemyKind.Skeleton && e.Hp == Ai.NecromancerMinionHp)
+            .ToList();
+        Assert.Single(summons);
+        Assert.Equal(Ai.NecromancerSummonMs, boss.Phase);
+    }
+
+    [Fact]
+    public void Update_Necromancer_RespectsMaxMinions()
+    {
+        var run = OpenRoomRun();
+        var boss = AddEnemy(run, EnemyKind.Necromancer, 200, 160, 16);
+        boss.Cooldown = 99999f;
+        boss.Phase = 0;
+        for (var i = 0; i < Ai.NecromancerMaxMinions; i++)
+            AddEnemy(run, EnemyKind.Skeleton, 220 + i * 10, 160);
+
+        Ai.Update(run, Dt);
+        Assert.Equal(Ai.NecromancerMaxMinions, run.Entities.OfType<EnemyEntity>()
+            .Count(e => e.Enemy == EnemyKind.Skeleton));
+    }
+
+    [Fact]
     public void Update_Specter_FloatsTowardPlayer()
     {
         var run = OpenRoomRun();

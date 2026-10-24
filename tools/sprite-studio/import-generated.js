@@ -38,6 +38,7 @@ const JOBS = [
   { id: 'tiles/obstacle', gen: 'gen-obstacle.jpg', size: 32, opaque: false },
   { id: 'tiles/portal', gen: 'gen-portal.jpg', size: 64, opaque: false },
   { id: 'enemies/enemy-specter', gen: 'gen-enemy-specter.jpg', size: 32, opaque: false },
+  { id: 'enemies/enemy-necromancer', gen: 'gen-enemy-necromancer.jpg', size: 64, opaque: false },
   { id: 'items/coin', gen: 'gen-coin.jpg', size: 64, opaque: false },
   { id: 'items/heart', gen: 'gen-heart.jpg', size: 64, opaque: false },
   { id: 'items/item-damage', gen: 'gen-item-damage.jpg', size: 64, opaque: false },

@@ -141,9 +141,10 @@ public static class RunFactory
                             EnemyKind.Slime => Ai.SlimeSplitMs,
                             EnemyKind.Ogre => Ai.OgrePhase1MaxMs,
                             EnemyKind.Specter => Ai.SpecterBlinkCooldownMs,
+                            EnemyKind.Necromancer => def.FireCooldownMs,
                             _ => def.FireCooldownMs,
                         },
-                        Phase = 0,
+                        Phase = enemy.Enemy == EnemyKind.Necromancer ? Ai.NecromancerSummonMs : 0,
                         CanSplit = enemy.Enemy == EnemyKind.Slime,
                     });
                     break;

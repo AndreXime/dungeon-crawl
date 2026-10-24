@@ -145,7 +145,7 @@ public static class RoomGen
                 break;
             }
             case RoomType.Boss:
-                spawns.Add(new EnemySpawn { Enemy = EnemyKind.Ogre, Tx = centerX, Ty = centerY });
+                spawns.Add(new EnemySpawn { Enemy = BossFor(depth), Tx = centerX, Ty = centerY });
                 break;
         }
 
@@ -156,6 +156,12 @@ public static class RoomGen
     {
         >= 2 => EnemyPoolDepth2,
         _ => EnemyPoolDepth1,
+    };
+
+    public static EnemyKind BossFor(int depth) => depth switch
+    {
+        >= 2 => EnemyKind.Necromancer,
+        _ => EnemyKind.Ogre,
     };
 
     /// <summary>Tile onde o jogador aparece ao entrar por aquela porta da sala.</summary>

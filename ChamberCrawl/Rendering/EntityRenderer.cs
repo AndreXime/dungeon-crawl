@@ -28,6 +28,8 @@ public static class EntityRenderer
     {
         if (entity is EnemyEntity { Enemy: EnemyKind.Ogre } ogre)
             return MathF.Max(ogre.Radius * 3.2f, 40f);
+        if (entity is EnemyEntity { Enemy: EnemyKind.Necromancer } necro)
+            return MathF.Max(necro.Radius * 3.0f, 36f);
 
         return entity switch
         {
@@ -75,7 +77,9 @@ public static class EntityRenderer
                 else
                 {
                     texture = atlas.Get("projectile");
-                    tint = new Color(180, 120, 255);
+                    tint = proj.Damage >= 2
+                        ? new Color(200, 80, 255)
+                        : new Color(180, 120, 255);
                 }
                 return true;
             case PickupEntity pickup:
