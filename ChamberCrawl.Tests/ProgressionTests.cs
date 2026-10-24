@@ -64,6 +64,8 @@ public class ProgressionTests
         state.PlayerStats.Damage = 3;
         state.PlayerStats.Hp = 4;
         state.PlayerStats.MaxHp = 8;
+        state.TimeMs = 90_000f;
+        state.PlayerStats.IframeUntil = 90_600f;
 
         RunFactory.AdvanceFloor(state);
 
@@ -74,6 +76,8 @@ public class ProgressionTests
         Assert.Equal(3, state.PlayerStats.Damage);
         Assert.Equal(4, state.PlayerStats.Hp);
         Assert.Equal(8, state.PlayerStats.MaxHp);
+        Assert.Equal(0f, state.TimeMs);
+        Assert.Equal(0f, state.PlayerStats.IframeUntil);
         Assert.Equal(state.Floor.StartRoomId, state.CurrentRoomId);
         Assert.Equal(RunStatus.Playing, state.Status);
         Assert.Contains(state.Entities, e => e is PlayerEntity);

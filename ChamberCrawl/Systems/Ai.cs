@@ -14,6 +14,7 @@ public static class Ai
     public const float SpecterBlinkCooldownMs = 1600f;
     public const float SpecterPhaseMs = 380f;
     public const float SpecterBlinkDistance = 48f;
+    public const float SpecterPreferredDist = 42f;
     public const float NecromancerSummonMs = 3200f;
     public const float NecromancerSummonEnragedMs = 2000f;
     public const int NecromancerMaxMinions = 3;
@@ -228,13 +229,17 @@ public static class Ai
             var dx = player.X - enemy.X;
             var dy = player.Y - enemy.Y;
             var dist = MathF.Sqrt(dx * dx + dy * dy);
-            if (dist > 1f)
+            // Para perto o bastante para ameacar, sem pousar em cima do jogador (evita iframe eterno).
+            if (dist > SpecterPreferredDist)
             {
-                var step = MathF.Min(SpecterBlinkDistance, dist * 0.65f);
+                var step = MathF.Min(SpecterBlinkDistance, dist - SpecterPreferredDist);
                 enemy.X += dx / dist * step;
                 enemy.Y += dy / dist * step;
                 ClampInsideRoom(enemy);
             }
+            if (Collision.CirclesOverlap(
+                    enemy.X, enemy.Y, enemy.Radius + 6f, player.X, player.Y, player.Radius))
+                Combat.DamagePlayer(state, def.Damage);
             enemy.IframeUntil = state.TimeMs + SpecterPhaseMs;
             enemy.Cooldown = SpecterBlinkCooldownMs;
             return;
@@ -247,8 +252,12 @@ public static class Ai
         var sdist = MathF.Sqrt(sx * sx + sy * sy);
         if (sdist == 0) return;
         var speed = def.Speed * Movement.SpeedScale(enemy.X, enemy.Y, state.Room.Tiles, enemy.Enemy);
-        enemy.Vx = sx / sdist * speed;
-        enemy.Vy = sy / sdist * speed;
+        float dirX, dirY;
+        if (sdist > SpecterPreferredDist + 8f) { dirX = sx / sdist; dirY = sy / sdist; }
+        else if (sdist < SpecterPreferredDist - 8f) { dirX = -sx / sdist; dirY = -sy / sdist; }
+        else return;
+        enemy.Vx = dirX * speed;
+        enemy.Vy = dirY * speed;
         enemy.X += enemy.Vx * dt;
         enemy.Y += enemy.Vy * dt;
         ClampInsideRoom(enemy);

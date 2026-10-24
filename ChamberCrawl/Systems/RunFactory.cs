@@ -47,6 +47,8 @@ public static class RunFactory
         state.CurrentRoomId = floor.StartRoomId;
         state.ShootCooldown = 0;
         state.TimeMs = 0;
+        // IframeUntil é absoluto em TimeMs; sem reset o jogador pisca o andar inteiro.
+        state.PlayerStats.IframeUntil = 0;
         state.Status = RunStatus.Playing;
         EnterRoom(state, floor.StartRoomId, null);
     }

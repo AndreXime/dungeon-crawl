@@ -184,6 +184,7 @@ public static class Combat
         foreach (var enemy in state.Entities.OfType<EnemyEntity>())
         {
             if (enemy.Hp <= 0) continue;
+            if (enemy.Enemy == EnemyKind.Specter) continue;
             if (state.TimeMs < enemy.IframeUntil) continue;
             if (Collision.CirclesOverlap(player.X, player.Y, player.Radius, enemy.X, enemy.Y, enemy.Radius))
                 DamagePlayer(state, Enemies.Defs[enemy.Enemy].Damage);

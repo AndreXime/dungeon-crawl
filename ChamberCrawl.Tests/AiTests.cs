@@ -335,6 +335,20 @@ public class AiTests
     }
 
     [Fact]
+    public void Update_Specter_BacksOffWhenTooClose()
+    {
+        var run = OpenRoomRun();
+        var player = run.Entities.OfType<PlayerEntity>().Single();
+        player.X = 200;
+        player.Y = 160;
+        var enemy = AddEnemy(run, EnemyKind.Specter, 210, 160);
+        enemy.Cooldown = 99999f;
+        var before = enemy.X;
+        Ai.Update(run, Dt);
+        Assert.True(enemy.X > before);
+    }
+
+    [Fact]
     public void Update_Specter_BlinksTowardPlayerWhenCooldownEnds()
     {
         var run = OpenRoomRun();
@@ -346,6 +360,8 @@ public class AiTests
         var before = enemy.X;
         Ai.Update(run, Dt);
         Assert.True(enemy.X > before + 10f);
+        var dist = MathF.Abs(300f - enemy.X);
+        Assert.True(dist >= Ai.SpecterPreferredDist - 1f);
         Assert.Equal(Ai.SpecterBlinkCooldownMs, enemy.Cooldown);
         Assert.Equal(run.TimeMs + Ai.SpecterPhaseMs, enemy.IframeUntil);
     }
