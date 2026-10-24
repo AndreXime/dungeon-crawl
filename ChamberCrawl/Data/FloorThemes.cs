@@ -17,7 +17,11 @@ public static class FloorThemes
 
     public static string MusicForDepth(int depth) => depth switch
     {
-        _ => "FirstFloorTheme",
+        1 => "FirstFloorTheme",
+        2 => "CatacombsTheme",
+        3 => "SewersTheme",
+        4 => "ArmoryTheme",
+        _ => "SanctumTheme",
     };
 
     public static string MusicFor(RunState state)

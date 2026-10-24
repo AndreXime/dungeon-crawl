@@ -38,9 +38,9 @@ Hoje: depths 1–5 via portal após o boss (vitória só no depth 5). Andar 2 (C
 | **Boss** | **Necromante** — mantém distância, orbes roxos, invoca esqueletos fracos (cap 3; enrage em 50% HP) |
 | **Obstáculos** | Mesmos do andar 1 por enquanto |
 | **Tiles** | `floor-2` / `wall-2` / `door-2` / `door-tile-2` |
-| **Música** | Ainda `FirstFloorTheme` (próximo: `CatacombsTheme`) |
+| **Música** | `CatacombsTheme` (fonte Strudel pronta; exportar WAV) |
 | **Diff** | +1 inimigo médio nas salas normais |
-| **Status** | Feito (tiles + Espectro + Necromante). Falta tema musical |
+| **Status** | Feito (tiles + Espectro + Necromante + tema Strudel) |
 
 ---
 
@@ -53,9 +53,9 @@ Hoje: depths 1–5 via portal após o boss (vitória só no depth 5). Andar 2 (C
 | **Inimigos** | Slime (dominante); **Rato** (rápido, melee); Morcego |
 | **Boss** | **Rei Lodo** — spit + divide em 2 slimes médios ao morrer (1x) |
 | **Obstáculos** | Poças (`TilePuddle`) — 50% speed; Slime/Rei Lodo imunes |
-| **Música** | Ainda `FirstFloorTheme` (próximo: `SewersTheme`) |
+| **Música** | `SewersTheme` (fonte Strudel pronta; exportar WAV) |
 | **Diff** | +1 inimigo extra vs depth 2 |
-| **Status** | Feito (tiles + Rato + Rei Lodo + slow zones). Falta tema musical |
+| **Status** | Feito (tiles + Rato + Rei Lodo + slow zones + tema Strudel) |
 
 ---
 
@@ -68,9 +68,9 @@ Hoje: depths 1–5 via portal após o boss (vitória só no depth 5). Andar 2 (C
 | **Inimigos** | **Guarda** (lento, tank, melee); Esqueleto; Slime raro |
 | **Boss** | **Golem de Ferro** — projéteis → charge → vulnerável (2x dano, tint laranja) |
 | **Obstáculos** | Mesmos genéricos (próximo: barricadas/bigornas) |
-| **Música** | Ainda `FirstFloorTheme` (próximo: `ArmoryTheme`) |
+| **Música** | `ArmoryTheme` (fonte Strudel pronta; exportar WAV) |
 | **Diff** | +1 inimigo extra vs depth 3 |
-| **Status** | Feito (tiles + Guarda + Golem). Falta tema musical e obstáculos novos |
+| **Status** | Feito (tiles + Guarda + Golem + tema Strudel). Falta obstáculos novos |
 
 ---
 
@@ -83,7 +83,7 @@ Hoje: depths 1–5 via portal após o boss (vitória só no depth 5). Andar 2 (C
 | **Inimigos** | Espectro, Guarda, **Acólito** (orbita e atira magia) |
 | **Boss** | **Senhor das Runas** — orbes, invoca Acólitos, burst em ≤50% HP |
 | **Obstáculos** | `TileRune` (dano 1 / iframe), `TilePedestal` (sólido) |
-| **Música** | Ainda `FirstFloorTheme` / `BossTheme` (próximo: `SanctumTheme`) |
+| **Música** | `SanctumTheme` (fonte Strudel pronta; exportar WAV). Boss: `BossTheme` |
 | **Diff** | Matar o boss = vitória da run |
 | **Status** | Feito (tiles + Acólito + Senhor das Runas + runas/pedestais) |
 

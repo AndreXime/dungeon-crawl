@@ -69,4 +69,15 @@ public class FloorThemesTests
     {
         Assert.Equal(expected, FloorThemes.NameForDepth(depth));
     }
+
+    [Theory]
+    [InlineData(1, "FirstFloorTheme")]
+    [InlineData(2, "CatacombsTheme")]
+    [InlineData(3, "SewersTheme")]
+    [InlineData(4, "ArmoryTheme")]
+    [InlineData(5, "SanctumTheme")]
+    public void MusicForDepth_MatchesBiome(int depth, string expected)
+    {
+        Assert.Equal(expected, FloorThemes.MusicForDepth(depth));
+    }
 }

@@ -4,6 +4,8 @@ A música do ChamberCrawl é gerada em [https://strudel.cc/](https://strudel.cc/
 
 Os padrões ficam em `ChamberCrawl/Assets/MusicSources/`. Exporte o áudio pelo Strudel e salve o WAV em `ChamberCrawl/Assets/Music/`.
 
+Temas de exploração por andar: `FirstFloorTheme`, `CatacombsTheme`, `SewersTheme`, `ArmoryTheme`, `SanctumTheme`. Loja: `ShopTheme`. Boss: `BossTheme`.
+
 ## Export (Strudel)
 
 Na aba **export**, use:
