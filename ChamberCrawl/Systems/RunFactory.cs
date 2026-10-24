@@ -143,6 +143,7 @@ public static class RunFactory
                             EnemyKind.Specter => Ai.SpecterBlinkCooldownMs,
                             EnemyKind.Necromancer => def.FireCooldownMs,
                             EnemyKind.SlimeKing => def.FireCooldownMs,
+                            EnemyKind.IronGolem => def.FireCooldownMs,
                             _ => def.FireCooldownMs,
                         },
                         Phase = enemy.Enemy == EnemyKind.Necromancer ? Ai.NecromancerSummonMs : 0,

@@ -203,6 +203,80 @@ public class AiTests
     }
 
     [Fact]
+    public void Update_Guard_ChasesPlayerSlowly()
+    {
+        var run = OpenRoomRun();
+        var enemy = AddEnemy(run, EnemyKind.Guard, 100, 160, 12);
+        run.Entities.OfType<PlayerEntity>().Single().X = 300;
+        var before = enemy.X;
+        Ai.Update(run, Dt);
+        Assert.True(enemy.X > before);
+        Assert.True(enemy.X - before < Enemies.Defs[EnemyKind.Rat].Speed * Dt);
+    }
+
+    [Fact]
+    public void Update_IronGolem_ShootsInPhase0()
+    {
+        var run = OpenRoomRun();
+        run.TimeMs = 100;
+        var boss = AddEnemy(run, EnemyKind.IronGolem, 200, 160, 22);
+        boss.Phase = 0;
+        boss.Cooldown = 0;
+        boss.IframeUntil = 0;
+        boss.Hp = Enemies.Defs[EnemyKind.IronGolem].Hp;
+        Ai.Update(run, Dt);
+        Assert.Single(run.Entities.OfType<ProjectileEntity>());
+        Assert.Equal(0, (int)boss.Phase);
+        Assert.True(boss.IframeUntil > run.TimeMs);
+    }
+
+    [Fact]
+    public void Update_IronGolem_EntersChargeAfterPhase0Timer()
+    {
+        var run = OpenRoomRun();
+        run.TimeMs = 5000;
+        var boss = AddEnemy(run, EnemyKind.IronGolem, 200, 160, 22);
+        boss.Phase = 0;
+        boss.Cooldown = 99999f;
+        boss.IframeUntil = 4000;
+        boss.Hp = Enemies.Defs[EnemyKind.IronGolem].Hp;
+        Ai.Update(run, Dt);
+        Assert.Equal(1, (int)boss.Phase);
+        Assert.Equal(Ai.IronGolemChargeMs, boss.Cooldown);
+    }
+
+    [Fact]
+    public void Update_IronGolem_EntersVulnerableAtHalfHp()
+    {
+        var run = OpenRoomRun();
+        run.TimeMs = 100;
+        var boss = AddEnemy(run, EnemyKind.IronGolem, 200, 160, 22);
+        boss.Phase = 0;
+        boss.Cooldown = 99999f;
+        boss.IframeUntil = 10_000;
+        boss.Hp = Enemies.Defs[EnemyKind.IronGolem].Hp * 0.5f;
+        Ai.Update(run, Dt);
+        Assert.Equal(2, (int)boss.Phase);
+        Assert.Equal(Ai.IronGolemVulnerableMs, boss.Cooldown);
+    }
+
+    [Fact]
+    public void Combat_IronGolem_TakesDoubleDamageWhenVulnerable()
+    {
+        var run = OpenRoomRun();
+        var boss = AddEnemy(run, EnemyKind.IronGolem, 200, 160, 22);
+        boss.Phase = 2;
+        boss.Hp = 20;
+        run.Entities.Add(new ProjectileEntity
+        {
+            Id = "hit", FromPlayer = true, X = 200, Y = 160, Vx = 0, Vy = 0,
+            Radius = 4, Damage = 5, Life = 1,
+        });
+        Combat.Update(run, new InputSnapshot(), Dt);
+        Assert.Equal(10, boss.Hp);
+    }
+
+    [Fact]
     public void Update_Rat_ChasesPlayer()
     {
         var run = OpenRoomRun();

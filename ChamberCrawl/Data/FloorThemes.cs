@@ -53,6 +53,7 @@ public static class FloorThemes
 
     private static string DepthTexture(string baseName, int depth) => depth switch
     {
+        >= 4 => $"{baseName}-4",
         >= 3 => $"{baseName}-3",
         >= 2 => $"{baseName}-2",
         _ => baseName,

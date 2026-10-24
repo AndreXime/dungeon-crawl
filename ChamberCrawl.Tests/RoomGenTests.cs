@@ -99,6 +99,42 @@ public class RoomGenTests
     }
 
     [Fact]
+    public void Generate_Normal_Depth4_UsesArmoryPool()
+    {
+        var foundGuard = false;
+        for (var seed = 0; seed < 80 && !foundGuard; seed++)
+        {
+            var room = RoomGen.Generate(Node(RoomType.Normal, seed), new[] { Dir.N }, depth: 4);
+            foundGuard = room.Spawns.OfType<EnemySpawn>().Any(s => s.Enemy == EnemyKind.Guard);
+        }
+        Assert.True(foundGuard);
+
+        var sample = RoomGen.Generate(Node(RoomType.Normal, seed: 5), new[] { Dir.N }, depth: 4);
+        var enemies = sample.Spawns.OfType<EnemySpawn>().Select(s => s.Enemy).ToHashSet();
+        Assert.Subset(new HashSet<EnemyKind>(RoomGen.EnemyPoolFor(4)), enemies);
+        Assert.DoesNotContain(EnemyKind.Rat, enemies);
+        Assert.DoesNotContain(EnemyKind.Specter, enemies);
+        Assert.Contains(EnemyKind.Guard, RoomGen.EnemyPoolFor(4));
+    }
+
+    [Fact]
+    public void Generate_Boss_SpawnsIronGolemOnDepth4()
+    {
+        var boss = RoomGen.Generate(Node(RoomType.Boss), new[] { Dir.N }, depth: 4);
+        Assert.Contains(boss.Spawns.OfType<EnemySpawn>(), s => s.Enemy == EnemyKind.IronGolem);
+        Assert.Equal(EnemyKind.IronGolem, RoomGen.BossFor(4));
+    }
+
+    [Fact]
+    public void Generate_Normal_Depth4_HasNoPuddles()
+    {
+        var room = RoomGen.Generate(Node(RoomType.Normal, seed: 9), new[] { Dir.N }, depth: 4);
+        for (var y = 0; y < GameConstants.RoomH; y++)
+        for (var x = 0; x < GameConstants.RoomW; x++)
+            Assert.NotEqual(GameConstants.TilePuddle, room.Tiles[y, x]);
+    }
+
+    [Fact]
     public void Generate_Normal_Depth3_PlacesPuddles()
     {
         var found = false;

@@ -27,6 +27,11 @@ public static class RoomGen
         EnemyKind.Slime, EnemyKind.Slime, EnemyKind.Slime, EnemyKind.Bat, EnemyKind.Rat, EnemyKind.Rat,
     };
 
+    private static readonly EnemyKind[] EnemyPoolDepth4 =
+    {
+        EnemyKind.Guard, EnemyKind.Guard, EnemyKind.Skeleton, EnemyKind.Skeleton, EnemyKind.Slime,
+    };
+
     private static readonly int[] DungeonObstacleTiles =
     {
         GameConstants.TileCrate,
@@ -87,10 +92,13 @@ public static class RoomGen
                     tiles[ty, tx] = DungeonObstacleTiles[rng.Next(DungeonObstacleTiles.Length)];
                 }
 
-                if (depth >= 3)
+                if (depth == 3)
                     ScatterPuddles(tiles, rng, centerX, centerY, count: 4 + rng.Next(5));
 
-                var enemyCount = 3 + rng.Next(3) + (depth >= 2 ? 1 : 0) + (depth >= 3 ? 1 : 0);
+                var enemyCount = 3 + rng.Next(3)
+                    + (depth >= 2 ? 1 : 0)
+                    + (depth >= 3 ? 1 : 0)
+                    + (depth >= 4 ? 1 : 0);
                 var entries = EntryTiles(neighbors);
                 var occupied = new HashSet<(int, int)> { (centerX, centerY) };
                 foreach (var entry in entries)
@@ -155,7 +163,7 @@ public static class RoomGen
                 break;
             }
             case RoomType.Boss:
-                if (depth >= 3)
+                if (depth == 3)
                     ScatterPuddles(tiles, rng, centerX, centerY, count: 3 + rng.Next(3), avoidCenter: true);
                 spawns.Add(new EnemySpawn { Enemy = BossFor(depth), Tx = centerX, Ty = centerY });
                 break;
@@ -190,6 +198,7 @@ public static class RoomGen
 
     public static EnemyKind[] EnemyPoolFor(int depth) => depth switch
     {
+        >= 4 => EnemyPoolDepth4,
         >= 3 => EnemyPoolDepth3,
         >= 2 => EnemyPoolDepth2,
         _ => EnemyPoolDepth1,
@@ -197,6 +206,7 @@ public static class RoomGen
 
     public static EnemyKind BossFor(int depth) => depth switch
     {
+        >= 4 => EnemyKind.IronGolem,
         >= 3 => EnemyKind.SlimeKing,
         >= 2 => EnemyKind.Necromancer,
         _ => EnemyKind.Ogre,

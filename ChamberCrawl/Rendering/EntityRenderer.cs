@@ -32,6 +32,8 @@ public static class EntityRenderer
             return MathF.Max(necro.Radius * 3.0f, 36f);
         if (entity is EnemyEntity { Enemy: EnemyKind.SlimeKing } king)
             return MathF.Max(king.Radius * 3.1f, 38f);
+        if (entity is EnemyEntity { Enemy: EnemyKind.IronGolem } golem)
+            return MathF.Max(golem.Radius * 3.2f, 40f);
 
         return entity switch
         {
@@ -72,6 +74,8 @@ public static class EntityRenderer
                     opacity = state.TimeMs < enemy.IframeUntil ? 0.25f : 0.7f;
                     tint = new Color(220, 200, 255);
                 }
+                else if (enemy.Enemy == EnemyKind.IronGolem && (int)enemy.Phase == 2)
+                    tint = new Color(255, 160, 80);
                 return true;
             case ProjectileEntity proj:
                 if (proj.FromPlayer)

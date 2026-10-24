@@ -64,12 +64,13 @@ Hoje: depths 1–5 via portal após o boss (vitória só no depth 5). Andar 2 (C
 | | |
 |---|---|
 | **Clima** | Ferro, tochas, disciplina militar |
-| **Tiles** | Floor laje escura, wall pedra+ferro |
-| **Inimigos** | **novo: Guarda** (escudo / lento / tank); Esqueleto arqueiro; Slime raro |
-| **Boss** | **Golem de Ferro** — fases: projéteis → charge → vulnerável |
-| **Obstáculos** | Barricadas, armadilhas de lança (spike up), bigornas |
-| **Música** | `ArmoryTheme` (tambores + metal) |
-| **Diff** | Dano inimigo sobe; Common cai, Rare/Legendary sobem um pouco |
+| **Tiles** | `floor-4` / `wall-4` / `door-4` / `door-tile-4` |
+| **Inimigos** | **Guarda** (lento, tank, melee); Esqueleto; Slime raro |
+| **Boss** | **Golem de Ferro** — projéteis → charge → vulnerável (2x dano, tint laranja) |
+| **Obstáculos** | Mesmos genéricos (próximo: barricadas/bigornas) |
+| **Música** | Ainda `FirstFloorTheme` (próximo: `ArmoryTheme`) |
+| **Diff** | +1 inimigo extra vs depth 3 |
+| **Status** | Feito (tiles + Guarda + Golem). Falta tema musical e obstáculos novos |
 
 ---
 

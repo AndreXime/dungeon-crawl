@@ -150,7 +150,10 @@ public static class Combat
                     continue;
                 }
 
-                target.Hp -= projectile.Damage;
+                var damage = projectile.Damage;
+                if (target.Enemy == EnemyKind.IronGolem && (int)target.Phase == 2)
+                    damage *= 2f;
+                target.Hp -= damage;
                 Sfx.Play("enemyHurt");
                 removed.Add(projectile);
                 if (target.Hp <= 0)

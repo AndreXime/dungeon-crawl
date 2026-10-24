@@ -20,6 +20,9 @@ public static class Ai
     public const float NecromancerMinionHp = 1f;
     public const float SlimeKingChildHp = 3f;
     public const float SlimeKingChildRadiusScale = 1.15f;
+    public const float IronGolemPhase0Ms = 6000f;
+    public const float IronGolemChargeMs = 2200f;
+    public const float IronGolemVulnerableMs = 2800f;
     private const float SlimeKingSplitOffsetPx = 14f;
     private const float SlimeSplitOffsetPx = 8f;
     private const float SlimeNoSplitCooldownMs = 999_999f;
@@ -52,6 +55,9 @@ public static class Ai
                 case EnemyKind.Rat:
                     UpdateRat(state, enemy, player, dt);
                     break;
+                case EnemyKind.Guard:
+                    UpdateGuard(state, enemy, player, dt);
+                    break;
                 case EnemyKind.Ogre:
                     UpdateOgre(state, enemy, player, dt, rng);
                     break;
@@ -60,6 +66,9 @@ public static class Ai
                     break;
                 case EnemyKind.SlimeKing:
                     UpdateSlimeKing(state, enemy, player, dt);
+                    break;
+                case EnemyKind.IronGolem:
+                    UpdateIronGolem(state, enemy, player, dt);
                     break;
             }
         }
@@ -191,6 +200,16 @@ public static class Ai
     private static void UpdateRat(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
     {
         var def = Enemies.Defs[EnemyKind.Rat];
+        var dx = player.X - enemy.X;
+        var dy = player.Y - enemy.Y;
+        var dist = MathF.Sqrt(dx * dx + dy * dy);
+        if (dist == 0) return;
+        Steer(state, enemy, dx / dist, dy / dist, def.Speed, dt);
+    }
+
+    private static void UpdateGuard(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
+    {
+        var def = Enemies.Defs[EnemyKind.Guard];
         var dx = player.X - enemy.X;
         var dy = player.Y - enemy.Y;
         var dist = MathF.Sqrt(dx * dx + dy * dy);
@@ -358,6 +377,82 @@ public static class Ai
         if (enemy.Cooldown > 0) return;
         Combat.SpawnEnemyProjectile(state, enemy, player.X, player.Y, def.Damage);
         enemy.Cooldown = def.FireCooldownMs;
+    }
+
+    private static void UpdateIronGolem(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
+    {
+        var def = Enemies.Defs[EnemyKind.IronGolem];
+        var mode = (int)enemy.Phase;
+
+        if (mode == 0)
+        {
+            if (enemy.IframeUntil <= 0f)
+                enemy.IframeUntil = state.TimeMs + IronGolemPhase0Ms;
+
+            KeepPreferredDistance(state, enemy, player, def.PreferredDist ?? 100f, def.Speed, dt);
+
+            enemy.Cooldown -= dt * 1000f;
+            if (enemy.Cooldown <= 0)
+            {
+                Combat.SpawnEnemyProjectile(state, enemy, player.X, player.Y, def.Damage);
+                enemy.Cooldown = def.FireCooldownMs;
+            }
+
+            if (state.TimeMs >= enemy.IframeUntil || enemy.Hp <= def.Hp * 0.5f)
+            {
+                enemy.Phase = enemy.Hp <= def.Hp * 0.5f ? 2 : 1;
+                enemy.Cooldown = enemy.Phase >= 2 ? IronGolemVulnerableMs : IronGolemChargeMs;
+                enemy.IframeUntil = 0;
+            }
+            return;
+        }
+
+        if (mode == 1)
+        {
+            var dx = player.X - enemy.X;
+            var dy = player.Y - enemy.Y;
+            var dist = MathF.Sqrt(dx * dx + dy * dy);
+            if (dist > 0)
+                Steer(state, enemy, dx / dist, dy / dist, def.ChargeSpeed ?? def.Speed, dt);
+
+            enemy.Cooldown -= dt * 1000f;
+            if (enemy.Cooldown > 0) return;
+
+            if (enemy.Hp <= def.Hp * 0.5f)
+            {
+                enemy.Phase = 2;
+                enemy.Cooldown = IronGolemVulnerableMs;
+            }
+            else
+            {
+                enemy.Phase = 0;
+                enemy.Cooldown = def.FireCooldownMs;
+                enemy.IframeUntil = state.TimeMs + IronGolemPhase0Ms;
+            }
+            return;
+        }
+
+        enemy.Vx = 0;
+        enemy.Vy = 0;
+        enemy.Cooldown -= dt * 1000f;
+        if (enemy.Cooldown > 0) return;
+        enemy.Phase = 1;
+        enemy.Cooldown = IronGolemChargeMs * 0.65f;
+    }
+
+    private static void KeepPreferredDistance(
+        RunState state, EnemyEntity enemy, PlayerEntity player, float preferred, float speed, float dt)
+    {
+        var dx = player.X - enemy.X;
+        var dy = player.Y - enemy.Y;
+        var dist = MathF.Sqrt(dx * dx + dy * dy);
+        if (dist == 0) return;
+        float dirX, dirY;
+        if (dist > preferred + 10f) { dirX = dx / dist; dirY = dy / dist; }
+        else if (dist < preferred - 10f) { dirX = -dx / dist; dirY = -dy / dist; }
+        else { dirX = 0; dirY = 0; }
+        if (dirX != 0 || dirY != 0)
+            Steer(state, enemy, dirX, dirY, speed, dt);
     }
 
     /// <summary>Chamado pelo Combat quando o Rei Lodo morre com CanSplit.</summary>
