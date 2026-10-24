@@ -2,7 +2,7 @@
 
 Roguelike top-down. Você é um **mago** que dispara **bolts** mágicos por salas de dungeon medieval.
 
-[Vídeo de gameplay](docs/gameplay.mp4)
+https://github.com/user-attachments/assets/df57e047-3ee4-4d96-96f7-7ba78abc235e
 
 ## Objetivo
 
