@@ -159,6 +159,34 @@ public class AiTests
     }
 
     [Fact]
+    public void Update_Specter_FloatsTowardPlayer()
+    {
+        var run = OpenRoomRun();
+        var enemy = AddEnemy(run, EnemyKind.Specter, 100, 160);
+        enemy.Cooldown = 99999f;
+        run.Entities.OfType<PlayerEntity>().Single().X = 300;
+        var before = enemy.X;
+        Ai.Update(run, Dt);
+        Assert.True(enemy.X > before);
+    }
+
+    [Fact]
+    public void Update_Specter_BlinksTowardPlayerWhenCooldownEnds()
+    {
+        var run = OpenRoomRun();
+        run.TimeMs = 1000f;
+        var enemy = AddEnemy(run, EnemyKind.Specter, 100, 160);
+        enemy.Cooldown = 0;
+        enemy.IframeUntil = 0;
+        run.Entities.OfType<PlayerEntity>().Single().X = 300;
+        var before = enemy.X;
+        Ai.Update(run, Dt);
+        Assert.True(enemy.X > before + 10f);
+        Assert.Equal(Ai.SpecterBlinkCooldownMs, enemy.Cooldown);
+        Assert.Equal(run.TimeMs + Ai.SpecterPhaseMs, enemy.IframeUntil);
+    }
+
+    [Fact]
     public void Combat_IgnoresDamageWhileEnemyIframes()
     {
         var run = OpenRoomRun();

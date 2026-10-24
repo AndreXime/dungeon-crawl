@@ -2,7 +2,7 @@
 
 Cada andar precisa ter **identidade própria**: bioma, inimigos, boss, tiles, música e ritmo de combate. Não basta recolorir o mesmo mapa.
 
-Hoje: **só depth 1**. Vitória no boss encerra a run. Próximo passo estrutural: após o boss, portal/saída → depth+1 (manter stats/inventário/moedas).
+Hoje: depths 1–5 via portal após o boss (vitória só no depth 5). Andar 2 (Catacumbas) tem tiles e Espectro.
 
 ## Princípios
 
@@ -34,11 +34,13 @@ Hoje: **só depth 1**. Vitória no boss encerra a run. Próximo passo estrutural
 |---|---|
 | **Clima** | Ossos, cinza frio, corredores estreitos |
 | **Tiles** | Floor cinza-osso, wall com ossários, spike → “ossos pontudos” |
-| **Inimigos** | Esqueleto (mais comum), Morcego; **novo: Espectro** (atravessa/pisca, frágil) |
-| **Boss** | **Necromante** — invoca esqueletos fracos + orbes |
-| **Obstáculos** | Pilhas de ossos (crate-like), urnas (barrel) |
-| **Música** | `CatacombsTheme` (mais lento, coral/drone) |
-| **Diff** | Salas um pouco maiores / +1 inimigo médio; raridade Rare um pouco mais frequente |
+| **Inimigos** | Esqueleto (mais comum), Morcego; **Espectro** (pisca/teleporta, frágil, atravessa paredes) |
+| **Boss** | Ainda Ogre (próximo: **Necromante** — invoca esqueletos + orbes) |
+| **Obstáculos** | Mesmos do andar 1 por enquanto |
+| **Tiles** | `floor-2` / `wall-2` / `door-2` / `door-tile-2` |
+| **Música** | Ainda `FirstFloorTheme` (próximo: `CatacombsTheme`) |
+| **Diff** | +1 inimigo médio nas salas normais |
+| **Status** | Parcial (tiles + Espectro + pool) |
 
 ---
 

@@ -63,6 +63,11 @@ public static class EntityRenderer
                 return true;
             case EnemyEntity enemy:
                 texture = atlas.Get(Enemies.Defs[enemy.Enemy].Texture);
+                if (enemy.Enemy == EnemyKind.Specter)
+                {
+                    opacity = state.TimeMs < enemy.IframeUntil ? 0.25f : 0.7f;
+                    tint = new Color(220, 200, 255);
+                }
                 return true;
             case ProjectileEntity proj:
                 if (proj.FromPlayer)
@@ -87,7 +92,7 @@ public static class EntityRenderer
             case DoorEntity door:
                 if (!door.Locked)
                     return false;
-                texture = atlas.Get("door");
+                texture = atlas.Get(FloorThemes.DoorTexture(state.Floor.Depth));
                 return true;
             default:
                 return false;

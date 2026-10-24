@@ -10,7 +10,8 @@ public static class TilemapRenderer
     public static void Draw(SpriteBatch spriteBatch, RunState state, TextureAtlas atlas)
     {
         var tiles = state.Room.Tiles;
-        var floor = atlas.Get("floor");
+        var depth = state.Floor.Depth;
+        var floor = atlas.Get(FloorThemes.TextureForTile(GameConstants.TileFloor, depth));
         for (var ty = 0; ty < GameConstants.RoomH; ty++)
         {
             for (var tx = 0; tx < GameConstants.RoomW; tx++)
@@ -29,7 +30,7 @@ public static class TilemapRenderer
                     continue;
                 }
 
-                spriteBatch.Draw(atlas.Get(FloorThemes.TextureForTile(tile)), dest, Color.White);
+                spriteBatch.Draw(atlas.Get(FloorThemes.TextureForTile(tile, depth)), dest, Color.White);
             }
         }
     }

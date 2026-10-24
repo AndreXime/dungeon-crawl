@@ -11,6 +11,9 @@ public static class Ai
     public const float OgrePhase1MaxMs = 8000f;
     public const float WanderMinMs = 500f;
     public const float WanderMaxMs = 1500f;
+    public const float SpecterBlinkCooldownMs = 1600f;
+    public const float SpecterPhaseMs = 380f;
+    public const float SpecterBlinkDistance = 48f;
     private const float SlimeSplitOffsetPx = 8f;
     private const float SlimeNoSplitCooldownMs = 999_999f;
 
@@ -34,6 +37,9 @@ public static class Ai
                     break;
                 case EnemyKind.Slime:
                     UpdateSlime(state, enemy, dt, random);
+                    break;
+                case EnemyKind.Specter:
+                    UpdateSpecter(state, enemy, player, dt);
                     break;
                 case EnemyKind.Ogre:
                     UpdateOgre(state, enemy, player, dt, rng);
@@ -161,6 +167,51 @@ public static class Ai
         else enemy.Vx = 0;
         if (!Collision.CircleHitsSolid(enemy.X, nextY, enemy.Radius, tiles)) enemy.Y = nextY;
         else enemy.Vy = 0;
+    }
+
+    private static void UpdateSpecter(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
+    {
+        var def = Enemies.Defs[EnemyKind.Specter];
+        var phasing = state.TimeMs < enemy.IframeUntil;
+
+        enemy.Cooldown -= dt * 1000f;
+        if (!phasing && enemy.Cooldown <= 0)
+        {
+            var dx = player.X - enemy.X;
+            var dy = player.Y - enemy.Y;
+            var dist = MathF.Sqrt(dx * dx + dy * dy);
+            if (dist > 1f)
+            {
+                var step = MathF.Min(SpecterBlinkDistance, dist * 0.65f);
+                enemy.X += dx / dist * step;
+                enemy.Y += dy / dist * step;
+                ClampInsideRoom(enemy);
+            }
+            enemy.IframeUntil = state.TimeMs + SpecterPhaseMs;
+            enemy.Cooldown = SpecterBlinkCooldownMs;
+            return;
+        }
+
+        if (phasing) return;
+
+        var sx = player.X - enemy.X;
+        var sy = player.Y - enemy.Y;
+        var sdist = MathF.Sqrt(sx * sx + sy * sy);
+        if (sdist == 0) return;
+        enemy.Vx = sx / sdist * def.Speed;
+        enemy.Vy = sy / sdist * def.Speed;
+        enemy.X += enemy.Vx * dt;
+        enemy.Y += enemy.Vy * dt;
+        ClampInsideRoom(enemy);
+    }
+
+    private static void ClampInsideRoom(EnemyEntity enemy)
+    {
+        var min = GameConstants.Cell + enemy.Radius;
+        var maxX = GameConstants.RoomW * GameConstants.Cell - GameConstants.Cell - enemy.Radius;
+        var maxY = GameConstants.RoomH * GameConstants.Cell - GameConstants.Cell - enemy.Radius;
+        enemy.X = Math.Clamp(enemy.X, min, maxX);
+        enemy.Y = Math.Clamp(enemy.Y, min, maxY);
     }
 
     private static void UpdateOgre(RunState state, EnemyEntity enemy, PlayerEntity player, float dt, Func<float>? rng)

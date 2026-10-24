@@ -18,10 +18,12 @@ public class RoomGenTests
     [Fact]
     public void Generate_Normal_UsesDungeonEnemyPoolAndObstacleTiles()
     {
-        var room = RoomGen.Generate(Node(RoomType.Normal, seed: 7), new[] { Dir.N, Dir.E });
+        var room = RoomGen.Generate(Node(RoomType.Normal, seed: 7), new[] { Dir.N, Dir.E }, depth: 1);
         var enemies = room.Spawns.OfType<EnemySpawn>().Select(s => s.Enemy).ToHashSet();
         Assert.Subset(new HashSet<EnemyKind> { EnemyKind.Bat, EnemyKind.Skeleton, EnemyKind.Slime }, enemies);
+        Assert.DoesNotContain(EnemyKind.Specter, enemies);
         Assert.DoesNotContain(EnemyKind.Ogre, enemies);
+        Assert.Contains(EnemyKind.Specter, RoomGen.EnemyPoolFor(2));
 
         var obstacleTiles = new HashSet<int>();
         for (var y = 0; y < GameConstants.RoomH; y++)
@@ -32,6 +34,24 @@ public class RoomGenTests
                     obstacleTiles.Add(t);
             }
         Assert.NotEmpty(obstacleTiles);
+    }
+
+    [Fact]
+    public void Generate_Normal_Depth2_CanSpawnSpecter()
+    {
+        var found = false;
+        for (var seed = 0; seed < 80 && !found; seed++)
+        {
+            var room = RoomGen.Generate(Node(RoomType.Normal, seed), new[] { Dir.N, Dir.E }, depth: 2);
+            found = room.Spawns.OfType<EnemySpawn>().Any(s => s.Enemy == EnemyKind.Specter);
+        }
+        Assert.True(found);
+
+        var sample = RoomGen.Generate(Node(RoomType.Normal, seed: 3), new[] { Dir.N }, depth: 2);
+        var enemies = sample.Spawns.OfType<EnemySpawn>().Select(s => s.Enemy).ToHashSet();
+        Assert.Subset(new HashSet<EnemyKind>(RoomGen.EnemyPoolFor(2)), enemies);
+        Assert.DoesNotContain(EnemyKind.Slime, enemies);
+        Assert.DoesNotContain(EnemyKind.Ogre, enemies);
     }
 
     [Fact]

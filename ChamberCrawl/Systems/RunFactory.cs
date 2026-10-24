@@ -60,7 +60,7 @@ public static class RunFactory
 
         node.Visited = true;
         state.CurrentRoomId = roomId;
-        state.Room = RoomGen.Generate(node, node.Neighbors.Keys.ToList());
+        state.Room = RoomGen.Generate(node, node.Neighbors.Keys.ToList(), state.Floor.Depth);
         state.Entities = SpawnRoomEntities(state.Room, node, entryDir);
         RestoreLooseCoins(state, node);
         PlayRoomOpenSfx(node.Type);
@@ -140,6 +140,7 @@ public static class RunFactory
                         {
                             EnemyKind.Slime => Ai.SlimeSplitMs,
                             EnemyKind.Ogre => Ai.OgrePhase1MaxMs,
+                            EnemyKind.Specter => Ai.SpecterBlinkCooldownMs,
                             _ => def.FireCooldownMs,
                         },
                         Phase = 0,

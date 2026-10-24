@@ -11,9 +11,14 @@ public static class RoomGen
     /// <summary>Distância Manhattan mínima entre inimigo e cada tile de entrada (porta).</summary>
     public const int MinEnemySpawnDistFromEntry = 4;
 
-    private static readonly EnemyKind[] EnemyPool =
+    private static readonly EnemyKind[] EnemyPoolDepth1 =
     {
         EnemyKind.Bat, EnemyKind.Skeleton, EnemyKind.Slime,
+    };
+
+    private static readonly EnemyKind[] EnemyPoolDepth2 =
+    {
+        EnemyKind.Skeleton, EnemyKind.Skeleton, EnemyKind.Bat, EnemyKind.Specter, EnemyKind.Specter,
     };
 
     private static readonly int[] DungeonObstacleTiles =
@@ -36,11 +41,12 @@ public static class RoomGen
         };
     }
 
-    public static RoomData Generate(FloorRoomNode node, IReadOnlyList<Dir> neighbors)
+    public static RoomData Generate(FloorRoomNode node, IReadOnlyList<Dir> neighbors, int depth = 1)
     {
         const int w = GameConstants.RoomW;
         const int h = GameConstants.RoomH;
         var rng = new Random(node.RoomSeed);
+        var enemyPool = EnemyPoolFor(depth);
 
         var tiles = new int[h, w];
         for (var y = 0; y < h; y++)
@@ -75,7 +81,7 @@ public static class RoomGen
                     tiles[ty, tx] = DungeonObstacleTiles[rng.Next(DungeonObstacleTiles.Length)];
                 }
 
-                var enemyCount = 3 + rng.Next(3);
+                var enemyCount = 3 + rng.Next(3) + (depth >= 2 ? 1 : 0);
                 var entries = EntryTiles(neighbors);
                 var occupied = new HashSet<(int, int)> { (centerX, centerY) };
                 foreach (var entry in entries)
@@ -83,7 +89,7 @@ public static class RoomGen
 
                 for (var i = 0; i < enemyCount; i++)
                 {
-                    var enemy = EnemyPool[rng.Next(EnemyPool.Length)];
+                    var enemy = enemyPool[rng.Next(enemyPool.Length)];
                     var placed = false;
                     for (var attempt = 0; attempt < 40 && !placed; attempt++)
                     {
@@ -145,6 +151,12 @@ public static class RoomGen
 
         return new RoomData { Tiles = tiles, Spawns = spawns };
     }
+
+    public static EnemyKind[] EnemyPoolFor(int depth) => depth switch
+    {
+        >= 2 => EnemyPoolDepth2,
+        _ => EnemyPoolDepth1,
+    };
 
     /// <summary>Tile onde o jogador aparece ao entrar por aquela porta da sala.</summary>
     public static (int Tx, int Ty) EntryTileForDoor(Dir doorDir)

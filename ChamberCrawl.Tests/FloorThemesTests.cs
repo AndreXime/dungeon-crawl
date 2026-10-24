@@ -24,4 +24,23 @@ public class FloorThemesTests
     {
         Assert.False(FloorThemes.TryOverlayTexture(tile, out _));
     }
+
+    [Theory]
+    [InlineData(GameConstants.TileFloor, 1, "floor")]
+    [InlineData(GameConstants.TileWall, 1, "wall")]
+    [InlineData(GameConstants.TileDoor, 1, "door-tile")]
+    [InlineData(GameConstants.TileFloor, 2, "floor-2")]
+    [InlineData(GameConstants.TileWall, 2, "wall-2")]
+    [InlineData(GameConstants.TileDoor, 2, "door-tile-2")]
+    public void TextureForTile_UsesDepthSuffix(int tile, int depth, string expected)
+    {
+        Assert.Equal(expected, FloorThemes.TextureForTile(tile, depth));
+    }
+
+    [Fact]
+    public void DoorTexture_UsesDepthSuffix()
+    {
+        Assert.Equal("door", FloorThemes.DoorTexture(1));
+        Assert.Equal("door-2", FloorThemes.DoorTexture(2));
+    }
 }
