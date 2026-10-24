@@ -135,6 +135,30 @@ public class RoomGenTests
     }
 
     [Fact]
+    public void Generate_Normal_Depth4_UsesArsenalObstacles()
+    {
+        var foundBarricade = false;
+        var foundAnvil = false;
+        var foundCrate = false;
+        for (var seed = 0; seed < 80; seed++)
+        {
+            var room = RoomGen.Generate(Node(RoomType.Normal, seed), new[] { Dir.N }, depth: 4);
+            for (var y = 0; y < GameConstants.RoomH; y++)
+            for (var x = 0; x < GameConstants.RoomW; x++)
+            {
+                var t = room.Tiles[y, x];
+                if (t == GameConstants.TileBarricade) foundBarricade = true;
+                if (t == GameConstants.TileAnvil) foundAnvil = true;
+                if (t == GameConstants.TileCrate) foundCrate = true;
+            }
+            if (foundBarricade && foundAnvil) break;
+        }
+        Assert.True(foundBarricade);
+        Assert.True(foundAnvil);
+        Assert.False(foundCrate);
+    }
+
+    [Fact]
     public void Generate_Normal_Depth5_UsesSanctumPoolAndHazards()
     {
         var foundAcolyte = false;

@@ -55,6 +55,8 @@ public class CollisionTests
     [InlineData(GameConstants.TileCrate)]
     [InlineData(GameConstants.TileBarrel)]
     [InlineData(GameConstants.TileSpike)]
+    [InlineData(GameConstants.TileBarricade)]
+    [InlineData(GameConstants.TileAnvil)]
     public void CircleHitsSolid_BlocksNewPartitionTiles(int tile)
     {
         var tiles = new[,] { { GameConstants.TileFloor, tile }, { GameConstants.TileDoor, GameConstants.TileFloor } };

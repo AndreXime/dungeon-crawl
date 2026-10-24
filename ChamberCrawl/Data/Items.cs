@@ -51,23 +51,50 @@ public static class Items
         _ => "COMUM",
     };
 
-    public static int Weight(ItemRarity rarity) => rarity switch
-    {
-        ItemRarity.Common => 70,
-        ItemRarity.Rare => 25,
-        ItemRarity.Legendary => 5,
-        _ => 70,
-    };
+    public static int Weight(ItemRarity rarity) => Weight(rarity, depth: 1);
 
-    public static int ShopPrice(ItemRarity rarity, Random rng) => rarity switch
+    /// <summary>Andares mais profundos pesam mais Rare/Legendary.</summary>
+    public static int Weight(ItemRarity rarity, int depth)
     {
-        ItemRarity.Common => 4 + rng.Next(4),
-        ItemRarity.Rare => 8 + rng.Next(5),
-        ItemRarity.Legendary => 15 + rng.Next(6),
-        _ => 4 + rng.Next(4),
-    };
+        var d = depth < 1 ? 1 : depth > 5 ? 5 : depth;
+        return (rarity, d) switch
+        {
+            (ItemRarity.Common, 1) => 75,
+            (ItemRarity.Rare, 1) => 22,
+            (ItemRarity.Legendary, 1) => 3,
+            (ItemRarity.Common, 2) => 65,
+            (ItemRarity.Rare, 2) => 28,
+            (ItemRarity.Legendary, 2) => 7,
+            (ItemRarity.Common, 3) => 55,
+            (ItemRarity.Rare, 3) => 35,
+            (ItemRarity.Legendary, 3) => 10,
+            (ItemRarity.Common, 4) => 45,
+            (ItemRarity.Rare, 4) => 40,
+            (ItemRarity.Legendary, 4) => 15,
+            (ItemRarity.Common, _) => 35,
+            (ItemRarity.Rare, _) => 45,
+            (ItemRarity.Legendary, _) => 20,
+            _ => 35,
+        };
+    }
 
-    public static ItemDef PickWeighted(Random rng, IEnumerable<string>? excludeIds = null)
+    public static int ShopPrice(ItemRarity rarity, Random rng) => ShopPrice(rarity, rng, depth: 1);
+
+    public static int ShopPrice(ItemRarity rarity, Random rng, int depth)
+    {
+        var basePrice = rarity switch
+        {
+            ItemRarity.Common => 4 + rng.Next(4),
+            ItemRarity.Rare => 8 + rng.Next(5),
+            ItemRarity.Legendary => 15 + rng.Next(6),
+            _ => 4 + rng.Next(4),
+        };
+        var d = depth < 1 ? 1 : depth > 5 ? 5 : depth;
+        return basePrice + (d - 1);
+    }
+
+    public static ItemDef PickWeighted(
+        Random rng, IEnumerable<string>? excludeIds = null, int depth = 1)
     {
         var exclude = excludeIds is null
             ? null
@@ -79,22 +106,22 @@ public static class Items
         if (available.Count == 0)
             available = Defs.Values.ToList();
 
-        var rarity = RollRarity(rng, available);
+        var rarity = RollRarity(rng, available, depth);
         var pool = available.Where(d => d.Rarity == rarity).ToList();
         if (pool.Count == 0)
             pool = available;
         return pool[rng.Next(pool.Count)];
     }
 
-    private static ItemRarity RollRarity(Random rng, IReadOnlyList<ItemDef> available)
+    private static ItemRarity RollRarity(Random rng, IReadOnlyList<ItemDef> available, int depth)
     {
         var present = available.Select(d => d.Rarity).Distinct().ToList();
-        var total = present.Sum(Weight);
+        var total = present.Sum(r => Weight(r, depth));
         var roll = rng.Next(total);
         var acc = 0;
-        foreach (var rarity in present.OrderBy(Weight))
+        foreach (var rarity in present.OrderBy(r => Weight(r, depth)))
         {
-            acc += Weight(rarity);
+            acc += Weight(rarity, depth);
             if (roll < acc) return rarity;
         }
         return present[0];

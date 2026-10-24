@@ -90,7 +90,7 @@ public static class Ai
 
     private static void UpdateBat(RunState state, EnemyEntity enemy, PlayerEntity player, float dt, Func<float>? rng)
     {
-        var def = Enemies.Defs[EnemyKind.Bat];
+        var def = Enemies.AtDepth(EnemyKind.Bat, state.Floor.Depth);
         var dx = player.X - enemy.X;
         var dy = player.Y - enemy.Y;
         var dist = MathF.Sqrt(dx * dx + dy * dy);
@@ -296,7 +296,7 @@ public static class Ai
 
     private static void UpdateSkeleton(RunState state, EnemyEntity enemy, PlayerEntity player, float dt, Func<float>? rng)
     {
-        var def = Enemies.Defs[EnemyKind.Skeleton];
+        var def = Enemies.AtDepth(EnemyKind.Skeleton, state.Floor.Depth);
         var preferred = def.PreferredDist ?? 90f;
         KeepPreferredDistance(state, enemy, player, preferred, def.Speed, dt);
 
@@ -320,7 +320,7 @@ public static class Ai
                 enemy.Cooldown = SlimeNoSplitCooldownMs;
         }
 
-        var def = Enemies.Defs[EnemyKind.Slime];
+        var def = Enemies.AtDepth(EnemyKind.Slime, state.Floor.Depth);
         var dx = player.X - enemy.X;
         var dy = player.Y - enemy.Y;
         var dist = MathF.Sqrt(dx * dx + dy * dy);
@@ -336,7 +336,7 @@ public static class Ai
 
     private static void SplitSlime(RunState state, EnemyEntity parent)
     {
-        var def = Enemies.Defs[EnemyKind.Slime];
+        var def = Enemies.AtDepth(EnemyKind.Slime, state.Floor.Depth);
         var childRadius = def.Radius * 0.7f;
         var px = parent.X;
         var py = parent.Y;
@@ -363,7 +363,7 @@ public static class Ai
 
     private static void UpdateSlimeWander(RunState state, EnemyEntity enemy, float dt, Func<float> rng)
     {
-        var speed = Enemies.Defs[EnemyKind.Slime].Speed
+        var speed = Enemies.AtDepth(EnemyKind.Slime, state.Floor.Depth).Speed
             * Movement.SpeedScale(enemy.X, enemy.Y, state.Room.Tiles, enemy.Enemy);
         enemy.Phase -= dt * 1000f;
         if (enemy.Phase <= 0)
@@ -401,7 +401,7 @@ public static class Ai
 
     private static void UpdateRat(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
     {
-        var def = Enemies.Defs[EnemyKind.Rat];
+        var def = Enemies.AtDepth(EnemyKind.Rat, state.Floor.Depth);
         var dx = player.X - enemy.X;
         var dy = player.Y - enemy.Y;
         var dist = MathF.Sqrt(dx * dx + dy * dy);
@@ -411,7 +411,7 @@ public static class Ai
 
     private static void UpdateGuard(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
     {
-        var def = Enemies.Defs[EnemyKind.Guard];
+        var def = Enemies.AtDepth(EnemyKind.Guard, state.Floor.Depth);
         var dx = player.X - enemy.X;
         var dy = player.Y - enemy.Y;
         var dist = MathF.Sqrt(dx * dx + dy * dy);
@@ -421,7 +421,7 @@ public static class Ai
 
     private static void UpdateAcolyte(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
     {
-        var def = Enemies.Defs[EnemyKind.Acolyte];
+        var def = Enemies.AtDepth(EnemyKind.Acolyte, state.Floor.Depth);
         var orbit = def.PreferredDist ?? 70f;
         if (!CanShootPlayer(state, enemy, player))
         {
@@ -446,7 +446,7 @@ public static class Ai
 
     private static void UpdateSpecter(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
     {
-        var def = Enemies.Defs[EnemyKind.Specter];
+        var def = Enemies.AtDepth(EnemyKind.Specter, state.Floor.Depth);
         var phasing = state.TimeMs < enemy.IframeUntil;
 
         enemy.Cooldown -= dt * 1000f;
@@ -500,7 +500,7 @@ public static class Ai
 
     private static void UpdateOgre(RunState state, EnemyEntity enemy, PlayerEntity player, float dt, Func<float>? rng)
     {
-        var def = Enemies.Defs[EnemyKind.Ogre];
+        var def = Enemies.AtDepth(EnemyKind.Ogre, state.Floor.Depth);
         if ((int)enemy.Phase == 0)
         {
             enemy.Cooldown -= dt * 1000f;
@@ -533,7 +533,7 @@ public static class Ai
 
     private static void UpdateNecromancer(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
     {
-        var def = Enemies.Defs[EnemyKind.Necromancer];
+        var def = Enemies.AtDepth(EnemyKind.Necromancer, state.Floor.Depth);
         var enraged = enemy.Hp <= def.Hp * 0.5f;
         var preferred = def.PreferredDist ?? 110f;
         var moveSpeed = enraged ? def.Speed * BossEnrageSpeedMul : def.Speed;
@@ -562,7 +562,7 @@ public static class Ai
             .Count(e => e.Hp > 0 && e.Enemy is EnemyKind.Skeleton or EnemyKind.Specter or EnemyKind.Bat);
         if (minions >= NecromancerMaxMinions) return;
 
-        var skel = Enemies.Defs[EnemyKind.Skeleton];
+        var skel = Enemies.AtDepth(EnemyKind.Skeleton, state.Floor.Depth);
         var angle = (++summonSerial % 8) * (MathF.PI / 4f);
         var ox = MathF.Cos(angle) * GameConstants.Cell * 1.5f;
         var oy = MathF.Sin(angle) * GameConstants.Cell * 1.5f;
@@ -583,7 +583,7 @@ public static class Ai
 
     private static void UpdateSlimeKing(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
     {
-        var def = Enemies.Defs[EnemyKind.SlimeKing];
+        var def = Enemies.AtDepth(EnemyKind.SlimeKing, state.Floor.Depth);
         var enraged = enemy.Hp <= def.Hp * 0.5f;
         var preferred = def.PreferredDist ?? 80f;
         var moveSpeed = enraged ? def.Speed * BossEnrageSpeedMul : def.Speed;
@@ -599,7 +599,7 @@ public static class Ai
 
     private static void UpdateIronGolem(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
     {
-        var def = Enemies.Defs[EnemyKind.IronGolem];
+        var def = Enemies.AtDepth(EnemyKind.IronGolem, state.Floor.Depth);
         var mode = (int)enemy.Phase;
 
         if (mode == 0)
@@ -680,7 +680,7 @@ public static class Ai
 
     private static void UpdateRuneLord(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
     {
-        var def = Enemies.Defs[EnemyKind.RuneLord];
+        var def = Enemies.AtDepth(EnemyKind.RuneLord, state.Floor.Depth);
         var enraged = enemy.Hp <= def.Hp * 0.5f;
         var moveSpeed = enraged ? def.Speed * BossEnrageSpeedMul : def.Speed;
         KeepPreferredDistance(state, enemy, player, def.PreferredDist ?? 105f, moveSpeed, dt);
@@ -710,7 +710,7 @@ public static class Ai
             .Count(e => e.Hp > 0 && e.Enemy == EnemyKind.Acolyte);
         if (minions >= RuneLordMaxMinions) return;
 
-        var def = Enemies.Defs[EnemyKind.Acolyte];
+        var def = Enemies.AtDepth(EnemyKind.Acolyte, state.Floor.Depth);
         var angle = (++summonSerial % 8) * (MathF.PI / 4f);
         var minion = new EnemyEntity
         {
@@ -731,7 +731,7 @@ public static class Ai
     /// <summary>Chamado pelo Combat quando o Rei Lodo morre com CanSplit.</summary>
     public static void SplitSlimeKing(RunState state, EnemyEntity king)
     {
-        var slime = Enemies.Defs[EnemyKind.Slime];
+        var slime = Enemies.AtDepth(EnemyKind.Slime, state.Floor.Depth);
         var px = king.X;
         var py = king.Y;
         var radius = slime.Radius * SlimeKingChildRadiusScale;

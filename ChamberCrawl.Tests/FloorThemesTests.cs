@@ -6,16 +6,20 @@ namespace ChamberCrawl.Tests;
 public class FloorThemesTests
 {
     [Theory]
-    [InlineData(GameConstants.TileCrate, "crate")]
-    [InlineData(GameConstants.TileBarrel, "barrel")]
-    [InlineData(GameConstants.TileSpike, "spike")]
-    [InlineData(GameConstants.TileObstacle, "obstacle")]
-    [InlineData(GameConstants.TilePuddle, "puddle")]
-    [InlineData(GameConstants.TileRune, "rune")]
-    [InlineData(GameConstants.TilePedestal, "pedestal")]
-    public void TryOverlayTexture_ReturnsObstacleSprites(int tile, string expected)
+    [InlineData(GameConstants.TileCrate, 1, "crate")]
+    [InlineData(GameConstants.TileBarrel, 1, "barrel")]
+    [InlineData(GameConstants.TileSpike, 1, "spike")]
+    [InlineData(GameConstants.TileSpike, 2, "spike-bone")]
+    [InlineData(GameConstants.TileSpike, 4, "spike")]
+    [InlineData(GameConstants.TileObstacle, 1, "obstacle")]
+    [InlineData(GameConstants.TileBarricade, 4, "barricade")]
+    [InlineData(GameConstants.TileAnvil, 4, "anvil")]
+    [InlineData(GameConstants.TilePuddle, 3, "puddle")]
+    [InlineData(GameConstants.TileRune, 5, "rune")]
+    [InlineData(GameConstants.TilePedestal, 5, "pedestal")]
+    public void TryOverlayTexture_ReturnsObstacleSprites(int tile, int depth, string expected)
     {
-        Assert.True(FloorThemes.TryOverlayTexture(tile, out var name));
+        Assert.True(FloorThemes.TryOverlayTexture(tile, depth, out var name));
         Assert.Equal(expected, name);
     }
 
@@ -25,7 +29,15 @@ public class FloorThemesTests
     [InlineData(GameConstants.TileDoor)]
     public void TryOverlayTexture_FalseForBaseTiles(int tile)
     {
-        Assert.False(FloorThemes.TryOverlayTexture(tile, out _));
+        Assert.False(FloorThemes.TryOverlayTexture(tile, depth: 1, out _));
+    }
+
+    [Fact]
+    public void SpikeTexture_UsesBoneOnCatacombs()
+    {
+        Assert.Equal("spike-bone", FloorThemes.SpikeTexture(2));
+        Assert.Equal("spike", FloorThemes.SpikeTexture(1));
+        Assert.Equal("spike", FloorThemes.SpikeTexture(4));
     }
 
     [Theory]

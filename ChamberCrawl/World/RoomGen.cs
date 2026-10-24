@@ -44,6 +44,13 @@ public static class RoomGen
         GameConstants.TileSpike,
     };
 
+    private static readonly int[] ArsenalObstacleTiles =
+    {
+        GameConstants.TileBarricade,
+        GameConstants.TileAnvil,
+        GameConstants.TileSpike,
+    };
+
     private static (int Tx, int Ty) DoorCoords(Dir dir)
     {
         var midX = GameConstants.RoomW / 2;
@@ -94,9 +101,12 @@ public static class RoomGen
                     var tx = 2 + rng.Next(w - 4);
                     var ty = 2 + rng.Next(h - 4);
                     if (tx == centerX && ty == centerY) continue;
-                    tiles[ty, tx] = depth >= 5
-                        ? GameConstants.TilePedestal
-                        : DungeonObstacleTiles[rng.Next(DungeonObstacleTiles.Length)];
+                    tiles[ty, tx] = depth switch
+                    {
+                        >= 5 => GameConstants.TilePedestal,
+                        4 => ArsenalObstacleTiles[rng.Next(ArsenalObstacleTiles.Length)],
+                        _ => DungeonObstacleTiles[rng.Next(DungeonObstacleTiles.Length)],
+                    };
                 }
 
                 if (depth == 3)
@@ -142,7 +152,7 @@ public static class RoomGen
             }
             case RoomType.Item:
             {
-                var free = Items.PickWeighted(rng);
+                var free = Items.PickWeighted(rng, depth: depth);
                 spawns.Add(new ItemSpawn
                 {
                     ItemId = free.Id,
@@ -159,14 +169,14 @@ public static class RoomGen
                 var startX = centerX - count / 2 * 2;
                 for (var i = 0; i < count; i++)
                 {
-                    var def = Items.PickWeighted(rng, picked);
+                    var def = Items.PickWeighted(rng, picked, depth);
                     picked.Add(def.Id);
                     spawns.Add(new ItemSpawn
                     {
                         ItemId = def.Id,
                         Tx = startX + i * 2,
                         Ty = centerY,
-                        Price = Items.ShopPrice(def.Rarity, rng),
+                        Price = Items.ShopPrice(def.Rarity, rng, depth),
                         SpawnIndex = itemIndex++,
                     });
                 }
@@ -175,6 +185,17 @@ public static class RoomGen
             case RoomType.Boss:
                 if (depth == 3)
                     ScatterFloorHazard(tiles, rng, centerX, centerY, GameConstants.TilePuddle, 3 + rng.Next(3), avoidCenter: true);
+                if (depth == 4)
+                {
+                    for (var i = 0; i < 4; i++)
+                    {
+                        var tx = 2 + rng.Next(w - 4);
+                        var ty = 2 + rng.Next(h - 4);
+                        if (tx == centerX && ty == centerY) continue;
+                        if (tiles[ty, tx] != GameConstants.TileFloor) continue;
+                        tiles[ty, tx] = ArsenalObstacleTiles[rng.Next(ArsenalObstacleTiles.Length)];
+                    }
+                }
                 if (depth >= 5)
                 {
                     ScatterFloorHazard(tiles, rng, centerX, centerY, GameConstants.TileRune, 4 + rng.Next(4), avoidCenter: true);

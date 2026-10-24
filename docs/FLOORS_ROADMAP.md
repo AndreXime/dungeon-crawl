@@ -33,14 +33,14 @@ Hoje: depths 1–5 via portal após o boss (vitória só no depth 5). Andar 2 (C
 | | |
 |---|---|
 | **Clima** | Ossos, cinza frio, corredores estreitos |
-| **Tiles** | Floor cinza-osso, wall com ossários, spike → “ossos pontudos” |
+| **Tiles** | Floor cinza-osso, wall com ossários, spike → `spike-bone` |
 | **Inimigos** | Esqueleto (mais comum), Morcego; **Espectro** (pisca/teleporta, frágil, atravessa paredes) |
 | **Boss** | **Necromante** — mantém distância, orbes roxos, invoca esqueletos fracos (cap 3; enrage em 50% HP) |
-| **Obstáculos** | Mesmos do andar 1 por enquanto |
+| **Obstáculos** | crate/barrel + spike ósseo (`spike-bone`) |
 | **Tiles** | `floor-2` / `wall-2` / `door-2`. Aberta: `wall` + `door-open` |
 | **Música** | `CatacombsTheme` (fonte Strudel pronta; exportar WAV) |
 | **Diff** | +1 inimigo médio nas salas normais |
-| **Status** | Feito (tiles + Espectro + Necromante + tema Strudel) |
+| **Status** | Feito (tiles + Espectro + Necromante + tema Strudel + spike-bone) |
 
 ---
 
@@ -67,10 +67,10 @@ Hoje: depths 1–5 via portal após o boss (vitória só no depth 5). Andar 2 (C
 | **Tiles** | `floor-4` / `wall-4` / `door-4`. Aberta: `wall` + `door-open` |
 | **Inimigos** | **Guarda** (lento, tank, melee); Esqueleto; Slime raro |
 | **Boss** | **Golem de Ferro** — projéteis → charge → vulnerável (2x dano, tint laranja) |
-| **Obstáculos** | Mesmos genéricos (próximo: barricadas/bigornas) |
+| **Obstáculos** | `barricade` / `anvil` / spike (sem crate/barrel) |
 | **Música** | `ArmoryTheme` (fonte Strudel pronta; exportar WAV) |
 | **Diff** | +1 inimigo extra vs depth 3 |
-| **Status** | Feito (tiles + Guarda + Golem + tema Strudel). Falta obstáculos novos |
+| **Status** | Feito (tiles + Guarda + Golem + tema Strudel + obstáculos) |
 
 ---
 
@@ -96,7 +96,7 @@ Hoje: depths 1–5 via portal após o boss (vitória só no depth 5). Andar 2 (C
 3. **Andar 3** — tileset + Rato + Rei Lodo + hazards de slow.
 4. **Andar 4** — Guarda + Golem + armadilhas.
 5. **Andar 5** — bioma final + Senhor das Runas + tema de boss exclusivo.
-6. **Polimento** — balanceamento de HP/dano por depth, pesos de raridade, stingers por bioma.
+6. **Polimento** — HP/dano por depth e pesos de raridade (feito). Falta stingers de boss por bioma.
 
 ## Fora de escopo (por enquanto)
 

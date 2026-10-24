@@ -86,11 +86,48 @@ public class ItemsTests
     }
 
     [Fact]
+    public void ShopPrice_RisesWithDepth()
+    {
+        var rng = new Random(2);
+        var d1 = Items.ShopPrice(ItemRarity.Common, new Random(2), depth: 1);
+        var d5 = Items.ShopPrice(ItemRarity.Common, new Random(2), depth: 5);
+        Assert.Equal(d1 + 4, d5);
+        Assert.InRange(Items.ShopPrice(ItemRarity.Rare, rng, depth: 5), 12, 16);
+    }
+
+    [Fact]
+    public void Weight_ShiftsTowardRareAndLegendaryOnDeeperFloors()
+    {
+        Assert.True(Items.Weight(ItemRarity.Common, 1) > Items.Weight(ItemRarity.Common, 5));
+        Assert.True(Items.Weight(ItemRarity.Rare, 5) > Items.Weight(ItemRarity.Rare, 1));
+        Assert.True(Items.Weight(ItemRarity.Legendary, 5) > Items.Weight(ItemRarity.Legendary, 1));
+        Assert.Equal(
+            100,
+            Items.Weight(ItemRarity.Common, 3)
+            + Items.Weight(ItemRarity.Rare, 3)
+            + Items.Weight(ItemRarity.Legendary, 3));
+    }
+
+    [Fact]
     public void PickWeighted_RespectsExcludeAndReturnsKnownId()
     {
         var rng = new Random(42);
         var picked = Items.PickWeighted(rng, new[] { "damage_up" });
         Assert.True(Items.Defs.ContainsKey(picked.Id));
         Assert.NotEqual("damage_up", picked.Id);
+    }
+
+    [Fact]
+    public void PickWeighted_Depth5YieldsMoreNonCommonThanDepth1()
+    {
+        var common1 = 0;
+        var common5 = 0;
+        const int n = 400;
+        for (var i = 0; i < n; i++)
+        {
+            if (Items.PickWeighted(new Random(i), depth: 1).Rarity == ItemRarity.Common) common1++;
+            if (Items.PickWeighted(new Random(i), depth: 5).Rarity == ItemRarity.Common) common5++;
+        }
+        Assert.True(common5 < common1, $"depth1 common={common1} depth5 common={common5}");
     }
 }

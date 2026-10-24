@@ -46,8 +46,10 @@ public static class FloorThemes
         GameConstants.TileDoor => DepthTexture("wall", depth),
         GameConstants.TileCrate => "crate",
         GameConstants.TileBarrel => "barrel",
-        GameConstants.TileSpike => "spike",
+        GameConstants.TileSpike => SpikeTexture(depth),
         GameConstants.TileObstacle => "obstacle",
+        GameConstants.TileBarricade => "barricade",
+        GameConstants.TileAnvil => "anvil",
         GameConstants.TilePuddle => "puddle",
         GameConstants.TileRune => "rune",
         GameConstants.TilePedestal => "pedestal",
@@ -57,15 +59,19 @@ public static class FloorThemes
     /// <summary>Sprite da porta fechada/trancada (entidade), por andar.</summary>
     public static string DoorTexture(int depth) => DepthTexture("door", depth);
 
+    public static string SpikeTexture(int depth) => depth == 2 ? "spike-bone" : "spike";
+
     /// <summary>Obstáculos são sprites sobre o chão; parede/porta/chão não usam overlay.</summary>
-    public static bool TryOverlayTexture(int tile, out string textureName)
+    public static bool TryOverlayTexture(int tile, int depth, out string textureName)
     {
         textureName = tile switch
         {
             GameConstants.TileCrate => "crate",
             GameConstants.TileBarrel => "barrel",
-            GameConstants.TileSpike => "spike",
+            GameConstants.TileSpike => SpikeTexture(depth),
             GameConstants.TileObstacle => "obstacle",
+            GameConstants.TileBarricade => "barricade",
+            GameConstants.TileAnvil => "anvil",
             GameConstants.TilePuddle => "puddle",
             GameConstants.TileRune => "rune",
             GameConstants.TilePedestal => "pedestal",

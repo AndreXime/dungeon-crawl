@@ -47,7 +47,7 @@ public static class TilemapRenderer
                     continue;
                 }
 
-                if (FloorThemes.TryOverlayTexture(tile, out var overlay))
+                if (FloorThemes.TryOverlayTexture(tile, depth, out var overlay))
                 {
                     spriteBatch.Draw(floor, dest, Color.White);
                     spriteBatch.Draw(atlas.Get(overlay), dest, Color.White);

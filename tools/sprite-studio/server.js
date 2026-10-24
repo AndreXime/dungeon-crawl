@@ -67,6 +67,9 @@ const SIZE_DEFAULTS = {
   'tiles/barrel': 32,
   'tiles/obstacle': 32,
   'tiles/spike': 32,
+  'tiles/spike-bone': 32,
+  'tiles/barricade': 32,
+  'tiles/anvil': 32,
   'tiles/puddle': 32,
   'tiles/portal': 64,
 };

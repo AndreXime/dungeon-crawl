@@ -65,7 +65,9 @@ public static class Collision
             or GameConstants.TileCrate
             or GameConstants.TileBarrel
             or GameConstants.TileSpike
-            or GameConstants.TilePedestal;
+            or GameConstants.TilePedestal
+            or GameConstants.TileBarricade
+            or GameConstants.TileAnvil;
 
     public static bool IsSlowTile(int tile) => tile == GameConstants.TilePuddle;
 

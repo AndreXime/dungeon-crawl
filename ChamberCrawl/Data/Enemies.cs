@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using ChamberCrawl.Models;
 
@@ -31,4 +32,18 @@ public static class Enemies
         [EnemyKind.IronGolem] = new(70, 36, 2, 22, 950, 160, "enemy-iron-golem", PreferredDist: 100, ChargeSpeed: 130),
         [EnemyKind.RuneLord] = new(75, 40, 2, 18, 850, 165, "enemy-rune-lord", PreferredDist: 105),
     };
+
+    /// <summary>HP e dano sobem por depth; speed/cadência ficam no def base.</summary>
+    public static EnemyDef AtDepth(EnemyKind kind, int depth)
+    {
+        var d = Defs[kind];
+        var floor = depth < 1 ? 1 : depth > 5 ? 5 : depth;
+        var hpMul = 1f + (floor - 1) * 0.15f;
+        var damageBonus = Math.Max(0, floor - 2);
+        return d with
+        {
+            Hp = MathF.Round(d.Hp * hpMul),
+            Damage = d.Damage + damageBonus,
+        };
+    }
 }

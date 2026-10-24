@@ -65,7 +65,7 @@ public static class RunFactory
         node.Visited = true;
         state.CurrentRoomId = roomId;
         state.Room = RoomGen.Generate(node, node.Neighbors.Keys.ToList(), state.Floor.Depth);
-        state.Entities = SpawnRoomEntities(state.Room, node, entryDir);
+        state.Entities = SpawnRoomEntities(state.Room, node, entryDir, state.Floor.Depth);
         RestoreLooseCoins(state, node);
         PlayRoomOpenSfx(node.Type);
 
@@ -115,7 +115,8 @@ public static class RunFactory
         }
     }
 
-    public static List<Entity> SpawnRoomEntities(RoomData room, FloorRoomNode node, Dir? entryDir)
+    public static List<Entity> SpawnRoomEntities(
+        RoomData room, FloorRoomNode node, Dir? entryDir, int depth = 1)
     {
         var (spawnTx, spawnTy) = entryDir is { } dir ? EntrySpawnTile(dir) : (GameConstants.RoomW / 2, GameConstants.RoomH / 2);
         var (px, py) = TileCenter(spawnTx, spawnTy);
@@ -131,7 +132,7 @@ public static class RunFactory
             switch (room.Spawns[index])
             {
                 case EnemySpawn enemy when !node.Cleared:
-                    var def = Enemies.Defs[enemy.Enemy];
+                    var def = Enemies.AtDepth(enemy.Enemy, depth);
                     var (ex, ey) = TileCenter(enemy.Tx, enemy.Ty);
                     entities.Add(new EnemyEntity
                     {

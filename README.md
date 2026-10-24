@@ -2,9 +2,19 @@
 
 Roguelike top-down em C# com MonoGame (DesktopGL). Você controla um **mago** que dispara **bolts** mágicos por salas de dungeon medieval.
 
-## Objetivo do MVP
+## Objetivo
 
-Sobreviva em salas geradas proceduralmente no **dungeon** (até 5 andares), derrote inimigos (Morcego, Esqueleto, Slime), colete moedas, compre itens na loja e avance pelos bosses. No andar 1 o **Ogre** solta um portal; a vitória final é no andar 5.
+Sobreviva a **5 andares** gerados proceduralmente, limpe salas, colete moedas, compre itens e derrote o boss de cada bioma. A vitória da run é no andar 5.
+
+| Andar | Bioma | Destaques |
+|------:|-------|-----------|
+| 1 | Masmorra | Morcego, Esqueleto, Slime · boss **Ogre** |
+| 2 | Catacumbas | Espectro · boss **Necromante** · spikes ósseos |
+| 3 | Esgotos | Rato · boss **Rei Lodo** · poças lentas |
+| 4 | Arsenal | Guarda · boss **Golem de Ferro** · barricadas/bigornas |
+| 5 | Santuário | Acólito · boss **Senhor das Runas** · runas/pedestais |
+
+Loja e salas de item ficam mais generosas em raridade conforme o depth. Inimigos ganham HP/dano por andar.
 
 ## Requisitos
 
