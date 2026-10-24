@@ -11,7 +11,7 @@ public class ObstacleCombatTests
         for (var y = 0; y < GameConstants.RoomH; y++)
             for (var x = 0; x < GameConstants.RoomW; x++)
                 run.Room.Tiles[y, x] = GameConstants.TileFloor;
-        run.PlayerStats = new PlayerStats { MaxHp = 6, Hp = 6, Damage = 1, FireRate = 4, Range = 320 };
+        run.PlayerStats = new PlayerStats { MaxHp = 6, Hp = 6, Damage = 1, FireRate = 2f, Range = 200 };
         run.Entities.Add(new PlayerEntity
         {
             Id = "player", X = 48, Y = 48, Radius = GameConstants.PlayerRadius, Hp = 6,

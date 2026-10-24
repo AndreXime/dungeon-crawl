@@ -192,10 +192,10 @@ public static class RunFactory
     {
         MaxHp = 6,
         Hp = 6,
-        Speed = 120,
+        Speed = 110,
         Damage = 1,
-        FireRate = 4,
-        Range = 320,
+        FireRate = 2f,
+        Range = 200,
         TripleShot = false,
         CoinMultiplier = 1,
         IframeUntil = 0,

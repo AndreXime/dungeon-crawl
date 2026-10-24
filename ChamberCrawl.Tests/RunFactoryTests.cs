@@ -15,8 +15,8 @@ public class RunFactoryTests
         Assert.Equal(run.Floor.StartRoomId, run.CurrentRoomId);
         Assert.True(run.Floor.Rooms[run.CurrentRoomId].Visited);
         Assert.Equal(6, run.PlayerStats.Hp);
-        Assert.Equal(120, run.PlayerStats.Speed);
-        Assert.Equal(320, run.PlayerStats.Range);
+        Assert.Equal(110, run.PlayerStats.Speed);
+        Assert.Equal(200, run.PlayerStats.Range);
         Assert.Single(run.Entities.OfType<PlayerEntity>());
         Assert.Equal(RunStatus.Playing, run.Status);
     }
@@ -82,7 +82,7 @@ public class RunFactoryTests
         var startX = player.X;
 
         Movement.Update(run, new InputSnapshot(1, 0, 0, 0, false), 0.1f);
-        Assert.Equal(startX + 12f, player.X, 3);
+        Assert.Equal(startX + 11f, player.X, 3);
 
         player.X = GameConstants.Cell * 1.5f;
         player.Y = GameConstants.Cell * 1.5f;

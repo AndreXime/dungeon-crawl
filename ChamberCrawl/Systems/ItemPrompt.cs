@@ -66,8 +66,7 @@ public static class ItemPrompt
     {
         if (Math.Abs(value - MathF.Round(value)) < 0.001f)
             return ((int)MathF.Round(value)).ToString(CultureInfo.InvariantCulture);
-        var tenths = (int)MathF.Round(value * 10f);
-        return $"{tenths / 10}-{tenths % 10}";
+        return value.ToString("0.0", CultureInfo.InvariantCulture);
     }
 
     private static string Normalize(string text) =>

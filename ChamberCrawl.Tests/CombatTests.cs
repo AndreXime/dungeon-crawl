@@ -19,7 +19,7 @@ public class CombatTests
                     : GameConstants.TileFloor;
         run.PlayerStats = new PlayerStats
         {
-            MaxHp = 6, Hp = 6, Speed = 120, Damage = 1, FireRate = 3, Range = 320, CoinMultiplier = 1,
+            MaxHp = 6, Hp = 6, Speed = 120, Damage = 1, FireRate = 2f, Range = 200, CoinMultiplier = 1,
         };
         run.Entities.Add(new PlayerEntity
         {
@@ -60,7 +60,7 @@ public class CombatTests
         Assert.True(shot.FromPlayer);
         Assert.True(shot.Vx > 0);
         Assert.Equal(0, shot.Vy, 3);
-        Assert.Equal(1f / 3f, run.ShootCooldown, 3);
+        Assert.Equal(0.5f, run.ShootCooldown, 3);
     }
 
     [Fact]

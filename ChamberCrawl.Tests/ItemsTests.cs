@@ -7,8 +7,8 @@ public class ItemsTests
 {
     private static PlayerStats Base() => new()
     {
-        MaxHp = 6, Hp = 4, Speed = 120, Damage = 1, FireRate = 4,
-        Range = 320, TripleShot = false, CoinMultiplier = 1, IframeUntil = 0,
+        MaxHp = 6, Hp = 4, Speed = 110, Damage = 1, FireRate = 2f,
+        Range = 200, TripleShot = false, CoinMultiplier = 1, IframeUntil = 0,
     };
 
     [Fact]
@@ -35,21 +35,21 @@ public class ItemsTests
 
         Assert.Equal(2, Items.Apply(original, "damage_up").Damage);
         var speed = Items.Apply(original, "speed_up");
-        Assert.Equal(150, speed.Speed);
-        Assert.Equal(120, original.Speed);
+        Assert.Equal(140, speed.Speed);
+        Assert.Equal(110, original.Speed);
 
         var hp = Items.Apply(original, "hp_up");
         Assert.Equal(8, hp.MaxHp);
         Assert.Equal(6, hp.Hp);
 
-        Assert.Equal(5.5f, Items.Apply(original, "fire_rate").FireRate);
+        Assert.Equal(3.5f, Items.Apply(original, "fire_rate").FireRate);
         Assert.True(Items.Apply(original, "triple").TripleShot);
         Assert.Equal(2, Items.Apply(original, "greedy").CoinMultiplier);
-        Assert.Equal(400, Items.Apply(original, "range_up").Range);
+        Assert.Equal(280, Items.Apply(original, "range_up").Range);
         Assert.Equal(3, Items.Apply(original, "sharpness").Damage);
         var haste = Items.Apply(original, "haste");
-        Assert.Equal(6f, haste.FireRate);
-        Assert.Equal(135, haste.Speed);
+        Assert.Equal(4f, haste.FireRate);
+        Assert.Equal(125, haste.Speed);
         var vigor = Items.Apply(original, "vigor");
         Assert.Equal(8, vigor.MaxHp);
         Assert.Equal(8, vigor.Hp);
