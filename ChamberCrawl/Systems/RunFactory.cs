@@ -29,6 +29,28 @@ public static class RunFactory
         return state;
     }
 
+    /// <summary>Gera o próximo andar mantendo seed, stats, inventário e moedas.</summary>
+    public static void AdvanceFloor(RunState state)
+    {
+        if (state.Floor.Depth >= GameConstants.MaxDepth)
+        {
+            state.Status = RunStatus.Won;
+            return;
+        }
+
+        var nextDepth = state.Floor.Depth + 1;
+        var floor = FloorGen.Generate(state.Seed, nextDepth);
+        if (!floor.Rooms.ContainsKey(floor.StartRoomId))
+            throw new InvalidOperationException("Andar sem sala inicial");
+
+        state.Floor = floor;
+        state.CurrentRoomId = floor.StartRoomId;
+        state.ShootCooldown = 0;
+        state.TimeMs = 0;
+        state.Status = RunStatus.Playing;
+        EnterRoom(state, floor.StartRoomId, null);
+    }
+
     public static void EnterRoom(RunState state, string roomId, Dir? entryDir)
     {
         if (!state.Floor.Rooms.TryGetValue(roomId, out var node))

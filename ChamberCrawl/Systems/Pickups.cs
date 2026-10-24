@@ -20,9 +20,16 @@ public static class Pickups
 
         foreach (var entity in state.Entities)
         {
-            if (entity is not PickupEntity pickup || pickup.Pickup == PickupKind.Portal) continue;
+            if (entity is not PickupEntity pickup) continue;
             if (!Collision.CirclesOverlap(player.X, player.Y, player.Radius, pickup.X, pickup.Y, pickup.Radius))
                 continue;
+
+            if (pickup.Pickup == PickupKind.Portal)
+            {
+                if (pickup.ActiveAt is { } at && state.TimeMs < at) continue;
+                RunFactory.AdvanceFloor(state);
+                return;
+            }
 
             if (pickup.Pickup == PickupKind.Coin)
             {

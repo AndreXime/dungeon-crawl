@@ -4,7 +4,7 @@ Roguelike top-down em C# com MonoGame (DesktopGL). Você controla um **mago** qu
 
 ## Objetivo do MVP
 
-Sobreviva em salas geradas proceduralmente no **dungeon** (depth 1), derrote inimigos (Morcego, Esqueleto, Slime), colete moedas, compre itens na loja e vença o **Ogre** para completar a run.
+Sobreviva em salas geradas proceduralmente no **dungeon** (até 5 andares), derrote inimigos (Morcego, Esqueleto, Slime), colete moedas, compre itens na loja e avance pelos bosses. No andar 1 o **Ogre** solta um portal; a vitória final é no andar 5.
 
 ## Requisitos
 

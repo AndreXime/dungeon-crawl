@@ -118,7 +118,7 @@ public class PickupsTests
     }
 
     [Fact]
-    public void Update_IgnoresPortal()
+    public void Update_IgnoresInactivePortal()
     {
         var state = RunFactory.Create(42);
         var player = Player(state);
@@ -129,10 +129,33 @@ public class PickupsTests
             X = player.X,
             Y = player.Y,
             Radius = 14,
+            ActiveAt = state.TimeMs + 1000,
         });
 
         Pickups.Update(state);
 
+        Assert.Equal(1, state.Floor.Depth);
         Assert.Contains(state.Entities, e => e.Id == "portal");
+    }
+
+    [Fact]
+    public void Update_ActivePortalAdvancesFloor()
+    {
+        var state = RunFactory.Create(42);
+        var player = Player(state);
+        state.Entities.Add(new PickupEntity
+        {
+            Id = "portal",
+            Pickup = PickupKind.Portal,
+            X = player.X,
+            Y = player.Y,
+            Radius = 14,
+            ActiveAt = state.TimeMs,
+        });
+
+        Pickups.Update(state);
+
+        Assert.Equal(2, state.Floor.Depth);
+        Assert.Equal(RunStatus.Playing, state.Status);
     }
 }

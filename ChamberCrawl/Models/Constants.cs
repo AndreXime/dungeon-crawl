@@ -8,6 +8,7 @@ public static class GameConstants
     public const float PlayerRadius = 10f;
     public const float ProjectileRadius = 4f;
     public const float IframeMs = 600f;
+    public const int MaxDepth = 5;
 
     public const int TileFloor = 0;
     public const int TileWall = 1;

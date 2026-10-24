@@ -43,7 +43,7 @@ public sealed class LooseCoin
 
 public sealed class Floor
 {
-    public int Depth { get; set; } // 1 or 2
+    public int Depth { get; set; } // 1 .. GameConstants.MaxDepth
     public Dictionary<string, FloorRoomNode> Rooms { get; set; } = new();
     public string StartRoomId { get; set; } = "";
     public string BossRoomId { get; set; } = "";
