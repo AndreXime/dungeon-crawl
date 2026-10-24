@@ -18,3 +18,7 @@ Na aba **export**, use:
 | **Multi Channel Orbits** | **desmarcado** | senão o WAV fica gordo / multi-canal |
 
 Depois: **Export to WAV** → `ChamberCrawl/Assets/Music/<Nome>.wav`.
+
+## SFX
+
+Para efeitos sonoros curtos (tiro, hit, portal, etc.), o recomendado é o [https://www.bfxr.net/](https://www.bfxr.net/). Exporte o WAV e salve em `ChamberCrawl/Assets/Sfx/`.
