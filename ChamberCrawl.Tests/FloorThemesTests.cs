@@ -10,6 +10,7 @@ public class FloorThemesTests
     [InlineData(GameConstants.TileBarrel, "barrel")]
     [InlineData(GameConstants.TileSpike, "spike")]
     [InlineData(GameConstants.TileObstacle, "obstacle")]
+    [InlineData(GameConstants.TilePuddle, "puddle")]
     public void TryOverlayTexture_ReturnsObstacleSprites(int tile, string expected)
     {
         Assert.True(FloorThemes.TryOverlayTexture(tile, out var name));
@@ -32,6 +33,9 @@ public class FloorThemesTests
     [InlineData(GameConstants.TileFloor, 2, "floor-2")]
     [InlineData(GameConstants.TileWall, 2, "wall-2")]
     [InlineData(GameConstants.TileDoor, 2, "door-tile-2")]
+    [InlineData(GameConstants.TileFloor, 3, "floor-3")]
+    [InlineData(GameConstants.TileWall, 3, "wall-3")]
+    [InlineData(GameConstants.TileDoor, 3, "door-tile-3")]
     public void TextureForTile_UsesDepthSuffix(int tile, int depth, string expected)
     {
         Assert.Equal(expected, FloorThemes.TextureForTile(tile, depth));
@@ -42,5 +46,6 @@ public class FloorThemesTests
     {
         Assert.Equal("door", FloorThemes.DoorTexture(1));
         Assert.Equal("door-2", FloorThemes.DoorTexture(2));
+        Assert.Equal("door-3", FloorThemes.DoorTexture(3));
     }
 }

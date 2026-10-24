@@ -203,6 +203,52 @@ public class AiTests
     }
 
     [Fact]
+    public void Update_Rat_ChasesPlayer()
+    {
+        var run = OpenRoomRun();
+        var enemy = AddEnemy(run, EnemyKind.Rat, 100, 160);
+        run.Entities.OfType<PlayerEntity>().Single().X = 300;
+        var before = enemy.X;
+        Ai.Update(run, Dt);
+        Assert.True(enemy.X > before);
+    }
+
+    [Fact]
+    public void Update_SlimeKing_SpitsWhenCooldownEnds()
+    {
+        var run = OpenRoomRun();
+        var boss = AddEnemy(run, EnemyKind.SlimeKing, 200, 160, 20);
+        boss.Cooldown = 0;
+        boss.CanSplit = true;
+        Ai.Update(run, Dt);
+        Assert.Single(run.Entities.OfType<ProjectileEntity>());
+        Assert.False(run.Entities.OfType<ProjectileEntity>().Single().FromPlayer);
+    }
+
+    [Fact]
+    public void Combat_SlimeKing_SplitsIntoTwoMediumSlimesOnDeath()
+    {
+        var run = OpenRoomRun();
+        var boss = AddEnemy(run, EnemyKind.SlimeKing, 200, 160, 20);
+        boss.Hp = 1;
+        boss.CanSplit = true;
+        run.Entities.Add(new ProjectileEntity
+        {
+            Id = "hit", FromPlayer = true, X = 200, Y = 160, Vx = 0, Vy = 0,
+            Radius = 4, Damage = 5, Life = 1,
+        });
+        Combat.Update(run, new InputSnapshot(), Dt);
+        Assert.DoesNotContain(run.Entities.OfType<EnemyEntity>(), e => e.Enemy == EnemyKind.SlimeKing);
+        var heirs = run.Entities.OfType<EnemyEntity>().Where(e => e.Enemy == EnemyKind.Slime).ToList();
+        Assert.Equal(2, heirs.Count);
+        Assert.All(heirs, h =>
+        {
+            Assert.False(h.CanSplit);
+            Assert.Equal(Ai.SlimeKingChildHp, h.Hp);
+        });
+    }
+
+    [Fact]
     public void Update_Specter_FloatsTowardPlayer()
     {
         var run = OpenRoomRun();

@@ -49,12 +49,13 @@ Hoje: depths 1–5 via portal após o boss (vitória só no depth 5). Andar 2 (C
 | | |
 |---|---|
 | **Clima** | Verde-limo, água rasa, escorregadio |
-| **Tiles** | Floor musgo/água, wall tijolo úmido |
-| **Inimigos** | Slime (dominante); **novo: Rato** (rápido, melee); Morcego |
-| **Boss** | **Rei Lodo** — divide em 2 slimes médios ao “morrer” (1x), spit |
-| **Obstáculos** | Poças (slow zone), grades, canos |
-| **Música** | `SewersTheme` (baixo gordo, percussão molhada) |
-| **Diff** | Slow zones; loot um pouco melhor na loja |
+| **Tiles** | `floor-3` / `wall-3` / `door-3` / `door-tile-3` |
+| **Inimigos** | Slime (dominante); **Rato** (rápido, melee); Morcego |
+| **Boss** | **Rei Lodo** — spit + divide em 2 slimes médios ao morrer (1x) |
+| **Obstáculos** | Poças (`TilePuddle`) — 50% speed; Slime/Rei Lodo imunes |
+| **Música** | Ainda `FirstFloorTheme` (próximo: `SewersTheme`) |
+| **Diff** | +1 inimigo extra vs depth 2 |
+| **Status** | Feito (tiles + Rato + Rei Lodo + slow zones). Falta tema musical |
 
 ---
 

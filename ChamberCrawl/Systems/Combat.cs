@@ -155,6 +155,12 @@ public static class Combat
                 removed.Add(projectile);
                 if (target.Hp <= 0)
                 {
+                    if (target.Enemy == EnemyKind.SlimeKing && target.CanSplit)
+                    {
+                        DropCoin(state, target, rng);
+                        Ai.SplitSlimeKing(state, target);
+                        continue;
+                    }
                     removed.Add(target);
                     DropCoin(state, target, rng);
                 }

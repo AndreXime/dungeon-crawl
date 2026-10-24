@@ -17,4 +17,5 @@ public static class GameConstants
     public const int TileCrate = 4;
     public const int TileBarrel = 5;
     public const int TileSpike = 6;
+    public const int TilePuddle = 7;
 }

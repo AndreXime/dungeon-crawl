@@ -72,6 +72,52 @@ public class RoomGenTests
     }
 
     [Fact]
+    public void Generate_Normal_Depth3_UsesSewerPool()
+    {
+        var foundRat = false;
+        for (var seed = 0; seed < 80 && !foundRat; seed++)
+        {
+            var room = RoomGen.Generate(Node(RoomType.Normal, seed), new[] { Dir.N }, depth: 3);
+            foundRat = room.Spawns.OfType<EnemySpawn>().Any(s => s.Enemy == EnemyKind.Rat);
+        }
+        Assert.True(foundRat);
+
+        var sample = RoomGen.Generate(Node(RoomType.Normal, seed: 11), new[] { Dir.N }, depth: 3);
+        var enemies = sample.Spawns.OfType<EnemySpawn>().Select(s => s.Enemy).ToHashSet();
+        Assert.Subset(new HashSet<EnemyKind>(RoomGen.EnemyPoolFor(3)), enemies);
+        Assert.DoesNotContain(EnemyKind.Skeleton, enemies);
+        Assert.DoesNotContain(EnemyKind.Specter, enemies);
+        Assert.Contains(EnemyKind.Rat, RoomGen.EnemyPoolFor(3));
+    }
+
+    [Fact]
+    public void Generate_Boss_SpawnsSlimeKingOnDepth3()
+    {
+        var boss = RoomGen.Generate(Node(RoomType.Boss), new[] { Dir.N }, depth: 3);
+        Assert.Contains(boss.Spawns.OfType<EnemySpawn>(), s => s.Enemy == EnemyKind.SlimeKing);
+        Assert.Equal(EnemyKind.SlimeKing, RoomGen.BossFor(3));
+    }
+
+    [Fact]
+    public void Generate_Normal_Depth3_PlacesPuddles()
+    {
+        var found = false;
+        for (var seed = 0; seed < 40 && !found; seed++)
+        {
+            var room = RoomGen.Generate(Node(RoomType.Normal, seed), new[] { Dir.N }, depth: 3);
+            for (var y = 0; y < GameConstants.RoomH && !found; y++)
+            for (var x = 0; x < GameConstants.RoomW && !found; x++)
+                found = room.Tiles[y, x] == GameConstants.TilePuddle;
+        }
+        Assert.True(found);
+
+        var depth1 = RoomGen.Generate(Node(RoomType.Normal, seed: 7), new[] { Dir.N }, depth: 1);
+        for (var y = 0; y < GameConstants.RoomH; y++)
+        for (var x = 0; x < GameConstants.RoomW; x++)
+            Assert.NotEqual(GameConstants.TilePuddle, depth1.Tiles[y, x]);
+    }
+
+    [Fact]
     public void Generate_Normal_EnemiesStayAwayFromDoorEntries()
     {
         var neighbors = new[] { Dir.N, Dir.E, Dir.S };

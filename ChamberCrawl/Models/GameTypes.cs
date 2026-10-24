@@ -5,7 +5,7 @@ namespace ChamberCrawl.Models;
 public enum Dir { N, S, E, W }
 public enum RoomType { Normal, Item, Shop, Boss, Start }
 public enum RunStatus { Playing, Dead, Won }
-public enum EnemyKind { Bat, Skeleton, Slime, Specter, Ogre, Necromancer }
+public enum EnemyKind { Bat, Skeleton, Slime, Specter, Rat, Ogre, Necromancer, SlimeKing }
 public enum EntityKind { Player, Enemy, Projectile, Pickup, Door }
 public enum PickupKind { Coin, Item, Portal }
 

@@ -30,6 +30,7 @@ public static class FloorThemes
         GameConstants.TileBarrel => "barrel",
         GameConstants.TileSpike => "spike",
         GameConstants.TileObstacle => "obstacle",
+        GameConstants.TilePuddle => "puddle",
         _ => DepthTexture("floor", depth),
     };
 
@@ -44,11 +45,16 @@ public static class FloorThemes
             GameConstants.TileBarrel => "barrel",
             GameConstants.TileSpike => "spike",
             GameConstants.TileObstacle => "obstacle",
+            GameConstants.TilePuddle => "puddle",
             _ => "",
         };
         return textureName.Length > 0;
     }
 
-    private static string DepthTexture(string baseName, int depth) =>
-        depth >= 2 ? $"{baseName}-2" : baseName;
+    private static string DepthTexture(string baseName, int depth) => depth switch
+    {
+        >= 3 => $"{baseName}-3",
+        >= 2 => $"{baseName}-2",
+        _ => baseName,
+    };
 }

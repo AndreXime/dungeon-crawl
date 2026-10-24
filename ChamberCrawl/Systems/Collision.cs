@@ -34,6 +34,19 @@ public static class Collision
             or GameConstants.TileBarrel
             or GameConstants.TileSpike;
 
+    public static bool IsSlowTile(int tile) => tile == GameConstants.TilePuddle;
+
+    public static bool IsWalkableFloor(int tile) =>
+        tile is GameConstants.TileFloor or GameConstants.TilePuddle or GameConstants.TileDoor;
+
+    public static bool IsOnSlowTile(float x, float y, int[,] tiles)
+    {
+        var tx = (int)MathF.Floor(x / GameConstants.Cell);
+        var ty = (int)MathF.Floor(y / GameConstants.Cell);
+        if (ty < 0 || ty >= tiles.GetLength(0) || tx < 0 || tx >= tiles.GetLength(1)) return false;
+        return IsSlowTile(tiles[ty, tx]);
+    }
+
     private static bool IsTileSolid(int tx, int ty, int[,] tiles)
     {
         if (ty < 0 || ty >= tiles.GetLength(0) || tx < 0 || tx >= tiles.GetLength(1)) return true;

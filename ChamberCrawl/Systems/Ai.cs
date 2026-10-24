@@ -18,6 +18,9 @@ public static class Ai
     public const float NecromancerSummonEnragedMs = 2000f;
     public const int NecromancerMaxMinions = 3;
     public const float NecromancerMinionHp = 1f;
+    public const float SlimeKingChildHp = 3f;
+    public const float SlimeKingChildRadiusScale = 1.15f;
+    private const float SlimeKingSplitOffsetPx = 14f;
     private const float SlimeSplitOffsetPx = 8f;
     private const float SlimeNoSplitCooldownMs = 999_999f;
     private static int summonSerial;
@@ -46,11 +49,17 @@ public static class Ai
                 case EnemyKind.Specter:
                     UpdateSpecter(state, enemy, player, dt);
                     break;
+                case EnemyKind.Rat:
+                    UpdateRat(state, enemy, player, dt);
+                    break;
                 case EnemyKind.Ogre:
                     UpdateOgre(state, enemy, player, dt, rng);
                     break;
                 case EnemyKind.Necromancer:
                     UpdateNecromancer(state, enemy, player, dt);
+                    break;
+                case EnemyKind.SlimeKing:
+                    UpdateSlimeKing(state, enemy, player, dt);
                     break;
             }
         }
@@ -68,8 +77,9 @@ public static class Ai
 
     private static void Steer(RunState state, EnemyEntity enemy, float dirX, float dirY, float speed, float dt)
     {
-        enemy.Vx = dirX * speed;
-        enemy.Vy = dirY * speed;
+        var scaled = speed * Movement.SpeedScale(enemy.X, enemy.Y, state.Room.Tiles, enemy.Enemy);
+        enemy.Vx = dirX * scaled;
+        enemy.Vy = dirY * scaled;
         MoveWithTiles(state, enemy, enemy.Vx * dt, enemy.Vy * dt);
     }
 
@@ -143,7 +153,8 @@ public static class Ai
 
     private static void UpdateSlimeWander(RunState state, EnemyEntity enemy, float dt, Func<float> rng)
     {
-        var speed = Enemies.Defs[EnemyKind.Slime].Speed;
+        var speed = Enemies.Defs[EnemyKind.Slime].Speed
+            * Movement.SpeedScale(enemy.X, enemy.Y, state.Room.Tiles, enemy.Enemy);
         enemy.Phase -= dt * 1000f;
         if (enemy.Phase <= 0)
         {
@@ -177,6 +188,16 @@ public static class Ai
         else enemy.Vy = 0;
     }
 
+    private static void UpdateRat(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
+    {
+        var def = Enemies.Defs[EnemyKind.Rat];
+        var dx = player.X - enemy.X;
+        var dy = player.Y - enemy.Y;
+        var dist = MathF.Sqrt(dx * dx + dy * dy);
+        if (dist == 0) return;
+        Steer(state, enemy, dx / dist, dy / dist, def.Speed, dt);
+    }
+
     private static void UpdateSpecter(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
     {
         var def = Enemies.Defs[EnemyKind.Specter];
@@ -206,8 +227,9 @@ public static class Ai
         var sy = player.Y - enemy.Y;
         var sdist = MathF.Sqrt(sx * sx + sy * sy);
         if (sdist == 0) return;
-        enemy.Vx = sx / sdist * def.Speed;
-        enemy.Vy = sy / sdist * def.Speed;
+        var speed = def.Speed * Movement.SpeedScale(enemy.X, enemy.Y, state.Room.Tiles, enemy.Enemy);
+        enemy.Vx = sx / sdist * speed;
+        enemy.Vy = sy / sdist * speed;
         enemy.X += enemy.Vx * dt;
         enemy.Y += enemy.Vy * dt;
         ClampInsideRoom(enemy);
@@ -313,5 +335,58 @@ public static class Ai
         };
         ClampInsideRoom(minion);
         state.Entities.Add(minion);
+    }
+
+    private static void UpdateSlimeKing(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
+    {
+        var def = Enemies.Defs[EnemyKind.SlimeKing];
+        var preferred = def.PreferredDist ?? 80f;
+        var dx = player.X - enemy.X;
+        var dy = player.Y - enemy.Y;
+        var dist = MathF.Sqrt(dx * dx + dy * dy);
+        if (dist > 0)
+        {
+            float dirX, dirY;
+            if (dist > preferred + 10f) { dirX = dx / dist; dirY = dy / dist; }
+            else if (dist < preferred - 10f) { dirX = -dx / dist; dirY = -dy / dist; }
+            else { dirX = 0; dirY = 0; }
+            if (dirX != 0 || dirY != 0)
+                Steer(state, enemy, dirX, dirY, def.Speed, dt);
+        }
+
+        enemy.Cooldown -= dt * 1000f;
+        if (enemy.Cooldown > 0) return;
+        Combat.SpawnEnemyProjectile(state, enemy, player.X, player.Y, def.Damage);
+        enemy.Cooldown = def.FireCooldownMs;
+    }
+
+    /// <summary>Chamado pelo Combat quando o Rei Lodo morre com CanSplit.</summary>
+    public static void SplitSlimeKing(RunState state, EnemyEntity king)
+    {
+        var slime = Enemies.Defs[EnemyKind.Slime];
+        var px = king.X;
+        var py = king.Y;
+        var radius = slime.Radius * SlimeKingChildRadiusScale;
+        state.Entities.Remove(king);
+
+        SpawnChild(-SlimeKingSplitOffsetPx);
+        SpawnChild(SlimeKingSplitOffsetPx);
+
+        void SpawnChild(float offsetX)
+        {
+            var child = new EnemyEntity
+            {
+                Id = $"{king.Id}-heir-{offsetX}",
+                Enemy = EnemyKind.Slime,
+                X = px + offsetX,
+                Y = py,
+                Radius = radius,
+                Hp = SlimeKingChildHp,
+                CanSplit = false,
+                Cooldown = SlimeNoSplitCooldownMs,
+            };
+            ClampInsideRoom(child);
+            state.Entities.Add(child);
+        }
     }
 }

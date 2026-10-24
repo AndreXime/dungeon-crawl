@@ -47,6 +47,15 @@ public class CollisionTests
     }
 
     [Fact]
+    public void CircleHitsSolid_AllowsWalkingOnPuddle()
+    {
+        var tiles = new[,] { { GameConstants.TilePuddle } };
+        Assert.False(Collision.CircleHitsSolid(GameConstants.Cell * 0.5f, GameConstants.Cell * 0.5f, 6, tiles));
+        Assert.True(Collision.IsSlowTile(GameConstants.TilePuddle));
+        Assert.True(Collision.IsOnSlowTile(GameConstants.Cell * 0.5f, GameConstants.Cell * 0.5f, tiles));
+    }
+
+    [Fact]
     public void TrySampleSolidTile_ReturnsFolderUnderProjectile()
     {
         var tiles = new[,] { { GameConstants.TileFloor, GameConstants.TileCrate } };

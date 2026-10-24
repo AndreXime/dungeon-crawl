@@ -30,6 +30,8 @@ public static class EntityRenderer
             return MathF.Max(ogre.Radius * 3.2f, 40f);
         if (entity is EnemyEntity { Enemy: EnemyKind.Necromancer } necro)
             return MathF.Max(necro.Radius * 3.0f, 36f);
+        if (entity is EnemyEntity { Enemy: EnemyKind.SlimeKing } king)
+            return MathF.Max(king.Radius * 3.1f, 38f);
 
         return entity switch
         {

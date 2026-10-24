@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ChamberCrawl.Data;
 using ChamberCrawl.Models;
+using ChamberCrawl.Systems;
 
 namespace ChamberCrawl.World;
 
@@ -19,6 +20,11 @@ public static class RoomGen
     private static readonly EnemyKind[] EnemyPoolDepth2 =
     {
         EnemyKind.Skeleton, EnemyKind.Skeleton, EnemyKind.Bat, EnemyKind.Specter, EnemyKind.Specter,
+    };
+
+    private static readonly EnemyKind[] EnemyPoolDepth3 =
+    {
+        EnemyKind.Slime, EnemyKind.Slime, EnemyKind.Slime, EnemyKind.Bat, EnemyKind.Rat, EnemyKind.Rat,
     };
 
     private static readonly int[] DungeonObstacleTiles =
@@ -81,7 +87,10 @@ public static class RoomGen
                     tiles[ty, tx] = DungeonObstacleTiles[rng.Next(DungeonObstacleTiles.Length)];
                 }
 
-                var enemyCount = 3 + rng.Next(3) + (depth >= 2 ? 1 : 0);
+                if (depth >= 3)
+                    ScatterPuddles(tiles, rng, centerX, centerY, count: 4 + rng.Next(5));
+
+                var enemyCount = 3 + rng.Next(3) + (depth >= 2 ? 1 : 0) + (depth >= 3 ? 1 : 0);
                 var entries = EntryTiles(neighbors);
                 var occupied = new HashSet<(int, int)> { (centerX, centerY) };
                 foreach (var entry in entries)
@@ -94,7 +103,8 @@ public static class RoomGen
                     for (var attempt = 0; attempt < 40 && !placed; attempt++)
                     {
                         var (tx, ty) = (2 + rng.Next(w - 4), 2 + rng.Next(h - 4));
-                        if (tiles[ty, tx] != GameConstants.TileFloor) continue;
+                        if (tiles[ty, tx] is not (GameConstants.TileFloor or GameConstants.TilePuddle))
+                            continue;
                         if (!FarFromEntries(tx, ty, entries, MinEnemySpawnDistFromEntry)) continue;
                         if (!occupied.Add((tx, ty))) continue;
                         spawns.Add(new EnemySpawn { Enemy = enemy, Tx = tx, Ty = ty });
@@ -145,6 +155,8 @@ public static class RoomGen
                 break;
             }
             case RoomType.Boss:
+                if (depth >= 3)
+                    ScatterPuddles(tiles, rng, centerX, centerY, count: 3 + rng.Next(3), avoidCenter: true);
                 spawns.Add(new EnemySpawn { Enemy = BossFor(depth), Tx = centerX, Ty = centerY });
                 break;
         }
@@ -152,14 +164,40 @@ public static class RoomGen
         return new RoomData { Tiles = tiles, Spawns = spawns };
     }
 
+    private static void ScatterPuddles(
+        int[,] tiles,
+        Random rng,
+        int centerX,
+        int centerY,
+        int count,
+        bool avoidCenter = false)
+    {
+        var h = tiles.GetLength(0);
+        var w = tiles.GetLength(1);
+        for (var i = 0; i < count; i++)
+        {
+            for (var attempt = 0; attempt < 30; attempt++)
+            {
+                var tx = 2 + rng.Next(w - 4);
+                var ty = 2 + rng.Next(h - 4);
+                if (avoidCenter && tx == centerX && ty == centerY) continue;
+                if (tiles[ty, tx] != GameConstants.TileFloor) continue;
+                tiles[ty, tx] = GameConstants.TilePuddle;
+                break;
+            }
+        }
+    }
+
     public static EnemyKind[] EnemyPoolFor(int depth) => depth switch
     {
+        >= 3 => EnemyPoolDepth3,
         >= 2 => EnemyPoolDepth2,
         _ => EnemyPoolDepth1,
     };
 
     public static EnemyKind BossFor(int depth) => depth switch
     {
+        >= 3 => EnemyKind.SlimeKing,
         >= 2 => EnemyKind.Necromancer,
         _ => EnemyKind.Ogre,
     };
@@ -213,7 +251,7 @@ public static class RoomGen
         {
             for (var tx = 2; tx < w - 2; tx++)
             {
-                if (tiles[ty, tx] != GameConstants.TileFloor) continue;
+                if (tiles[ty, tx] is not (GameConstants.TileFloor or GameConstants.TilePuddle)) continue;
                 if (occupied.Contains((tx, ty))) continue;
                 var minEntry = int.MaxValue;
                 foreach (var (ex, ey) in entries)

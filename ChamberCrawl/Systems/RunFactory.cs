@@ -142,10 +142,11 @@ public static class RunFactory
                             EnemyKind.Ogre => Ai.OgrePhase1MaxMs,
                             EnemyKind.Specter => Ai.SpecterBlinkCooldownMs,
                             EnemyKind.Necromancer => def.FireCooldownMs,
+                            EnemyKind.SlimeKing => def.FireCooldownMs,
                             _ => def.FireCooldownMs,
                         },
                         Phase = enemy.Enemy == EnemyKind.Necromancer ? Ai.NecromancerSummonMs : 0,
-                        CanSplit = enemy.Enemy == EnemyKind.Slime,
+                        CanSplit = enemy.Enemy is EnemyKind.Slime or EnemyKind.SlimeKing,
                     });
                     break;
                 case ItemSpawn item when !node.ClaimedSpawns.Contains(index):
