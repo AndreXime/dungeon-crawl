@@ -2,6 +2,8 @@
 
 Roguelike top-down. Você é um **mago** que dispara **bolts** mágicos por salas de dungeon medieval.
 
+[Vídeo de gameplay](docs/gameplay.mp4)
+
 ## Objetivo
 
 Sobreviva a **5 andares** gerados proceduralmente, limpe salas, colete moedas, compre itens e derrote o boss de cada bioma. A vitória da run é no andar 5.
