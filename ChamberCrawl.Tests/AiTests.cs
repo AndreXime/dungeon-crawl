@@ -84,6 +84,38 @@ public class AiTests
     }
 
     [Fact]
+    public void Update_Slime_ChasesWhenPlayerIsClose()
+    {
+        var run = OpenRoomRun();
+        var player = run.Entities.OfType<PlayerEntity>().Single();
+        player.X = 200;
+        player.Y = 160;
+        var enemy = AddEnemy(run, EnemyKind.Slime, 140, 160);
+        enemy.Hp = Enemies.Defs[EnemyKind.Slime].Hp;
+        enemy.CanSplit = false;
+        enemy.Cooldown = 99999f;
+        var before = enemy.X;
+        Ai.Update(run, Dt);
+        Assert.True(enemy.X > before);
+    }
+
+    [Fact]
+    public void Update_Slime_ChasesAfterTakingDamageEvenFromFar()
+    {
+        var run = OpenRoomRun();
+        var player = run.Entities.OfType<PlayerEntity>().Single();
+        player.X = 300;
+        player.Y = 160;
+        var enemy = AddEnemy(run, EnemyKind.Slime, 100, 160);
+        enemy.Hp = Enemies.Defs[EnemyKind.Slime].Hp - 1;
+        enemy.CanSplit = false;
+        enemy.Cooldown = 99999f;
+        var before = enemy.X;
+        Ai.Update(run, Dt);
+        Assert.True(enemy.X > before);
+    }
+
+    [Fact]
     public void Update_Bat_ChasesPlayer()
     {
         var run = OpenRoomRun();
@@ -127,7 +159,7 @@ public class AiTests
         var boss = AddEnemy(run, EnemyKind.Ogre, 100, 160, 24);
         boss.Phase = 0;
         boss.Cooldown = Ai.OgrePhase1MaxMs;
-        boss.Hp = 40;
+        boss.Hp = Enemies.Defs[EnemyKind.Ogre].Hp;
         run.Entities.OfType<PlayerEntity>().Single().X = 300;
         var before = boss.X;
         Ai.Update(run, Dt);
@@ -213,6 +245,52 @@ public class AiTests
         Ai.Update(run, Dt);
         Assert.Single(run.Entities.OfType<ProjectileEntity>());
         Assert.True(enemy.Phase > 0);
+    }
+
+    [Fact]
+    public void Update_Acolyte_DoesNotShootThroughObstacle()
+    {
+        var run = OpenRoomRun();
+        var player = run.Entities.OfType<PlayerEntity>().Single();
+        player.X = 240;
+        player.Y = 176;
+        var enemy = AddEnemy(run, EnemyKind.Acolyte, 100, 176);
+        enemy.Cooldown = 0;
+        // Barril exatamente entre o acólito e o jogador.
+        run.Room.Tiles[5, 5] = GameConstants.TileBarrel;
+
+        Ai.Update(run, Dt);
+
+        Assert.Empty(run.Entities.OfType<ProjectileEntity>());
+    }
+
+    [Fact]
+    public void Update_Acolyte_StrafesUntilClearShotAroundObstacle()
+    {
+        var run = OpenRoomRun();
+        var player = run.Entities.OfType<PlayerEntity>().Single();
+        player.X = 240;
+        player.Y = 176;
+        var enemy = AddEnemy(run, EnemyKind.Acolyte, 100, 176);
+        enemy.Cooldown = 0;
+        run.Room.Tiles[5, 5] = GameConstants.TileBarrel;
+
+        var startY = enemy.Y;
+        for (var i = 0; i < 90; i++)
+        {
+            enemy.Cooldown = 0;
+            Ai.Update(run, Dt);
+            if (run.Entities.OfType<ProjectileEntity>().Any())
+                break;
+        }
+
+        Assert.True(MathF.Abs(enemy.Y - startY) > 6f, $"esperado desvio lateral, dy={enemy.Y - startY}");
+        Assert.True(
+            Collision.HasLineOfSight(
+                enemy.X, enemy.Y, player.X, player.Y,
+                GameConstants.ProjectileRadius, run.Room.Tiles),
+            "esperado linha de visão limpa após contornar");
+        Assert.NotEmpty(run.Entities.OfType<ProjectileEntity>());
     }
 
     [Fact]
@@ -412,7 +490,7 @@ public class AiTests
     {
         var run = OpenRoomRun();
         var boss = AddEnemy(run, EnemyKind.Ogre, 200, 160, 24);
-        boss.Hp = 40;
+        boss.Hp = Enemies.Defs[EnemyKind.Ogre].Hp;
         boss.IframeUntil = 10_000;
         run.TimeMs = 100;
         run.Entities.Add(new ProjectileEntity
@@ -421,6 +499,49 @@ public class AiTests
             Radius = 4, Damage = 5, Life = 1,
         });
         Combat.Update(run, new InputSnapshot(), Dt);
-        Assert.Equal(40, boss.Hp);
+        Assert.Equal(Enemies.Defs[EnemyKind.Ogre].Hp, boss.Hp);
+    }
+
+    [Fact]
+    public void Update_Bat_StrafesAroundBlockingObstacle()
+    {
+        var run = OpenRoomRun();
+        var player = run.Entities.OfType<PlayerEntity>().Single();
+        player.X = 300;
+        player.Y = 160;
+        var enemy = AddEnemy(run, EnemyKind.Bat, 100, 160);
+        // Coluna de obstáculos bloqueando a linha reta até o jogador.
+        for (var y = 3; y <= 7; y++)
+            run.Room.Tiles[y, 5] = GameConstants.TileCrate;
+
+        var startX = enemy.X;
+        var startY = enemy.Y;
+        for (var i = 0; i < 120; i++)
+            Ai.Update(run, Dt);
+
+        Assert.True(enemy.X > startX);
+        Assert.True(MathF.Abs(enemy.Y - startY) > 8f, $"esperado desvio lateral, dy={enemy.Y - startY}");
+        Assert.True(enemy.X > 5.5f * GameConstants.Cell, $"esperado passar a coluna, x={enemy.X}");
+    }
+
+    [Fact]
+    public void Update_Bat_StrafesAroundWideWall()
+    {
+        var run = OpenRoomRun();
+        var player = run.Entities.OfType<PlayerEntity>().Single();
+        player.X = 380;
+        player.Y = 176;
+        var enemy = AddEnemy(run, EnemyKind.Bat, 80, 176);
+        // Parede larga (2 colunas) cobrindo quase toda a altura útil.
+        for (var y = 2; y <= 8; y++)
+        {
+            run.Room.Tiles[y, 5] = GameConstants.TileCrate;
+            run.Room.Tiles[y, 6] = GameConstants.TileCrate;
+        }
+
+        for (var i = 0; i < 200; i++)
+            Ai.Update(run, Dt);
+
+        Assert.True(enemy.X > 7f * GameConstants.Cell, $"esperado contornar parede larga, x={enemy.X}");
     }
 }

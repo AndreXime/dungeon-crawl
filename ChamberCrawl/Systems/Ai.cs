@@ -18,8 +18,10 @@ public static class Ai
     public const float NecromancerSummonMs = 3200f;
     public const float NecromancerSummonEnragedMs = 2000f;
     public const int NecromancerMaxMinions = 3;
-    public const float NecromancerMinionHp = 1f;
-    public const float SlimeKingChildHp = 3f;
+    public const float NecromancerMinionHp = 2f;
+    public const float SlimeKingChildHp = 4f;
+    public const float BossEnrageSpeedMul = 1.4f;
+    public const float SlimeAggroRange = 96f;
     public const float SlimeKingChildRadiusScale = 1.15f;
     public const float IronGolemPhase0Ms = 6000f;
     public const float IronGolemChargeMs = 2200f;
@@ -28,7 +30,7 @@ public static class Ai
     public const float RuneLordSummonMs = 3600f;
     public const float RuneLordSummonEnragedMs = 2200f;
     public const int RuneLordMaxMinions = 3;
-    public const float RuneLordMinionHp = 2f;
+    public const float RuneLordMinionHp = 3f;
     private const float SlimeKingSplitOffsetPx = 14f;
     private const float SlimeSplitOffsetPx = 8f;
     private const float SlimeNoSplitCooldownMs = 999_999f;
@@ -53,7 +55,7 @@ public static class Ai
                     UpdateSkeleton(state, enemy, player, dt, rng);
                     break;
                 case EnemyKind.Slime:
-                    UpdateSlime(state, enemy, dt, random);
+                    UpdateSlime(state, enemy, player, dt, random);
                     break;
                 case EnemyKind.Specter:
                     UpdateSpecter(state, enemy, player, dt);
@@ -99,36 +101,212 @@ public static class Ai
     private static void Steer(RunState state, EnemyEntity enemy, float dirX, float dirY, float speed, float dt)
     {
         var scaled = speed * Movement.SpeedScale(enemy.X, enemy.Y, state.Room.Tiles, enemy.Enemy);
-        enemy.Vx = dirX * scaled;
-        enemy.Vy = dirY * scaled;
+        var step = scaled * dt;
+        if (step < 0.001f) return;
+
+        var dirLen = Length(dirX, dirY);
+        if (dirLen < 0.001f) return;
+        dirX /= dirLen;
+        dirY /= dirLen;
+
+        var probe = GameConstants.Cell * 2.5f;
+        var forwardClear = ProbeClearDistance(state, enemy, dirX, dirY, probe);
+        var stuckSide = MathF.Sign(enemy.Vx * -dirY + enemy.Vy * dirX);
+        float moveX = dirX;
+        float moveY = dirY;
+
+        // Só contorna quando a frente fecha (~1 tile). Longe, diagonais “mentem” mais clear.
+        if (forwardClear < GameConstants.Cell)
+        {
+            ReadOnlySpan<float> anglesDeg =
+            [
+                35, -35, 55, -55, 70, -70, 90, -90, 110, -110, 135, -135,
+            ];
+            var bestScore = float.NegativeInfinity;
+            foreach (var deg in anglesDeg)
+            {
+                var rad = deg * (MathF.PI / 180f);
+                var cos = MathF.Cos(rad);
+                var sin = MathF.Sin(rad);
+                var nx = dirX * cos - dirY * sin;
+                var ny = dirX * sin + dirY * cos;
+                var clear = ProbeClearDistance(state, enemy, nx, ny, probe);
+                if (clear < step * 2f) continue;
+
+                var progress = nx * dirX + ny * dirY;
+                var score = clear * (1f + MathF.Max(0f, progress) * 0.7f);
+                if (progress < 0f) score *= 0.15f;
+
+                var side = MathF.Sign(deg);
+                if (stuckSide != 0 && side == stuckSide) score += GameConstants.Cell * 1.5f;
+                if (stuckSide != 0 && side == -stuckSide) score -= GameConstants.Cell * 2.5f;
+
+                if (score <= bestScore) continue;
+                bestScore = score;
+                moveX = nx;
+                moveY = ny;
+            }
+        }
+
+        var x0 = enemy.X;
+        var y0 = enemy.Y;
+        enemy.Vx = moveX * scaled;
+        enemy.Vy = moveY * scaled;
         MoveWithTiles(state, enemy, enemy.Vx * dt, enemy.Vy * dt);
+
+        var moved = Length(enemy.X - x0, enemy.Y - y0);
+        if (moved >= step * 0.15f) return;
+
+        TryCornerEscape(state, enemy, dirX, dirY, scaled, dt, x0, y0, moved, stuckSide);
+    }
+
+    private static void TryCornerEscape(
+        RunState state,
+        EnemyEntity enemy,
+        float dirX,
+        float dirY,
+        float scaled,
+        float dt,
+        float x0,
+        float y0,
+        float bestMoved,
+        float preferSide)
+    {
+        Span<(float X, float Y, float Side)> laterals =
+        [
+            (-dirY, dirX, 1f),
+            (dirY, -dirX, -1f),
+            (-dirX, -dirY, 0f),
+        ];
+        var bestX = enemy.X;
+        var bestY = enemy.Y;
+        var bestVx = enemy.Vx;
+        var bestVy = enemy.Vy;
+        for (var pass = 0; pass < 2; pass++)
+        {
+            foreach (var (lx, ly, side) in laterals)
+            {
+                if (pass == 0 && preferSide != 0 && side != 0 && side != preferSide) continue;
+                var len = Length(lx, ly);
+                if (len < 0.001f) continue;
+                enemy.X = x0;
+                enemy.Y = y0;
+                enemy.Vx = lx / len * scaled;
+                enemy.Vy = ly / len * scaled;
+                MoveWithTiles(state, enemy, enemy.Vx * dt, enemy.Vy * dt);
+                var m = Length(enemy.X - x0, enemy.Y - y0);
+                if (m <= bestMoved) continue;
+                bestMoved = m;
+                bestX = enemy.X;
+                bestY = enemy.Y;
+                bestVx = enemy.Vx;
+                bestVy = enemy.Vy;
+            }
+            if (bestMoved >= scaled * dt * 0.15f) break;
+        }
+
+        enemy.X = bestX;
+        enemy.Y = bestY;
+        enemy.Vx = bestVx;
+        enemy.Vy = bestVy;
+    }
+
+    private static float ProbeClearDistance(
+        RunState state, EnemyEntity enemy, float nx, float ny, float maxDist)
+    {
+        const int samples = 10;
+        var tiles = state.Room.Tiles;
+        var entities = state.Entities;
+        for (var i = 1; i <= samples; i++)
+        {
+            var t = maxDist * i / samples;
+            if (Collision.CircleHitsSolid(
+                    enemy.X + nx * t, enemy.Y + ny * t, enemy.Radius, tiles, entities))
+                return maxDist * (i - 1) / samples;
+        }
+        return maxDist;
+    }
+
+    private static float Length(float x, float y) => MathF.Sqrt(x * x + y * y);
+
+    private static bool CanShootPlayer(RunState state, EnemyEntity enemy, PlayerEntity player) =>
+        Collision.HasLineOfSight(
+            enemy.X, enemy.Y, player.X, player.Y,
+            GameConstants.ProjectileRadius, state.Room.Tiles, state.Entities);
+
+    /// <summary>Quando o tiro está bloqueado, desliza lateralmente até achar ângulo limpo.</summary>
+    private static void SeekClearShot(
+        RunState state, EnemyEntity enemy, PlayerEntity player, float speed, float dt)
+    {
+        var dx = player.X - enemy.X;
+        var dy = player.Y - enemy.Y;
+        var dist = Length(dx, dy);
+        if (dist < 1f) return;
+        var fx = dx / dist;
+        var fy = dy / dist;
+        var px = -fy;
+        var py = fx;
+        var stuckSide = MathF.Sign(enemy.Vx * px + enemy.Vy * py);
+        if (stuckSide == 0) stuckSide = 1;
+
+        ReadOnlySpan<float> offsets = [20f, 36f, 52f, 72f, 96f, 128f];
+        float bestDx = px * stuckSide;
+        float bestDy = py * stuckSide;
+        var found = false;
+        foreach (var side in (ReadOnlySpan<float>)[stuckSide, -stuckSide])
+        {
+            foreach (var o in offsets)
+            {
+                var tx = enemy.X + px * o * side;
+                var ty = enemy.Y + py * o * side;
+                if (Collision.CircleHitsSolid(tx, ty, enemy.Radius, state.Room.Tiles, state.Entities))
+                    continue;
+                if (!Collision.HasLineOfSight(
+                        tx, ty, player.X, player.Y,
+                        GameConstants.ProjectileRadius, state.Room.Tiles, state.Entities))
+                    continue;
+                bestDx = tx - enemy.X;
+                bestDy = ty - enemy.Y;
+                found = true;
+                break;
+            }
+            if (found) break;
+        }
+
+        if (!found)
+        {
+            // Sem assento limpo perto: contorna + aproxima um pouco para abrir o ângulo.
+            bestDx = px * stuckSide + fx * 0.35f;
+            bestDy = py * stuckSide + fy * 0.35f;
+        }
+
+        var len = Length(bestDx, bestDy);
+        if (len < 0.001f) return;
+        Steer(state, enemy, bestDx / len, bestDy / len, speed, dt);
+    }
+
+    private static bool TryFireAtPlayer(
+        RunState state, EnemyEntity enemy, PlayerEntity player, float damage, float cooldownMs)
+    {
+        if (!CanShootPlayer(state, enemy, player)) return false;
+        Combat.SpawnEnemyProjectile(state, enemy, player.X, player.Y, damage);
+        enemy.Cooldown = cooldownMs;
+        return true;
     }
 
     private static void UpdateSkeleton(RunState state, EnemyEntity enemy, PlayerEntity player, float dt, Func<float>? rng)
     {
         var def = Enemies.Defs[EnemyKind.Skeleton];
-        var dx = player.X - enemy.X;
-        var dy = player.Y - enemy.Y;
-        var dist = MathF.Sqrt(dx * dx + dy * dy);
         var preferred = def.PreferredDist ?? 90f;
-
-        if (dist > 0)
-        {
-            float dirX, dirY;
-            if (dist > preferred + 8f) { dirX = dx / dist; dirY = dy / dist; }
-            else if (dist < preferred - 8f) { dirX = -dx / dist; dirY = -dy / dist; }
-            else { dirX = 0; dirY = 0; }
-            if (dirX != 0 || dirY != 0)
-                Steer(state, enemy, dirX, dirY, def.Speed, dt);
-        }
+        KeepPreferredDistance(state, enemy, player, preferred, def.Speed, dt);
 
         enemy.Cooldown -= dt * 1000f;
         if (enemy.Cooldown > 0) return;
-        Combat.SpawnEnemyProjectile(state, enemy, player.X, player.Y, def.Damage);
-        enemy.Cooldown = def.FireCooldownMs;
+        TryFireAtPlayer(state, enemy, player, def.Damage, def.FireCooldownMs);
     }
 
-    private static void UpdateSlime(RunState state, EnemyEntity enemy, float dt, Func<float> rng)
+    private static void UpdateSlime(
+        RunState state, EnemyEntity enemy, PlayerEntity player, float dt, Func<float> rng)
     {
         enemy.Cooldown -= dt * 1000f;
         if (enemy.Cooldown <= 0)
@@ -140,6 +318,17 @@ public static class Ai
             }
             if (!enemy.CanSplit)
                 enemy.Cooldown = SlimeNoSplitCooldownMs;
+        }
+
+        var def = Enemies.Defs[EnemyKind.Slime];
+        var dx = player.X - enemy.X;
+        var dy = player.Y - enemy.Y;
+        var dist = MathF.Sqrt(dx * dx + dy * dy);
+        var aggro = enemy.Hp < def.Hp || dist <= SlimeAggroRange;
+        if (aggro && dist > 0)
+        {
+            Steer(state, enemy, dx / dist, dy / dist, def.Speed, dt);
+            return;
         }
 
         UpdateSlimeWander(state, enemy, dt, rng);
@@ -194,18 +383,19 @@ public static class Ai
     private static void MoveWithTiles(RunState state, EnemyEntity enemy, float dx, float dy)
     {
         var tiles = state.Room.Tiles;
+        var entities = state.Entities;
         var nextX = enemy.X + dx;
         var nextY = enemy.Y + dy;
 
-        if (!Collision.CircleHitsSolid(nextX, nextY, enemy.Radius, tiles))
+        if (!Collision.CircleHitsSolid(nextX, nextY, enemy.Radius, tiles, entities))
         {
             enemy.X = nextX;
             enemy.Y = nextY;
             return;
         }
-        if (!Collision.CircleHitsSolid(nextX, enemy.Y, enemy.Radius, tiles)) enemy.X = nextX;
+        if (!Collision.CircleHitsSolid(nextX, enemy.Y, enemy.Radius, tiles, entities)) enemy.X = nextX;
         else enemy.Vx = 0;
-        if (!Collision.CircleHitsSolid(enemy.X, nextY, enemy.Radius, tiles)) enemy.Y = nextY;
+        if (!Collision.CircleHitsSolid(enemy.X, nextY, enemy.Radius, tiles, entities)) enemy.Y = nextY;
         else enemy.Vy = 0;
     }
 
@@ -233,19 +423,25 @@ public static class Ai
     {
         var def = Enemies.Defs[EnemyKind.Acolyte];
         var orbit = def.PreferredDist ?? 70f;
-        enemy.Phase += dt * AcolyteOrbitSpeed;
-        var targetX = player.X + MathF.Cos(enemy.Phase) * orbit;
-        var targetY = player.Y + MathF.Sin(enemy.Phase) * orbit;
-        var dx = targetX - enemy.X;
-        var dy = targetY - enemy.Y;
-        var dist = MathF.Sqrt(dx * dx + dy * dy);
-        if (dist > 1f)
-            Steer(state, enemy, dx / dist, dy / dist, def.Speed, dt);
+        if (!CanShootPlayer(state, enemy, player))
+        {
+            SeekClearShot(state, enemy, player, def.Speed, dt);
+        }
+        else
+        {
+            enemy.Phase += dt * AcolyteOrbitSpeed;
+            var targetX = player.X + MathF.Cos(enemy.Phase) * orbit;
+            var targetY = player.Y + MathF.Sin(enemy.Phase) * orbit;
+            var dx = targetX - enemy.X;
+            var dy = targetY - enemy.Y;
+            var dist = MathF.Sqrt(dx * dx + dy * dy);
+            if (dist > 1f)
+                Steer(state, enemy, dx / dist, dy / dist, def.Speed, dt);
+        }
 
         enemy.Cooldown -= dt * 1000f;
         if (enemy.Cooldown > 0) return;
-        Combat.SpawnEnemyProjectile(state, enemy, player.X, player.Y, def.Damage);
-        enemy.Cooldown = def.FireCooldownMs;
+        TryFireAtPlayer(state, enemy, player, def.Damage, def.FireCooldownMs);
     }
 
     private static void UpdateSpecter(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
@@ -328,12 +524,11 @@ public static class Ai
         var dy1 = player.Y - enemy.Y;
         var dist1 = MathF.Sqrt(dx1 * dx1 + dy1 * dy1);
         if (dist1 > 0)
-            Steer(state, enemy, dx1 / dist1, dy1 / dist1, def.Speed, dt);
+            Steer(state, enemy, dx1 / dist1, dy1 / dist1, def.Speed * BossEnrageSpeedMul, dt);
 
         enemy.Cooldown -= dt * 1000f;
         if (enemy.Cooldown > 0) return;
-        Combat.SpawnEnemyProjectile(state, enemy, player.X, player.Y, def.Damage);
-        enemy.Cooldown = def.FireCooldownMs;
+        TryFireAtPlayer(state, enemy, player, def.Damage, def.FireCooldownMs);
     }
 
     private static void UpdateNecromancer(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
@@ -341,25 +536,16 @@ public static class Ai
         var def = Enemies.Defs[EnemyKind.Necromancer];
         var enraged = enemy.Hp <= def.Hp * 0.5f;
         var preferred = def.PreferredDist ?? 110f;
-
-        var dx = player.X - enemy.X;
-        var dy = player.Y - enemy.Y;
-        var dist = MathF.Sqrt(dx * dx + dy * dy);
-        if (dist > 0)
-        {
-            float dirX, dirY;
-            if (dist > preferred + 10f) { dirX = dx / dist; dirY = dy / dist; }
-            else if (dist < preferred - 10f) { dirX = -dx / dist; dirY = -dy / dist; }
-            else { dirX = 0; dirY = 0; }
-            if (dirX != 0 || dirY != 0)
-                Steer(state, enemy, dirX, dirY, def.Speed, dt);
-        }
+        var moveSpeed = enraged ? def.Speed * BossEnrageSpeedMul : def.Speed;
+        KeepPreferredDistance(state, enemy, player, preferred, moveSpeed, dt);
 
         enemy.Cooldown -= dt * 1000f;
         if (enemy.Cooldown <= 0)
         {
-            Combat.SpawnEnemyProjectile(state, enemy, player.X, player.Y, Math.Max(1, def.Damage + (enraged ? 1 : 0)));
-            enemy.Cooldown = enraged ? def.FireCooldownMs * 0.7f : def.FireCooldownMs;
+            TryFireAtPlayer(
+                state, enemy, player,
+                Math.Max(1, def.Damage + (enraged ? 1 : 0)),
+                enraged ? def.FireCooldownMs * 0.7f : def.FireCooldownMs);
         }
 
         enemy.Phase -= dt * 1000f;
@@ -398,24 +584,17 @@ public static class Ai
     private static void UpdateSlimeKing(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
     {
         var def = Enemies.Defs[EnemyKind.SlimeKing];
+        var enraged = enemy.Hp <= def.Hp * 0.5f;
         var preferred = def.PreferredDist ?? 80f;
-        var dx = player.X - enemy.X;
-        var dy = player.Y - enemy.Y;
-        var dist = MathF.Sqrt(dx * dx + dy * dy);
-        if (dist > 0)
-        {
-            float dirX, dirY;
-            if (dist > preferred + 10f) { dirX = dx / dist; dirY = dy / dist; }
-            else if (dist < preferred - 10f) { dirX = -dx / dist; dirY = -dy / dist; }
-            else { dirX = 0; dirY = 0; }
-            if (dirX != 0 || dirY != 0)
-                Steer(state, enemy, dirX, dirY, def.Speed, dt);
-        }
+        var moveSpeed = enraged ? def.Speed * BossEnrageSpeedMul : def.Speed;
+        KeepPreferredDistance(state, enemy, player, preferred, moveSpeed, dt);
 
         enemy.Cooldown -= dt * 1000f;
         if (enemy.Cooldown > 0) return;
-        Combat.SpawnEnemyProjectile(state, enemy, player.X, player.Y, def.Damage);
-        enemy.Cooldown = def.FireCooldownMs;
+        TryFireAtPlayer(
+            state, enemy, player,
+            def.Damage + (enraged ? 1 : 0),
+            enraged ? def.FireCooldownMs * 0.75f : def.FireCooldownMs);
     }
 
     private static void UpdateIronGolem(RunState state, EnemyEntity enemy, PlayerEntity player, float dt)
@@ -432,10 +611,7 @@ public static class Ai
 
             enemy.Cooldown -= dt * 1000f;
             if (enemy.Cooldown <= 0)
-            {
-                Combat.SpawnEnemyProjectile(state, enemy, player.X, player.Y, def.Damage);
-                enemy.Cooldown = def.FireCooldownMs;
-            }
+                TryFireAtPlayer(state, enemy, player, def.Damage, def.FireCooldownMs);
 
             if (state.TimeMs >= enemy.IframeUntil || enemy.Hp <= def.Hp * 0.5f)
             {
@@ -448,16 +624,18 @@ public static class Ai
 
         if (mode == 1)
         {
+            var enraged = enemy.Hp <= def.Hp * 0.5f;
+            var charge = (def.ChargeSpeed ?? def.Speed) * (enraged ? BossEnrageSpeedMul : 1f);
             var dx = player.X - enemy.X;
             var dy = player.Y - enemy.Y;
             var dist = MathF.Sqrt(dx * dx + dy * dy);
             if (dist > 0)
-                Steer(state, enemy, dx / dist, dy / dist, def.ChargeSpeed ?? def.Speed, dt);
+                Steer(state, enemy, dx / dist, dy / dist, charge, dt);
 
             enemy.Cooldown -= dt * 1000f;
             if (enemy.Cooldown > 0) return;
 
-            if (enemy.Hp <= def.Hp * 0.5f)
+            if (enraged)
             {
                 enemy.Phase = 2;
                 enemy.Cooldown = IronGolemVulnerableMs;
@@ -482,6 +660,12 @@ public static class Ai
     private static void KeepPreferredDistance(
         RunState state, EnemyEntity enemy, PlayerEntity player, float preferred, float speed, float dt)
     {
+        if (!CanShootPlayer(state, enemy, player))
+        {
+            SeekClearShot(state, enemy, player, speed, dt);
+            return;
+        }
+
         var dx = player.X - enemy.X;
         var dy = player.Y - enemy.Y;
         var dist = MathF.Sqrt(dx * dx + dy * dy);
@@ -498,15 +682,19 @@ public static class Ai
     {
         var def = Enemies.Defs[EnemyKind.RuneLord];
         var enraged = enemy.Hp <= def.Hp * 0.5f;
-        KeepPreferredDistance(state, enemy, player, def.PreferredDist ?? 105f, def.Speed, dt);
+        var moveSpeed = enraged ? def.Speed * BossEnrageSpeedMul : def.Speed;
+        KeepPreferredDistance(state, enemy, player, def.PreferredDist ?? 105f, moveSpeed, dt);
 
         enemy.Cooldown -= dt * 1000f;
         if (enemy.Cooldown <= 0)
         {
-            Combat.SpawnEnemyProjectile(state, enemy, player.X, player.Y, def.Damage + (enraged ? 1 : 0));
-            if (enraged)
+            if (!TryFireAtPlayer(
+                    state, enemy, player,
+                    def.Damage + (enraged ? 1 : 0),
+                    enraged ? def.FireCooldownMs * 0.65f : def.FireCooldownMs))
+                return;
+            if (enraged && CanShootPlayer(state, enemy, player))
                 Combat.SpawnEnemyProjectile(state, enemy, player.X + 24f, player.Y - 18f, def.Damage);
-            enemy.Cooldown = enraged ? def.FireCooldownMs * 0.65f : def.FireCooldownMs;
         }
 
         enemy.Phase -= dt * 1000f;
