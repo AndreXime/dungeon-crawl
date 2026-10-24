@@ -48,6 +48,24 @@ public class MovementTests
     }
 
     [Fact]
+    public void Update_BlocksPlayerAgainstLockedDoor()
+    {
+        var run = OpenRunWithTile(GameConstants.TileDoor);
+        var player = run.Entities.OfType<PlayerEntity>().Single();
+        run.Entities.Add(new DoorEntity
+        {
+            Id = "door",
+            Locked = true,
+            X = player.X + GameConstants.Cell,
+            Y = player.Y,
+            Radius = GameConstants.Cell / 2f,
+        });
+        var startX = player.X;
+        Movement.Update(run, new InputSnapshot(1, 0, 0, 0, false), 0.2f);
+        Assert.True(player.X < startX + 8f);
+    }
+
+    [Fact]
     public void SpeedScale_IgnoresPuddleForSlimeKinds()
     {
         var tiles = new int[GameConstants.RoomH, GameConstants.RoomW];

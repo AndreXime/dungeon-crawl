@@ -19,19 +19,20 @@ public static class Movement
         var nextX = player.X + player.Vx * dtSeconds;
         var nextY = player.Y + player.Vy * dtSeconds;
         var tiles = state.Room.Tiles;
+        var entities = state.Entities;
         var radius = GameConstants.PlayerRadius;
 
-        if (!Collision.CircleHitsSolid(nextX, nextY, radius, tiles))
+        if (!Collision.CircleHitsSolid(nextX, nextY, radius, tiles, entities))
         {
             player.X = nextX;
             player.Y = nextY;
             return;
         }
 
-        if (!Collision.CircleHitsSolid(nextX, player.Y, radius, tiles)) player.X = nextX;
+        if (!Collision.CircleHitsSolid(nextX, player.Y, radius, tiles, entities)) player.X = nextX;
         else player.Vx = 0;
 
-        if (!Collision.CircleHitsSolid(player.X, nextY, radius, tiles)) player.Y = nextY;
+        if (!Collision.CircleHitsSolid(player.X, nextY, radius, tiles, entities)) player.Y = nextY;
         else player.Vy = 0;
     }
 

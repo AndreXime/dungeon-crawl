@@ -20,6 +20,21 @@ public class CollisionTests
     }
 
     [Fact]
+    public void HasLineOfSight_BlockedByBarrelBetweenPoints()
+    {
+        var tiles = new[,]
+        {
+            { F, F, F },
+            { F, GameConstants.TileBarrel, F },
+            { F, F, F },
+        };
+        Assert.False(Collision.HasLineOfSight(
+            Cell * 0.5f, Cell * 1.5f, Cell * 2.5f, Cell * 1.5f, 4, tiles));
+        Assert.True(Collision.HasLineOfSight(
+            Cell * 0.5f, Cell * 0.5f, Cell * 2.5f, Cell * 0.5f, 4, tiles));
+    }
+
+    [Fact]
     public void CircleHitsSolid_BlocksAgainstWalls()
     {
         var tiles = new[,] { { W, W }, { W, F } };
@@ -64,6 +79,26 @@ public class CollisionTests
 
         var pedestal = new[,] { { GameConstants.TilePedestal } };
         Assert.True(Collision.CircleHitsSolid(GameConstants.Cell * 0.5f, GameConstants.Cell * 0.5f, 6, pedestal));
+    }
+
+    [Fact]
+    public void CircleHitsSolid_BlocksLockedDoorButAllowsUnlocked()
+    {
+        var tiles = new[,] { { GameConstants.TileDoor } };
+        var x = GameConstants.Cell * 0.5f;
+        var y = GameConstants.Cell * 0.5f;
+        var locked = new List<Entity>
+        {
+            new DoorEntity { Locked = true, X = x, Y = y, Radius = GameConstants.Cell / 2f },
+        };
+        var unlocked = new List<Entity>
+        {
+            new DoorEntity { Locked = false, X = x, Y = y, Radius = GameConstants.Cell / 2f },
+        };
+
+        Assert.False(Collision.CircleHitsSolid(x, y, 6, tiles));
+        Assert.True(Collision.CircleHitsSolid(x, y, 6, tiles, locked));
+        Assert.False(Collision.CircleHitsSolid(x, y, 6, tiles, unlocked));
     }
 
     [Fact]

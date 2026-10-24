@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ChamberCrawl.Models;
 
 namespace ChamberCrawl.Systems;
@@ -15,7 +16,30 @@ public static class Collision
         return dx * dx + dy * dy < radiusSum * radiusSum;
     }
 
-    public static bool CircleHitsSolid(float x, float y, float radius, int[,] tiles)
+    /// <summary>True se o trajeto entre dois pontos não cruza tile sólido (ex.: tiro).</summary>
+    public static bool HasLineOfSight(
+        float x0, float y0, float x1, float y1, float radius, int[,] tiles,
+        IEnumerable<Entity>? entities = null)
+    {
+        var dx = x1 - x0;
+        var dy = y1 - y0;
+        var dist = MathF.Sqrt(dx * dx + dy * dy);
+        if (dist < 0.001f) return true;
+        var samples = Math.Max(4, (int)MathF.Ceiling(dist / (GameConstants.Cell * 0.25f)));
+        for (var i = 1; i < samples; i++)
+        {
+            var t = (float)i / samples;
+            if (CircleHitsSolid(x0 + dx * t, y0 + dy * t, radius, tiles, entities))
+                return false;
+        }
+        return true;
+    }
+
+    public static bool CircleHitsSolid(float x, float y, float radius, int[,] tiles) =>
+        CircleHitsSolid(x, y, radius, tiles, entities: null);
+
+    public static bool CircleHitsSolid(
+        float x, float y, float radius, int[,] tiles, IEnumerable<Entity>? entities)
     {
         for (var i = 0; i < SampleCount; i++)
         {
@@ -23,6 +47,14 @@ public static class Collision
             var tx = (int)MathF.Floor((x + MathF.Cos(angle) * radius) / GameConstants.Cell);
             var ty = (int)MathF.Floor((y + MathF.Sin(angle) * radius) / GameConstants.Cell);
             if (IsTileSolid(tx, ty, tiles)) return true;
+        }
+
+        if (entities is null) return false;
+        foreach (var entity in entities)
+        {
+            if (entity is not DoorEntity { Locked: true } door) continue;
+            if (CirclesOverlap(x, y, radius, door.X, door.Y, door.Radius))
+                return true;
         }
         return false;
     }
