@@ -20,7 +20,7 @@ Hoje: depths 1–5 via portal após o boss (vitória só no depth 5). Andar 2 (C
 | | |
 |---|---|
 | **Clima** | Pedra úmida, exploração tensa |
-| **Tiles** | floor / wall atuais |
+| **Tiles** | `floor-1` / `wall-1` / `door-1` (fechada). Aberta: `wall` + `door-open` |
 | **Inimigos** | Morcego, Esqueleto, Slime |
 | **Boss** | Ogre (charge + projétil) |
 | **Música** | `FirstFloorTheme` |
@@ -37,7 +37,7 @@ Hoje: depths 1–5 via portal após o boss (vitória só no depth 5). Andar 2 (C
 | **Inimigos** | Esqueleto (mais comum), Morcego; **Espectro** (pisca/teleporta, frágil, atravessa paredes) |
 | **Boss** | **Necromante** — mantém distância, orbes roxos, invoca esqueletos fracos (cap 3; enrage em 50% HP) |
 | **Obstáculos** | Mesmos do andar 1 por enquanto |
-| **Tiles** | `floor-2` / `wall-2` / `door-2` / `door-tile-2` |
+| **Tiles** | `floor-2` / `wall-2` / `door-2`. Aberta: `wall` + `door-open` |
 | **Música** | `CatacombsTheme` (fonte Strudel pronta; exportar WAV) |
 | **Diff** | +1 inimigo médio nas salas normais |
 | **Status** | Feito (tiles + Espectro + Necromante + tema Strudel) |
@@ -49,7 +49,7 @@ Hoje: depths 1–5 via portal após o boss (vitória só no depth 5). Andar 2 (C
 | | |
 |---|---|
 | **Clima** | Verde-limo, água rasa, escorregadio |
-| **Tiles** | `floor-3` / `wall-3` / `door-3` / `door-tile-3` |
+| **Tiles** | `floor-3` / `wall-3` / `door-3`. Aberta: `wall` + `door-open` |
 | **Inimigos** | Slime (dominante); **Rato** (rápido, melee); Morcego |
 | **Boss** | **Rei Lodo** — spit + divide em 2 slimes médios ao morrer (1x) |
 | **Obstáculos** | Poças (`TilePuddle`) — 50% speed; Slime/Rei Lodo imunes |
@@ -64,7 +64,7 @@ Hoje: depths 1–5 via portal após o boss (vitória só no depth 5). Andar 2 (C
 | | |
 |---|---|
 | **Clima** | Ferro, tochas, disciplina militar |
-| **Tiles** | `floor-4` / `wall-4` / `door-4` / `door-tile-4` |
+| **Tiles** | `floor-4` / `wall-4` / `door-4`. Aberta: `wall` + `door-open` |
 | **Inimigos** | **Guarda** (lento, tank, melee); Esqueleto; Slime raro |
 | **Boss** | **Golem de Ferro** — projéteis → charge → vulnerável (2x dano, tint laranja) |
 | **Obstáculos** | Mesmos genéricos (próximo: barricadas/bigornas) |
@@ -79,7 +79,7 @@ Hoje: depths 1–5 via portal após o boss (vitória só no depth 5). Andar 2 (C
 | | |
 |---|---|
 | **Clima** | Roxo/carmesim, runas, ritual |
-| **Tiles** | `floor-5` / `wall-5` / `door-5` / `door-tile-5` |
+| **Tiles** | `floor-5` / `wall-5` / `door-5`. Aberta: `wall` + `door-open` |
 | **Inimigos** | Espectro, Guarda, **Acólito** (orbita e atira magia) |
 | **Boss** | **Senhor das Runas** — orbes, invoca Acólitos, burst em ≤50% HP |
 | **Obstáculos** | `TileRune` (dano 1 / iframe), `TilePedestal` (sólido) |

@@ -14,12 +14,26 @@ public static class EntityRenderer
             if (!TrySprite(entity, state, atlas, out var texture, out var tint, out var opacity))
                 continue;
 
-            var size = SpriteDrawSize(entity, state);
-            var dest = new Rectangle(
-                (int)MathF.Round(entity.X - size / 2f),
-                (int)MathF.Round(entity.Y - size / 2f),
-                (int)MathF.Round(size),
-                (int)MathF.Round(size));
+            Rectangle dest;
+            if (entity is DoorEntity)
+            {
+                var tx = (int)MathF.Floor(entity.X / GameConstants.Cell);
+                var ty = (int)MathF.Floor(entity.Y / GameConstants.Cell);
+                dest = new Rectangle(
+                    tx * GameConstants.Cell,
+                    ty * GameConstants.Cell,
+                    GameConstants.Cell,
+                    GameConstants.Cell);
+            }
+            else
+            {
+                var size = SpriteDrawSize(entity, state);
+                dest = new Rectangle(
+                    (int)MathF.Round(entity.X - size / 2f),
+                    (int)MathF.Round(entity.Y - size / 2f),
+                    (int)MathF.Round(size),
+                    (int)MathF.Round(size));
+            }
             spriteBatch.Draw(texture, dest, tint * opacity);
         }
     }
@@ -44,7 +58,8 @@ public static class EntityRenderer
             EnemyEntity => MathF.Max(entity.Radius * 2.8f, 26f),
             PickupEntity { Pickup: PickupKind.Portal } => 36f,
             PickupEntity => 28f,
-            DoorEntity => 30f,
+            // Mesmo footprint do tile (wall + door-open); 30px centralizado deixava vão embaixo.
+            DoorEntity => GameConstants.Cell,
             _ => MathF.Max(entity.Radius * 2f, 16f),
         };
     }

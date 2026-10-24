@@ -29,30 +29,36 @@ public class FloorThemesTests
     }
 
     [Theory]
-    [InlineData(GameConstants.TileFloor, 1, "floor")]
-    [InlineData(GameConstants.TileWall, 1, "wall")]
-    [InlineData(GameConstants.TileDoor, 1, "door-tile")]
+    [InlineData(GameConstants.TileFloor, 1, "floor-1")]
+    [InlineData(GameConstants.TileWall, 1, "wall-1")]
+    [InlineData(GameConstants.TileDoor, 1, "wall-1")]
     [InlineData(GameConstants.TileFloor, 2, "floor-2")]
     [InlineData(GameConstants.TileWall, 2, "wall-2")]
-    [InlineData(GameConstants.TileDoor, 2, "door-tile-2")]
+    [InlineData(GameConstants.TileDoor, 2, "wall-2")]
     [InlineData(GameConstants.TileFloor, 3, "floor-3")]
     [InlineData(GameConstants.TileWall, 3, "wall-3")]
-    [InlineData(GameConstants.TileDoor, 3, "door-tile-3")]
+    [InlineData(GameConstants.TileDoor, 3, "wall-3")]
     [InlineData(GameConstants.TileFloor, 4, "floor-4")]
     [InlineData(GameConstants.TileWall, 4, "wall-4")]
-    [InlineData(GameConstants.TileDoor, 4, "door-tile-4")]
+    [InlineData(GameConstants.TileDoor, 4, "wall-4")]
     [InlineData(GameConstants.TileFloor, 5, "floor-5")]
     [InlineData(GameConstants.TileWall, 5, "wall-5")]
-    [InlineData(GameConstants.TileDoor, 5, "door-tile-5")]
+    [InlineData(GameConstants.TileDoor, 5, "wall-5")]
     public void TextureForTile_UsesDepthSuffix(int tile, int depth, string expected)
     {
         Assert.Equal(expected, FloorThemes.TextureForTile(tile, depth));
     }
 
     [Fact]
+    public void DoorOpenTexture_IsSharedOverlay()
+    {
+        Assert.Equal("door-open", FloorThemes.DoorOpenTexture);
+    }
+
+    [Fact]
     public void DoorTexture_UsesDepthSuffix()
     {
-        Assert.Equal("door", FloorThemes.DoorTexture(1));
+        Assert.Equal("door-1", FloorThemes.DoorTexture(1));
         Assert.Equal("door-2", FloorThemes.DoorTexture(2));
         Assert.Equal("door-3", FloorThemes.DoorTexture(3));
         Assert.Equal("door-4", FloorThemes.DoorTexture(4));

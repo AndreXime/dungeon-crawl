@@ -37,10 +37,13 @@ public static class FloorThemes
         };
     }
 
+    public const string DoorOpenTexture = "door-open";
+
     public static string TextureForTile(int tile, int depth = 1) => tile switch
     {
         GameConstants.TileWall => DepthTexture("wall", depth),
-        GameConstants.TileDoor => DepthTexture("door-tile", depth),
+        // Porta aberta = wall do andar + overlay door-open (ver TilemapRenderer).
+        GameConstants.TileDoor => DepthTexture("wall", depth),
         GameConstants.TileCrate => "crate",
         GameConstants.TileBarrel => "barrel",
         GameConstants.TileSpike => "spike",
@@ -51,6 +54,7 @@ public static class FloorThemes
         _ => DepthTexture("floor", depth),
     };
 
+    /// <summary>Sprite da porta fechada/trancada (entidade), por andar.</summary>
     public static string DoorTexture(int depth) => DepthTexture("door", depth);
 
     /// <summary>Obstáculos são sprites sobre o chão; parede/porta/chão não usam overlay.</summary>
@@ -70,12 +74,9 @@ public static class FloorThemes
         return textureName.Length > 0;
     }
 
-    private static string DepthTexture(string baseName, int depth) => depth switch
+    private static string DepthTexture(string baseName, int depth)
     {
-        >= 5 => $"{baseName}-5",
-        >= 4 => $"{baseName}-4",
-        >= 3 => $"{baseName}-3",
-        >= 2 => $"{baseName}-2",
-        _ => baseName,
-    };
+        var d = depth < 1 ? 1 : depth > 5 ? 5 : depth;
+        return $"{baseName}-{d}";
+    }
 }
